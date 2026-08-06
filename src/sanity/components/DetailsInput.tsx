@@ -20,10 +20,17 @@ export function DetailsInput(props: ArrayOfPrimitivesInputProps) {
           props.onChange(unset())
           return
         }
-        // Keep blank lines while typing; drop trailing empties on the edges only
-        // so Enter for a new line doesn’t clear the field.
-        const items = next.split('\n')
-        props.onChange(set(items))
+        // Keep blank lines while typing so Enter can start a new detail.
+        props.onChange(set(next.split('\n')))
+      }}
+      onBlur={(event) => {
+        props.elementProps.onBlur?.(event)
+        const items = event.currentTarget.value
+          .split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean)
+        if (items.length === 0) props.onChange(unset())
+        else props.onChange(set(items))
       }}
     />
   )
