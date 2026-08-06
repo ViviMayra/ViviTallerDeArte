@@ -4,12 +4,14 @@ import {NextIntlClientProvider, hasLocale} from 'next-intl'
 import {getMessages, setRequestLocale} from 'next-intl/server'
 import {Figtree, Syne} from 'next/font/google'
 import {CartProvider} from '@/lib/cart'
-import {getSettings, getSections} from '@/lib/content'
+import {getSettings, getPiecesByCategory} from '@/lib/content'
+import {collectPieceTypes} from '@/lib/piece-types'
 import {Header} from '@/components/Header'
 import {Footer} from '@/components/Footer'
 import {CartDrawer} from '@/components/CartDrawer'
 import {JsonLd} from '@/components/JsonLd'
 import {routing} from '@/i18n/routing'
+import type {Locale} from '@/lib/types'
 import '../globals.css'
 
 const bodyFont = Figtree({
@@ -51,13 +53,18 @@ export default async function LocaleLayout({
 
   const messages = await getMessages()
   const settings = await getSettings()
-  const [joyeriaSections, ceramicaSections, ilustracionesSections, pinturaSections] =
+  const localeKey = locale as Locale
+  const [joyeriaPieces, ceramicaPieces, ilustracionesPieces, pinturaPieces] =
     await Promise.all([
-      getSections('joyeria'),
-      getSections('ceramica'),
-      getSections('ilustraciones'),
-      getSections('pintura'),
+      getPiecesByCategory('joyeria'),
+      getPiecesByCategory('ceramica'),
+      getPiecesByCategory('ilustraciones'),
+      getPiecesByCategory('pintura'),
     ])
+  const joyeriaTypes = collectPieceTypes(joyeriaPieces, localeKey)
+  const ceramicaTypes = collectPieceTypes(ceramicaPieces, localeKey)
+  const ilustracionesTypes = collectPieceTypes(ilustracionesPieces, localeKey)
+  const pinturaTypes = collectPieceTypes(pinturaPieces, localeKey)
 
   const localBusiness = {
     '@context': 'https://schema.org',
@@ -97,10 +104,10 @@ export default async function LocaleLayout({
           <CartProvider>
             <JsonLd data={localBusiness} />
             <Header
-              joyeriaSections={joyeriaSections}
-              ceramicaSections={ceramicaSections}
-              ilustracionesSections={ilustracionesSections}
-              pinturaSections={pinturaSections}
+              joyeriaTypes={joyeriaTypes}
+              ceramicaTypes={ceramicaTypes}
+              ilustracionesTypes={ilustracionesTypes}
+              pinturaTypes={pinturaTypes}
             />
             <main className="flex-1">{children}</main>
             <Footer settings={settings} />

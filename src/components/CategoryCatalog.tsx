@@ -2,30 +2,30 @@ import {getLocale, getTranslations} from 'next-intl/server'
 import {JumpNav} from '@/components/JumpNav'
 import {PieceCard} from '@/components/PieceCard'
 import {ImageCarousel} from '@/components/ImageCarousel'
+import {collectPieceTypes, pieceTypeSlug} from '@/lib/piece-types'
 import {t} from '@/lib/locale'
-import type {Category, Locale, Piece, SanityImage, SectionRef} from '@/lib/types'
+import type {Category, Locale, Piece, SanityImage} from '@/lib/types'
 
 export async function CategoryCatalog({
   title,
   pieces,
-  sections,
   carouselSlides = [],
 }: {
   title: string
   category: Category
   pieces: Piece[]
-  sections: SectionRef[]
   carouselSlides?: SanityImage[]
 }) {
   const locale = (await getLocale()) as Locale
   const common = await getTranslations('common')
+  const pieceTypes = collectPieceTypes(pieces, locale)
 
-  const jumpItems = sections.map((s) => ({
-    id: s.slug,
-    label: t(s.title, locale),
+  const jumpItems = pieceTypes.map((type) => ({
+    id: type.slug,
+    label: t(type.label, locale),
   }))
 
-  const unsectioned = pieces.filter((p) => !p.section)
+  const plain = pieces.filter((p) => !pieceTypeSlug(p))
 
   return (
     <div>
@@ -40,7 +40,7 @@ export async function CategoryCatalog({
       )}
 
       <div className="mx-auto max-w-7xl space-y-16 px-4 py-10 md:px-8">
-        {sections.length === 0 ? (
+        {pieceTypes.length === 0 ? (
           <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
             {pieces.map((piece) => (
               <PieceCard key={piece._id} piece={piece} />
@@ -48,24 +48,24 @@ export async function CategoryCatalog({
           </div>
         ) : (
           <>
-            {unsectioned.length > 0 && (
+            {plain.length > 0 && (
               <section>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-                  {unsectioned.map((piece) => (
+                  {plain.map((piece) => (
                     <PieceCard key={piece._id} piece={piece} />
                   ))}
                 </div>
               </section>
             )}
-            {sections.map((section) => {
+            {pieceTypes.map((type) => {
               const subset = pieces.filter(
-                (p) => p.section?._id === section._id,
+                (p) => pieceTypeSlug(p) === type.slug,
               )
               if (!subset.length) return null
               return (
-                <section key={section._id} id={section.slug}>
+                <section key={type.slug} id={type.slug}>
                   <h2 className="mb-8 font-[family-name:var(--font-display)] text-xl uppercase tracking-[0.1em]">
-                    {t(section.title, locale)}
+                    {t(type.label, locale)}
                   </h2>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
                     {subset.map((piece) => (

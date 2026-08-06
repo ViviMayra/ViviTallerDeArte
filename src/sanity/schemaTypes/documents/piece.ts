@@ -29,23 +29,11 @@ export const piece = defineType({
         }),
     }),
     defineField({
-      name: 'section',
-      title: 'Tipo de pieza (opcional)',
+      name: 'pieceType',
+      title: '¿Qué tipo de pieza es? (opcional)',
       description:
-        'Ejemplos: Aretes, Pulseras, Anillos, Collares… Créalos en “Subsecciones” de esta categoría. Si no usas grupos, déjalo vacío.',
-      type: 'reference',
-      to: [{type: 'section'}],
-      options: {
-        filter: ({document}) => {
-          if (!document?.category) {
-            return {filter: 'false'}
-          }
-          return {
-            filter: 'category == $category',
-            params: {category: document.category},
-          }
-        },
-      },
+        'Escríbelo aquí si quieres agrupar en la web. Ejemplos: Aretes, Pulseras, Anillos, Collares, Cuencos… Si no importa, déjalo vacío.',
+      type: 'optionalLocalizedString',
     }),
     defineField({
       name: 'photos',
@@ -159,10 +147,11 @@ export const piece = defineType({
       title: 'title.es',
       media: 'photos.0',
       gender: 'gender',
+      pieceType: 'pieceType.es',
       status: 'status',
       price: 'price',
     },
-    prepare({title, media, gender, status, price}) {
+    prepare({title, media, gender, pieceType, status, price}) {
       const statusLabel =
         status === 'sold' ? 'Vendido' : status === 'hidden' ? 'Oculto' : 'Disponible'
       const genderLabel =
@@ -175,7 +164,7 @@ export const piece = defineType({
               : ''
       return {
         title: title || 'Sin título',
-        subtitle: [genderLabel, `S/ ${price ?? '—'}`, statusLabel]
+        subtitle: [genderLabel, pieceType, `S/ ${price ?? '—'}`, statusLabel]
           .filter(Boolean)
           .join(' · '),
         media,

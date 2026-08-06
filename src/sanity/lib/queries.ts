@@ -47,13 +47,7 @@ export const piecesByCategoryQuery = groq`*[_type == "piece" && category == $cat
   category,
   gender,
   status,
-  "section": section->{
-    _id,
-    title ${localizedString},
-    "slug": slug.current,
-    order,
-    category
-  },
+  pieceType ${localizedString},
   seo
 }`
 
@@ -68,7 +62,7 @@ export const pieceBySlugQuery = groq`*[_type == "piece" && slug.current == $slug
   category,
   gender,
   status,
-  "section": section->{title ${localizedString}, "slug": slug.current},
+  pieceType ${localizedString},
   seo
 }`
 
@@ -79,14 +73,6 @@ export const relatedPiecesQuery = groq`*[_type == "piece" && category == $catego
   photos[] ${imageFields},
   price,
   status
-}`
-
-export const sectionsByCategoryQuery = groq`*[_type == "section" && category == $category] | order(order asc){
-  _id,
-  title ${localizedString},
-  "slug": slug.current,
-  order,
-  category
 }`
 
 export const jewelryCarouselsQuery = groq`*[_type == "jewelryCarousels"][0]{

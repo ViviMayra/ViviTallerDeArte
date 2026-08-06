@@ -5,21 +5,21 @@ import {useTranslations, useLocale} from 'next-intl'
 import {useState} from 'react'
 import {Link, usePathname} from '@/i18n/navigation'
 import {useCart} from '@/lib/cart'
-import type {SectionRef} from '@/lib/types'
+import type {PieceTypeLabel} from '@/lib/types'
 import {t} from '@/lib/locale'
 
 type Props = {
-  joyeriaSections?: SectionRef[]
-  ceramicaSections?: SectionRef[]
-  ilustracionesSections?: SectionRef[]
-  pinturaSections?: SectionRef[]
+  joyeriaTypes?: PieceTypeLabel[]
+  ceramicaTypes?: PieceTypeLabel[]
+  ilustracionesTypes?: PieceTypeLabel[]
+  pinturaTypes?: PieceTypeLabel[]
 }
 
 export function Header({
-  joyeriaSections = [],
-  ceramicaSections = [],
-  ilustracionesSections = [],
-  pinturaSections = [],
+  joyeriaTypes = [],
+  ceramicaTypes = [],
+  ilustracionesTypes = [],
+  pinturaTypes = [],
 }: Props) {
   const tr = useTranslations('nav')
   const common = useTranslations('common')
@@ -40,9 +40,9 @@ export function Header({
         {label: tr('women'), href: '/joyeria#mujer'},
         {label: tr('men'), href: '/joyeria#hombre'},
         {label: tr('general'), href: '/joyeria#general'},
-        ...joyeriaSections.map((section) => ({
-          label: t(section.title, locale),
-          href: `/joyeria#${section.slug}`,
+        ...joyeriaTypes.map((type) => ({
+          label: t(type.label, locale),
+          href: `/joyeria#${type.slug}`,
         })),
       ],
     },
@@ -50,27 +50,27 @@ export function Header({
       key: 'ceramica',
       label: tr('ceramica'),
       href: '/ceramica',
-      items: ceramicaSections.map((s) => ({
-        label: t(s.title, locale),
-        href: `/ceramica#${s.slug}`,
+      items: ceramicaTypes.map((type) => ({
+        label: t(type.label, locale),
+        href: `/ceramica#${type.slug}`,
       })),
     },
     {
       key: 'ilustraciones',
       label: tr('ilustraciones'),
       href: '/ilustraciones',
-      items: ilustracionesSections.map((s) => ({
-        label: t(s.title, locale),
-        href: `/ilustraciones#${s.slug}`,
+      items: ilustracionesTypes.map((type) => ({
+        label: t(type.label, locale),
+        href: `/ilustraciones#${type.slug}`,
       })),
     },
     {
       key: 'pintura',
       label: tr('pintura'),
       href: '/pintura',
-      items: pinturaSections.map((s) => ({
-        label: t(s.title, locale),
-        href: `/pintura#${s.slug}`,
+      items: pinturaTypes.map((type) => ({
+        label: t(type.label, locale),
+        href: `/pintura#${type.slug}`,
       })),
     },
   ]

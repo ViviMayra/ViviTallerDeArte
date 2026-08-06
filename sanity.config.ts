@@ -41,28 +41,15 @@ export default defineConfig({
           status: 'available',
         },
       })),
-      ...categories.map((category) => ({
-        id: `section-${category.id}`,
-        title: 'Nuevo tipo (ej. Aretes)',
-        schemaType: 'section' as const,
-        value: {
-          category: category.id,
-          order: 0,
-        },
-      })),
     ],
   },
   document: {
-    // Hide global “new piece” that would force picking a category.
-    // New pieces are created from each category list (already tagged).
     newDocumentOptions: (prev, {creationContext}) => {
       if (creationContext.type === 'global') {
         return prev.filter(
           (template) =>
             !String(template.templateId).startsWith('piece-') &&
-            !String(template.templateId).startsWith('section-') &&
-            template.templateId !== 'piece' &&
-            template.templateId !== 'section',
+            template.templateId !== 'piece',
         )
       }
       return prev
@@ -73,7 +60,6 @@ export default defineConfig({
         'exhibition',
         'homePage',
         'aboutPage',
-        'section',
       ]
       if (translateTypes.includes(context.schemaType)) {
         return [...prev, translateAction]
@@ -82,4 +68,3 @@ export default defineConfig({
     },
   },
 })
-

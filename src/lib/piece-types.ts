@@ -1,0 +1,32 @@
+import {slugify} from './slugify'
+import {t} from './locale'
+import type {Locale, Piece, PieceTypeLabel} from './types'
+
+/** Unique piece types found on pieces (typed inline in Studio). */
+export function collectPieceTypes(
+  pieces: Piece[],
+  locale: Locale,
+): PieceTypeLabel[] {
+  const map = new Map<string, PieceTypeLabel>()
+  for (const piece of pieces) {
+    const es = piece.pieceType?.es?.trim()
+    if (!es) continue
+    const slug = slugify(es)
+    if (!slug || map.has(slug)) continue
+    map.set(slug, {
+      slug,
+      label: {
+        es,
+        en: piece.pieceType?.en?.trim() || es,
+      },
+    })
+  }
+  return Array.from(map.values()).sort((a, b) =>
+    t(a.label, locale).localeCompare(t(b.label, locale), locale),
+  )
+}
+
+export function pieceTypeSlug(piece: Piece): string | null {
+  const es = piece.pieceType?.es?.trim()
+  return es ? slugify(es) : null
+}

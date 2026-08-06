@@ -123,6 +123,7 @@ export async function POST(request: Request) {
     queueLocalized(queue, 'place', doc.place)
     queueLocalized(queue, 'summary', doc.summary)
     queueLocalized(queue, 'heroEyebrow', doc.heroEyebrow)
+    queueLocalized(queue, 'pieceType', doc.pieceType)
 
     if (Array.isArray(doc.details)) {
       doc.details.forEach(

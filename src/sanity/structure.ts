@@ -40,19 +40,6 @@ function categoryBranch(
                 ])
                 .defaultOrdering([{field: 'title.es', direction: 'asc'}]),
             ),
-          S.listItem()
-            .title('Tipos de pieza (opcional)')
-            .schemaType('section')
-            .child(
-              S.documentList()
-                .title(`Tipos de pieza · ${title}`)
-                .filter('_type == "section" && category == $category')
-                .params({category})
-                .initialValueTemplates([
-                  S.initialValueTemplateItem(`section-${category}`),
-                ])
-                .defaultOrdering([{field: 'order', direction: 'asc'}]),
-            ),
           ...extraItems,
         ]),
     )

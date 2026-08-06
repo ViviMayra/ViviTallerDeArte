@@ -4,7 +4,6 @@ import {
   demoExhibitions,
   demoHome,
   demoPieces,
-  demoSections,
   demoSettings,
 } from './demo-data'
 import type {
@@ -13,12 +12,11 @@ import type {
   Exhibition,
   HomePage,
   Piece,
-  SectionRef,
   Settings,
 } from './types'
+import type {SanityImage} from './types'
 import {hasSanityConfig} from '@/sanity/env'
 import {sanityFetch} from '@/sanity/lib/client'
-import type {SanityImage} from './types'
 import {
   aboutPageQuery,
   categoryCarouselQuery,
@@ -29,7 +27,6 @@ import {
   pieceBySlugQuery,
   piecesByCategoryQuery,
   relatedPiecesQuery,
-  sectionsByCategoryQuery,
   settingsQuery,
 } from '@/sanity/lib/queries'
 
@@ -78,18 +75,6 @@ export async function getRelatedPieces(
   }
   const data = await sanityFetch<Piece[]>(relatedPiecesQuery, {category, slug})
   return data || []
-}
-
-export async function getSections(category: Category): Promise<SectionRef[]> {
-  if (!hasSanityConfig) {
-    return demoSections.filter((s) => s.category === category)
-  }
-  const data = await sanityFetch<SectionRef[]>(sectionsByCategoryQuery, {
-    category,
-  })
-  return data?.length
-    ? data
-    : demoSections.filter((s) => s.category === category)
 }
 
 export async function getJewelryCarousels() {

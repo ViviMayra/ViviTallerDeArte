@@ -41,9 +41,11 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 
 ### Studio sidebar (simple for Mayra)
 
-- **Joyería** → Piezas · Subsecciones (opcional) · Carruseles  
-- **Cerámica / Ilustraciones / Pintura** → Piezas · Subsecciones (opcional)  
+- **Joyería** → Piezas · Carruseles (opcional)  
+- **Cerámica / Ilustraciones / Pintura** → Piezas · Carrusel (opcional)  
 - **Exhibiciones · Inicio · About · Ajustes**
+
+On each piece she can optionally type **¿Qué tipo de pieza es?** (Aretes, Pulseras…). That groups items on the website — no separate list to manage.
 
 She only fills **Spanish**. Use document action **Traducir al inglés** after saving (needs `SANITY_API_WRITE_TOKEN`). English fields stay hidden in Studio; the public site still has ES/EN.
 

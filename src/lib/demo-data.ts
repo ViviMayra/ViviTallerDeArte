@@ -3,7 +3,6 @@ import type {
   Exhibition,
   HomePage,
   Piece,
-  SectionRef,
   Settings,
 } from './types'
 
@@ -74,24 +73,6 @@ export const demoHome: HomePage = {
   },
 }
 
-const aretes: SectionRef = {
-  _id: 'sec-aretes',
-  title: {es: 'Aretes', en: 'Earrings'},
-  slug: 'aretes',
-  order: 1,
-  category: 'joyeria',
-}
-
-const anillos: SectionRef = {
-  _id: 'sec-anillos',
-  title: {es: 'Anillos', en: 'Rings'},
-  slug: 'anillos',
-  order: 2,
-  category: 'joyeria',
-}
-
-export const demoSections: SectionRef[] = [aretes, anillos]
-
 export const demoPieces: Piece[] = [
   {
     _id: 'demo-1',
@@ -101,7 +82,7 @@ export const demoPieces: Piece[] = [
     category: 'joyeria',
     gender: 'mujer',
     status: 'available',
-    section: aretes,
+    pieceType: {es: 'Aretes', en: 'Earrings'},
     description: {
       es: 'Aretes artesanales con motivo lunar, hechos a mano.',
       en: 'Handmade artisan earrings with a lunar motif.',
@@ -120,7 +101,7 @@ export const demoPieces: Piece[] = [
     category: 'joyeria',
     gender: 'mujer',
     status: 'sold',
-    section: anillos,
+    pieceType: {es: 'Anillos', en: 'Rings'},
     description: {
       es: 'Anillo con textura solar. Pieza única.',
       en: 'Ring with solar texture. One of a kind.',
@@ -139,6 +120,7 @@ export const demoPieces: Piece[] = [
     category: 'joyeria',
     gender: 'hombre',
     status: 'available',
+    pieceType: {es: 'Collares', en: 'Necklaces'},
     description: {
       es: 'Cadena masculina con dije geométrico.',
       en: 'Men’s chain with a geometric pendant.',
@@ -153,6 +135,7 @@ export const demoPieces: Piece[] = [
     price: 150,
     category: 'ceramica',
     status: 'available',
+    pieceType: {es: 'Cuencos', en: 'Bowls'},
     description: {
       es: 'Cuenco de cerámica esmaltada en tonos tierra.',
       en: 'Glazed ceramic bowl in earth tones.',

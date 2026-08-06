@@ -3,8 +3,8 @@ import {
   localizedBlockContent,
   localizedString,
   localizedText,
+  optionalLocalizedString,
 } from './objects/localizedString'
-import {section} from './documents/section'
 import {piece} from './documents/piece'
 import {exhibition} from './documents/exhibition'
 import {homePage} from './documents/homePage'
@@ -15,10 +15,10 @@ import {categoryCarousel} from './documents/categoryCarousel'
 
 export const schemaTypes = [
   localizedString,
+  optionalLocalizedString,
   localizedText,
   localizedBlockContent,
   seo,
-  section,
   piece,
   exhibition,
   homePage,

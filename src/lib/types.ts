@@ -22,12 +22,9 @@ export type Category =
   | 'ilustraciones'
   | 'pintura'
 
-export type SectionRef = {
-  _id: string
-  title: LocalizedString
+export type PieceTypeLabel = {
+  label: LocalizedString
   slug: string
-  order?: number
-  category?: string
 }
 
 export type Piece = {
@@ -41,7 +38,7 @@ export type Piece = {
   category: Category
   gender?: 'mujer' | 'hombre' | 'general'
   status: PieceStatus
-  section?: SectionRef | null
+  pieceType?: LocalizedString | null
   seo?: {
     title?: string
     description?: string

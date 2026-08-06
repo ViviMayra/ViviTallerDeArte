@@ -43,6 +43,27 @@ export const localizedText = defineType({
   ],
 })
 
+/** Same as localizedString but optional (no required Spanish). */
+export const optionalLocalizedString = defineType({
+  name: 'optionalLocalizedString',
+  title: 'Texto opcional',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'es',
+      title: 'Texto',
+      type: 'string',
+    }),
+    defineField({
+      name: 'en',
+      title: 'English',
+      type: 'string',
+      hidden: true,
+    }),
+  ],
+})
+
+
 export const localizedBlockContent = defineType({
   name: 'localizedBlockContent',
   title: 'Contenido',

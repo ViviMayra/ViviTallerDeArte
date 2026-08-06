@@ -2,20 +2,19 @@ import {getLocale, getTranslations} from 'next-intl/server'
 import {JumpNav} from '@/components/JumpNav'
 import {PieceCard} from '@/components/PieceCard'
 import {ImageCarousel} from '@/components/ImageCarousel'
+import {collectPieceTypes, pieceTypeSlug} from '@/lib/piece-types'
 import {t} from '@/lib/locale'
-import type {Locale, Piece, SanityImage, SectionRef} from '@/lib/types'
+import type {Locale, Piece, SanityImage} from '@/lib/types'
 
 type GenderId = 'mujer' | 'hombre' | 'general'
 
 export async function JewelryCatalog({
   pieces,
-  sections,
   womenSlides,
   menSlides,
   generalSlides,
 }: {
   pieces: Piece[]
-  sections: SectionRef[]
   womenSlides: SanityImage[]
   menSlides: SanityImage[]
   generalSlides: SanityImage[]
@@ -29,14 +28,15 @@ export async function JewelryCatalog({
   const general = pieces.filter(
     (p) => p.gender === 'general' || !p.gender,
   )
+  const pieceTypes = collectPieceTypes(pieces, locale)
 
   const jumpItems = [
     {id: 'mujer', label: nav('women')},
     {id: 'hombre', label: nav('men')},
     {id: 'general', label: nav('general')},
-    ...sections.map((section) => ({
-      id: section.slug,
-      label: t(section.title, locale),
+    ...pieceTypes.map((type) => ({
+      id: type.slug,
+      label: t(type.label, locale),
     })),
   ]
 
@@ -48,14 +48,14 @@ export async function JewelryCatalog({
   ) {
     if (!genderPieces.length && !slides.length) return null
 
-    const withSections = sections
-      .map((section) => ({
-        section,
-        items: genderPieces.filter((p) => p.section?._id === section._id),
+    const withTypes = pieceTypes
+      .map((type) => ({
+        type,
+        items: genderPieces.filter((p) => pieceTypeSlug(p) === type.slug),
       }))
       .filter((entry) => entry.items.length > 0)
 
-    const plain = genderPieces.filter((p) => !p.section)
+    const plain = genderPieces.filter((p) => !pieceTypeSlug(p))
 
     return (
       <section id={id} className="scroll-mt-28">
@@ -90,10 +90,10 @@ export async function JewelryCatalog({
           </div>
         )}
 
-        {withSections.map(({section, items}) => (
-          <div key={`${id}-${section._id}`} id={section.slug} className="mb-14 scroll-mt-28">
+        {withTypes.map(({type, items}) => (
+          <div key={`${id}-${type.slug}`} id={type.slug} className="mb-14 scroll-mt-28">
             <h3 className="mb-6 text-sm uppercase tracking-[0.16em] text-muted">
-              {t(section.title, locale)}
+              {t(type.label, locale)}
             </h3>
             <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
               {items.map((piece) => (
