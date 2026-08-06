@@ -7,9 +7,20 @@ export const piece = defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'title',
+      title: 'Nombre de la pieza',
+      type: 'localizedString',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'description',
+      title: 'Descripción',
+      type: 'localizedText',
+    }),
+    defineField({
       name: 'gender',
       title: 'Tipo de joyería',
-      description: 'Elige primero: para mujer, para hombre, o general (para cualquiera).',
+      description: 'Elige: para mujer, para hombre, o general (para cualquiera).',
       type: 'string',
       options: {
         list: [
@@ -57,17 +68,6 @@ export const piece = defineType({
         }),
       ],
       validation: (Rule) => Rule.min(1).error('Agrega al menos una foto'),
-    }),
-    defineField({
-      name: 'title',
-      title: 'Nombre de la pieza',
-      type: 'localizedString',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'description',
-      title: 'Descripción',
-      type: 'localizedText',
     }),
     defineField({
       name: 'details',
@@ -155,8 +155,9 @@ export const piece = defineType({
               ? 'Mujer'
               : ''
       return {
-        title: title || 'Sin título',
-        subtitle: [genderLabel, pieceType, `S/ ${price ?? '—'}`, statusLabel]
+        // Shown in the left list — not a field she fills
+        title: title?.trim() || 'Nueva pieza',
+        subtitle: [genderLabel, pieceType, price != null ? `S/ ${price}` : null, statusLabel]
           .filter(Boolean)
           .join(' · '),
         media,
