@@ -48,13 +48,14 @@ export default async function HomePage({
 
   return (
     <div>
-      <section className="relative min-h-[78vh] w-full overflow-hidden">
+      <section className="relative -mt-28 min-h-[78vh] w-full overflow-hidden md:-mt-36">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={heroSrc}
           alt={getImageAlt(home.heroImage, locale, 'VIVI')}
           className="absolute inset-0 h-full w-full object-cover"
         />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/35 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
         <div className="relative mx-auto flex min-h-[78vh] max-w-7xl flex-col justify-end px-4 pb-16 md:px-8">
           <p className="animate-fade-up font-[family-name:var(--font-display)] text-5xl tracking-[0.2em] md:text-7xl">

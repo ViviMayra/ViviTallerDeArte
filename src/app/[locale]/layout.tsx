@@ -105,7 +105,7 @@ export default async function LocaleLayout({
       lang={locale}
       className={`${bodyFont.variable} ${displayFont.variable} h-full`}
     >
-      <body className="flex min-h-full flex-col antialiased">
+      <body className="relative flex min-h-full flex-col antialiased">
         <NextIntlClientProvider messages={messages}>
           <CartProvider>
             <JsonLd data={localBusiness} />
@@ -115,7 +115,7 @@ export default async function LocaleLayout({
               ilustracionesTypes={ilustracionesTypes}
               pinturaTypes={pinturaTypes}
             />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 pt-28 md:pt-36">{children}</main>
             <Footer settings={settings} />
             <CartDrawer whatsapp={settings.whatsapp || '51954734273'} />
           </CartProvider>

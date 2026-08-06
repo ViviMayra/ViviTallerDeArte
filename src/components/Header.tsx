@@ -31,7 +31,6 @@ export function Header({
   pinturaTypes = [],
 }: Props) {
   const tr = useTranslations('nav')
-  const common = useTranslations('common')
   const locale = useLocale() as 'es' | 'en'
   const pathname = usePathname()
   const {count, toggleCart} = useCart()
@@ -39,8 +38,6 @@ export function Header({
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null)
-
-  const otherLocale = locale === 'es' ? 'en' : 'es'
 
   const typeLinks = (types: PieceTypeLabel[], gender: 'mujer' | 'hombre') =>
     types.map((type) => ({
@@ -101,20 +98,21 @@ export function Header({
   ]
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-background/95 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 md:px-8">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
+    <header className="absolute inset-x-0 top-0 z-40">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-5 md:px-10 md:py-7">
+        <Link href="/" className="flex shrink-0 items-center">
           <Image
             src="/logo.png"
             alt="VIVI Taller de Arte"
-            width={160}
-            height={48}
-            className="h-10 w-auto md:h-12"
+            width={424}
+            height={304}
+            className="h-20 w-auto md:h-28"
+            style={{width: 'auto'}}
             priority
           />
         </Link>
 
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden items-center gap-7 lg:flex">
           {categoryMenus.map((menu) => (
             <div
               key={menu.key}
@@ -188,28 +186,20 @@ export function Header({
           >
             {tr('about')}
           </Link>
-          <button
-            type="button"
+          <CartButton
+            label={tr('cart')}
+            count={count}
             onClick={toggleCart}
-            className="nav-link cursor-pointer"
-          >
-            {tr('cart')}
-            {count > 0 ? ` (${count})` : ''}
-          </button>
-          <Link
-            href={pathname || '/'}
-            locale={otherLocale}
-            className="nav-link text-muted"
-          >
-            {common('language')}
-          </Link>
+          />
+          <LanguageSwitch locale={locale} pathname={pathname || '/'} />
         </nav>
 
-        <div className="flex items-center gap-3 lg:hidden">
-          <button type="button" onClick={toggleCart} className="nav-link">
-            {tr('cart')}
-            {count > 0 ? ` (${count})` : ''}
-          </button>
+        <div className="flex items-center gap-4 lg:hidden">
+          <CartButton
+            label={tr('cart')}
+            count={count}
+            onClick={toggleCart}
+          />
           <button
             type="button"
             className="nav-link"
@@ -222,7 +212,7 @@ export function Header({
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-line bg-surface px-4 py-4 lg:hidden">
+        <div className="bg-background/95 px-4 py-4 backdrop-blur-sm lg:hidden">
           <div className="flex flex-col gap-3">
             {categoryMenus.map((menu) => (
               <div key={menu.key}>
@@ -287,12 +277,97 @@ export function Header({
             <Link href="/about" className="nav-link" onClick={() => setMobileOpen(false)}>
               {tr('about')}
             </Link>
-            <Link href={pathname || '/'} locale={otherLocale} className="nav-link text-muted">
-              {common('language')}
-            </Link>
+            <LanguageSwitch
+              locale={locale}
+              pathname={pathname || '/'}
+              onNavigate={() => setMobileOpen(false)}
+            />
           </div>
         </div>
       )}
     </header>
+  )
+}
+
+function CartButton({
+  label,
+  count,
+  onClick,
+}: {
+  label: string
+  count: number
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="relative inline-flex cursor-pointer items-center justify-center text-foreground transition-colors hover:text-ochre-deep"
+      aria-label={count > 0 ? `${label} (${count})` : label}
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
+        <path d="M6 6h15l-1.5 9h-12z" />
+        <path d="M6 6 5 3H2" />
+        <circle cx="9" cy="20" r="1" fill="currentColor" stroke="none" />
+        <circle cx="18" cy="20" r="1" fill="currentColor" stroke="none" />
+      </svg>
+      {count > 0 ? (
+        <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-ochre-deep px-1 text-[10px] leading-none text-white">
+          {count}
+        </span>
+      ) : null}
+    </button>
+  )
+}
+
+function LanguageSwitch({
+  locale,
+  pathname,
+  onNavigate,
+}: {
+  locale: 'es' | 'en'
+  pathname: string
+  onNavigate?: () => void
+}) {
+  const common = useTranslations('common')
+  const otherLocale = locale === 'es' ? 'en' : 'es'
+
+  return (
+    <Link
+      href={pathname}
+      locale={otherLocale}
+      onClick={onNavigate}
+      className="inline-flex items-center gap-1.5 text-[0.72rem] tracking-[0.08em] text-foreground transition-colors hover:text-ochre-deep"
+      aria-label={common('switchLanguage')}
+      title={common('switchLanguage')}
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18" />
+        <path d="M12 3a14 14 0 0 1 0 18" />
+        <path d="M12 3a14 14 0 0 0 0 18" />
+      </svg>
+      <span>{common('language')}</span>
+    </Link>
   )
 }
