@@ -1,6 +1,7 @@
 'use client'
 
-import {AddIcon, RemoveIcon} from '@sanity/icons'
+import {AddIcon} from '@sanity/icons/Add'
+import {RemoveIcon} from '@sanity/icons/Remove'
 import {Button, Flex, Stack, TextInput} from '@sanity/ui'
 import {set, unset, type ArrayOfPrimitivesInputProps} from 'sanity'
 
@@ -13,7 +14,7 @@ export function DetailsInput(props: ArrayOfPrimitivesInputProps) {
 
   const update = (next: string[]) => {
     const cleaned = next.map((v) => v ?? '')
-    if (cleaned.every((v) => !v.trim()) && cleaned.length === 0) {
+    if (cleaned.length === 0) {
       props.onChange(unset())
       return
     }
