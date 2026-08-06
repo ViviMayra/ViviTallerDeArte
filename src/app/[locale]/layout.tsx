@@ -5,7 +5,10 @@ import {getMessages, setRequestLocale} from 'next-intl/server'
 import {Figtree, Syne} from 'next/font/google'
 import {CartProvider} from '@/lib/cart'
 import {getSettings, getPiecesByCategory} from '@/lib/content'
-import {collectPieceTypes} from '@/lib/piece-types'
+import {
+  collectJewelryTypesByGender,
+  collectPieceTypes,
+} from '@/lib/piece-types'
 import {Header} from '@/components/Header'
 import {Footer} from '@/components/Footer'
 import {CartDrawer} from '@/components/CartDrawer'
@@ -61,7 +64,10 @@ export default async function LocaleLayout({
       getPiecesByCategory('ilustraciones'),
       getPiecesByCategory('pintura'),
     ])
-  const joyeriaTypes = collectPieceTypes(joyeriaPieces, localeKey)
+  const joyeriaTypesByGender = collectJewelryTypesByGender(
+    joyeriaPieces,
+    localeKey,
+  )
   const ceramicaTypes = collectPieceTypes(ceramicaPieces, localeKey)
   const ilustracionesTypes = collectPieceTypes(ilustracionesPieces, localeKey)
   const pinturaTypes = collectPieceTypes(pinturaPieces, localeKey)
@@ -104,7 +110,7 @@ export default async function LocaleLayout({
           <CartProvider>
             <JsonLd data={localBusiness} />
             <Header
-              joyeriaTypes={joyeriaTypes}
+              joyeriaTypesByGender={joyeriaTypesByGender}
               ceramicaTypes={ceramicaTypes}
               ilustracionesTypes={ilustracionesTypes}
               pinturaTypes={pinturaTypes}

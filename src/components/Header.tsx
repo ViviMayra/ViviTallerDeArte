@@ -8,15 +8,24 @@ import {useCart} from '@/lib/cart'
 import type {PieceTypeLabel} from '@/lib/types'
 import {t} from '@/lib/locale'
 
+type NavChild = {
+  label: string
+  href: string
+  children?: {label: string; href: string}[]
+}
+
 type Props = {
-  joyeriaTypes?: PieceTypeLabel[]
+  joyeriaTypesByGender?: {
+    mujer: PieceTypeLabel[]
+    hombre: PieceTypeLabel[]
+  }
   ceramicaTypes?: PieceTypeLabel[]
   ilustracionesTypes?: PieceTypeLabel[]
   pinturaTypes?: PieceTypeLabel[]
 }
 
 export function Header({
-  joyeriaTypes = [],
+  joyeriaTypesByGender = {mujer: [], hombre: []},
   ceramicaTypes = [],
   ilustracionesTypes = [],
   pinturaTypes = [],
@@ -28,22 +37,38 @@ export function Header({
   const {count, toggleCart} = useCart()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<string | null>(null)
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null)
 
   const otherLocale = locale === 'es' ? 'en' : 'es'
 
-  const categoryMenus = [
+  const typeLinks = (types: PieceTypeLabel[], gender: 'mujer' | 'hombre') =>
+    types.map((type) => ({
+      label: t(type.label, locale),
+      href: `/joyeria#${gender}-${type.slug}`,
+    }))
+
+  const categoryMenus: {
+    key: string
+    label: string
+    href: string
+    items: NavChild[]
+  }[] = [
     {
       key: 'joyeria',
       label: tr('joyeria'),
       href: '/joyeria',
       items: [
-        {label: tr('women'), href: '/joyeria#mujer'},
-        {label: tr('men'), href: '/joyeria#hombre'},
-        {label: tr('general'), href: '/joyeria#general'},
-        ...joyeriaTypes.map((type) => ({
-          label: t(type.label, locale),
-          href: `/joyeria#${type.slug}`,
-        })),
+        {
+          label: tr('women'),
+          href: '/joyeria#mujer',
+          children: typeLinks(joyeriaTypesByGender.mujer, 'mujer'),
+        },
+        {
+          label: tr('men'),
+          href: '/joyeria#hombre',
+          children: typeLinks(joyeriaTypesByGender.hombre, 'hombre'),
+        },
       ],
     },
     {
@@ -94,8 +119,14 @@ export function Header({
             <div
               key={menu.key}
               className="relative"
-              onMouseEnter={() => setOpenMenu(menu.key)}
-              onMouseLeave={() => setOpenMenu(null)}
+              onMouseEnter={() => {
+                setOpenMenu(menu.key)
+                setOpenSubmenu(null)
+              }}
+              onMouseLeave={() => {
+                setOpenMenu(null)
+                setOpenSubmenu(null)
+              }}
             >
               <Link
                 href={menu.href}
@@ -106,13 +137,40 @@ export function Header({
               {menu.items.length > 0 && openMenu === menu.key && (
                 <div className="absolute left-0 top-full min-w-44 border border-line bg-surface py-2 shadow-sm">
                   {menu.items.map((item) => (
-                    <Link
+                    <div
                       key={item.href}
-                      href={item.href}
-                      className="block px-4 py-2 text-xs uppercase tracking-[0.12em] text-foreground hover:bg-background hover:text-ochre-deep"
+                      className="relative"
+                      onMouseEnter={() =>
+                        setOpenSubmenu(item.children?.length ? item.href : null)
+                      }
                     >
-                      {item.label}
-                    </Link>
+                      <Link
+                        href={item.href}
+                        className="flex items-center justify-between gap-3 px-4 py-2 text-xs uppercase tracking-[0.12em] text-foreground hover:bg-background hover:text-ochre-deep"
+                      >
+                        <span>{item.label}</span>
+                        {item.children && item.children.length > 0 && (
+                          <span className="text-muted" aria-hidden>
+                            ›
+                          </span>
+                        )}
+                      </Link>
+                      {item.children &&
+                        item.children.length > 0 &&
+                        openSubmenu === item.href && (
+                          <div className="absolute left-full top-0 min-w-40 border border-line bg-surface py-2 shadow-sm">
+                            {item.children.map((child) => (
+                              <Link
+                                key={child.href}
+                                href={child.href}
+                                className="block px-4 py-2 text-xs uppercase tracking-[0.12em] text-foreground hover:bg-background hover:text-ochre-deep"
+                              >
+                                {child.label}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                    </div>
                   ))}
                 </div>
               )}
@@ -178,14 +236,46 @@ export function Header({
                 {menu.items.length > 0 && (
                   <div className="ml-3 mt-1 flex flex-col gap-1">
                     {menu.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="text-xs uppercase tracking-[0.12em] text-muted"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {item.label}
-                      </Link>
+                      <div key={item.href}>
+                        <div className="flex items-center justify-between gap-2">
+                          <Link
+                            href={item.href}
+                            className="text-xs uppercase tracking-[0.12em] text-muted"
+                            onClick={() => setMobileOpen(false)}
+                          >
+                            {item.label}
+                          </Link>
+                          {item.children && item.children.length > 0 && (
+                            <button
+                              type="button"
+                              className="text-[10px] uppercase tracking-[0.12em] text-ochre-deep"
+                              onClick={() =>
+                                setMobileExpanded((v) =>
+                                  v === item.href ? null : item.href,
+                                )
+                              }
+                            >
+                              {mobileExpanded === item.href ? '−' : '+'}
+                            </button>
+                          )}
+                        </div>
+                        {item.children &&
+                          item.children.length > 0 &&
+                          mobileExpanded === item.href && (
+                            <div className="ml-3 mt-1 flex flex-col gap-1">
+                              {item.children.map((child) => (
+                                <Link
+                                  key={child.href}
+                                  href={child.href}
+                                  className="text-[11px] uppercase tracking-[0.12em] text-muted"
+                                  onClick={() => setMobileOpen(false)}
+                                >
+                                  {child.label}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                      </div>
                     ))}
                   </div>
                 )}

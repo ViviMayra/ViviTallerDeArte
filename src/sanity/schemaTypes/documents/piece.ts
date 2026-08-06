@@ -2,6 +2,7 @@ import {defineArrayMember, defineField, defineType} from 'sanity'
 import {AutoSlugInput, HiddenSlugField} from '../../components/AutoSlugInput'
 import {DetailsInput} from '../../components/DetailsInput'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
+import {PieceTypeInput} from '../../components/PieceTypeInput'
 
 export const piece = defineType({
   name: 'piece',
@@ -46,8 +47,9 @@ export const piece = defineType({
       name: 'pieceType',
       title: '¿Qué tipo de pieza es? (opcional)',
       description:
-        'Escríbelo aquí si quieres agrupar en la web. Ejemplos: Aretes, Pulseras, Anillos, Collares, Cuencos… Si no importa, déjalo vacío.',
+        'Elige un tipo ya usado para agrupar en la web, o agrega uno nuevo (Aretes, Collares…). Déjalo vacío si no quieres subsección.',
       type: 'optionalLocalizedString',
+      components: {input: PieceTypeInput},
     }),
     defineField({
       name: 'photos',

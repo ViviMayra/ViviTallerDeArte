@@ -26,7 +26,32 @@ export function collectPieceTypes(
   )
 }
 
+/** Types used under Mujer / Hombre (for nested nav). */
+export function collectJewelryTypesByGender(
+  pieces: Piece[],
+  locale: Locale,
+): {mujer: PieceTypeLabel[]; hombre: PieceTypeLabel[]} {
+  return {
+    mujer: collectPieceTypes(
+      pieces.filter((p) => p.gender === 'mujer'),
+      locale,
+    ),
+    hombre: collectPieceTypes(
+      pieces.filter((p) => p.gender === 'hombre'),
+      locale,
+    ),
+  }
+}
+
 export function pieceTypeSlug(piece: Piece): string | null {
   const es = piece.pieceType?.es?.trim()
   return es ? slugify(es) : null
+}
+
+/** Anchor unique per gender + type, e.g. mujer-collares */
+export function genderTypeAnchor(
+  gender: 'mujer' | 'hombre' | 'general',
+  typeSlug: string,
+) {
+  return `${gender}-${typeSlug}`
 }

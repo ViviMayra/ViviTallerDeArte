@@ -2,7 +2,11 @@ import {getLocale, getTranslations} from 'next-intl/server'
 import {JumpNav} from '@/components/JumpNav'
 import {PieceCard} from '@/components/PieceCard'
 import {ImageCarousel} from '@/components/ImageCarousel'
-import {collectPieceTypes, pieceTypeSlug} from '@/lib/piece-types'
+import {
+  collectPieceTypes,
+  genderTypeAnchor,
+  pieceTypeSlug,
+} from '@/lib/piece-types'
 import {t} from '@/lib/locale'
 import type {Locale, Piece, SanityImage} from '@/lib/types'
 
@@ -28,16 +32,15 @@ export async function JewelryCatalog({
   const general = pieces.filter(
     (p) => p.gender === 'general' || !p.gender,
   )
-  const pieceTypes = collectPieceTypes(pieces, locale)
 
+  // Jump / main nav: Mujer + Hombre only (types live under those via hover)
   const jumpItems = [
-    {id: 'mujer', label: nav('women')},
-    {id: 'hombre', label: nav('men')},
-    {id: 'general', label: nav('general')},
-    ...pieceTypes.map((type) => ({
-      id: type.slug,
-      label: t(type.label, locale),
-    })),
+    ...(women.length || womenSlides.length
+      ? [{id: 'mujer', label: nav('women')}]
+      : []),
+    ...(men.length || menSlides.length
+      ? [{id: 'hombre', label: nav('men')}]
+      : []),
   ]
 
   function renderGenderBlock(
@@ -48,6 +51,7 @@ export async function JewelryCatalog({
   ) {
     if (!genderPieces.length && !slides.length) return null
 
+    const pieceTypes = collectPieceTypes(genderPieces, locale)
     const withTypes = pieceTypes
       .map((type) => ({
         type,
@@ -74,11 +78,6 @@ export async function JewelryCatalog({
                 {common('seeMen')} →
               </a>
             )}
-            {id !== 'general' && general.length > 0 && (
-              <a href="#general" className="catalog-link">
-                {common('seeGeneral')} →
-              </a>
-            )}
           </div>
         </div>
 
@@ -91,7 +90,11 @@ export async function JewelryCatalog({
         )}
 
         {withTypes.map(({type, items}) => (
-          <div key={`${id}-${type.slug}`} id={type.slug} className="mb-14 scroll-mt-28">
+          <div
+            key={`${id}-${type.slug}`}
+            id={genderTypeAnchor(id, type.slug)}
+            className="mb-14 scroll-mt-28"
+          >
             <h3 className="mb-6 text-sm uppercase tracking-[0.16em] text-muted">
               {t(type.label, locale)}
             </h3>
