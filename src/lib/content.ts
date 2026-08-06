@@ -3,9 +3,8 @@ import {
   demoCarousels,
   demoExhibitions,
   demoHome,
-  demoJewelrySubtypes,
-  demoJewelryTypes,
   demoPieces,
+  demoSections,
   demoSettings,
 } from './demo-data'
 import type {
@@ -14,8 +13,8 @@ import type {
   Exhibition,
   HomePage,
   Piece,
+  SectionRef,
   Settings,
-  TaxonomyRef,
 } from './types'
 import {hasSanityConfig} from '@/sanity/env'
 import {sanityFetch} from '@/sanity/lib/client'
@@ -25,13 +24,11 @@ import {
   exhibitionsQuery,
   homePageQuery,
   jewelryCarouselsQuery,
-  jewelrySubtypesQuery,
-  jewelryTypesQuery,
   pieceBySlugQuery,
   piecesByCategoryQuery,
   relatedPiecesQuery,
+  sectionsByCategoryQuery,
   settingsQuery,
-  subsectionsByCategoryQuery,
 } from '@/sanity/lib/queries'
 
 export async function getSettings(): Promise<Settings> {
@@ -81,30 +78,16 @@ export async function getRelatedPieces(
   return data || []
 }
 
-export async function getJewelryTaxonomy(): Promise<{
-  types: TaxonomyRef[]
-  subtypes: TaxonomyRef[]
-}> {
+export async function getSections(category: Category): Promise<SectionRef[]> {
   if (!hasSanityConfig) {
-    return {types: demoJewelryTypes, subtypes: demoJewelrySubtypes}
+    return demoSections.filter((s) => s.category === category)
   }
-  const [types, subtypes] = await Promise.all([
-    sanityFetch<TaxonomyRef[]>(jewelryTypesQuery),
-    sanityFetch<TaxonomyRef[]>(jewelrySubtypesQuery),
-  ])
-  return {
-    types: types?.length ? types : demoJewelryTypes,
-    subtypes: subtypes?.length ? subtypes : demoJewelrySubtypes,
-  }
-}
-
-export async function getSubsections(category: Category): Promise<TaxonomyRef[]> {
-  if (category === 'joyeria') return []
-  if (!hasSanityConfig) return []
-  const data = await sanityFetch<TaxonomyRef[]>(subsectionsByCategoryQuery, {
+  const data = await sanityFetch<SectionRef[]>(sectionsByCategoryQuery, {
     category,
   })
-  return data || []
+  return data?.length
+    ? data
+    : demoSections.filter((s) => s.category === category)
 }
 
 export async function getJewelryCarousels() {

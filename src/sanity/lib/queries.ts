@@ -47,20 +47,7 @@ export const piecesByCategoryQuery = groq`*[_type == "piece" && category == $cat
   category,
   gender,
   status,
-  "jewelryType": jewelryType->{
-    _id,
-    title ${localizedString},
-    "slug": slug.current,
-    order
-  },
-  "jewelrySubtype": jewelrySubtype->{
-    _id,
-    title ${localizedString},
-    "slug": slug.current,
-    order,
-    "parentId": parentType->_id
-  },
-  "subsection": subsection->{
+  "section": section->{
     _id,
     title ${localizedString},
     "slug": slug.current,
@@ -81,9 +68,7 @@ export const pieceBySlugQuery = groq`*[_type == "piece" && slug.current == $slug
   category,
   gender,
   status,
-  "jewelryType": jewelryType->{title ${localizedString}, "slug": slug.current},
-  "jewelrySubtype": jewelrySubtype->{title ${localizedString}, "slug": slug.current},
-  "subsection": subsection->{title ${localizedString}, "slug": slug.current},
+  "section": section->{title ${localizedString}, "slug": slug.current},
   seo
 }`
 
@@ -96,22 +81,7 @@ export const relatedPiecesQuery = groq`*[_type == "piece" && category == $catego
   status
 }`
 
-export const jewelryTypesQuery = groq`*[_type == "jewelryType"] | order(order asc){
-  _id,
-  title ${localizedString},
-  "slug": slug.current,
-  order
-}`
-
-export const jewelrySubtypesQuery = groq`*[_type == "jewelrySubtype"] | order(order asc){
-  _id,
-  title ${localizedString},
-  "slug": slug.current,
-  order,
-  "parentId": parentType->_id
-}`
-
-export const subsectionsByCategoryQuery = groq`*[_type == "categorySubsection" && category == $category] | order(order asc){
+export const sectionsByCategoryQuery = groq`*[_type == "section" && category == $category] | order(order asc){
   _id,
   title ${localizedString},
   "slug": slug.current,

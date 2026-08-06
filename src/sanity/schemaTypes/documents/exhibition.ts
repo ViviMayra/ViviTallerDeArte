@@ -7,20 +7,21 @@ export const exhibition = defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Título',
+      title: 'Nombre de la exhibición',
       type: 'localizedString',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
-      title: 'Slug',
+      title: 'URL',
+      description: 'Haz clic en Generate a partir del nombre.',
       type: 'slug',
       options: {source: 'title.es'},
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'photos',
-      title: 'Fotos',
+      title: 'Fotos (todas las que quieras)',
       type: 'array',
       of: [
         defineArrayMember({

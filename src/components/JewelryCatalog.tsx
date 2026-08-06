@@ -3,18 +3,16 @@ import {JumpNav} from '@/components/JumpNav'
 import {PieceCard} from '@/components/PieceCard'
 import {ImageCarousel} from '@/components/ImageCarousel'
 import {t} from '@/lib/locale'
-import type {Locale, Piece, SanityImage, TaxonomyRef} from '@/lib/types'
+import type {Locale, Piece, SanityImage, SectionRef} from '@/lib/types'
 
 export async function JewelryCatalog({
   pieces,
-  types,
-  subtypes,
+  sections,
   womenSlides,
   menSlides,
 }: {
   pieces: Piece[]
-  types: TaxonomyRef[]
-  subtypes: TaxonomyRef[]
+  sections: SectionRef[]
   womenSlides: SanityImage[]
   menSlides: SanityImage[]
 }) {
@@ -28,9 +26,9 @@ export async function JewelryCatalog({
   const jumpItems = [
     {id: 'mujer', label: nav('women')},
     {id: 'hombre', label: nav('men')},
-    ...types.map((type) => ({
-      id: type.slug,
-      label: t(type.title, locale),
+    ...sections.map((section) => ({
+      id: section.slug,
+      label: t(section.title, locale),
     })),
   ]
 
@@ -40,17 +38,14 @@ export async function JewelryCatalog({
     genderPieces: Piece[],
     slides: SanityImage[],
   ) {
-    const typed = types
-      .map((type) => {
-        const typePieces = genderPieces.filter(
-          (p) => p.jewelryType?._id === type._id,
-        )
-        const typeSubtypes = subtypes.filter((s) => s.parentId === type._id)
-        return {type, typePieces, typeSubtypes}
-      })
-      .filter((entry) => entry.typePieces.length > 0)
+    const withSections = sections
+      .map((section) => ({
+        section,
+        items: genderPieces.filter((p) => p.section?._id === section._id),
+      }))
+      .filter((entry) => entry.items.length > 0)
 
-    const untyped = genderPieces.filter((p) => !p.jewelryType)
+    const plain = genderPieces.filter((p) => !p.section)
 
     return (
       <section id={id} className="scroll-mt-28">
@@ -70,57 +65,24 @@ export async function JewelryCatalog({
           )}
         </div>
 
-        {untyped.length > 0 && (
+        {plain.length > 0 && (
           <div className="mb-12 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-            {untyped.map((piece) => (
+            {plain.map((piece) => (
               <PieceCard key={piece._id} piece={piece} />
             ))}
           </div>
         )}
 
-        {typed.map(({type, typePieces, typeSubtypes}) => (
-          <div key={type._id} id={type.slug} className="mb-14 scroll-mt-28">
+        {withSections.map(({section, items}) => (
+          <div key={section._id} id={section.slug} className="mb-14 scroll-mt-28">
             <h3 className="mb-6 text-sm uppercase tracking-[0.16em] text-muted">
-              {t(type.title, locale)}
+              {t(section.title, locale)}
             </h3>
-
-            {typeSubtypes.length === 0 ? (
-              <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-                {typePieces.map((piece) => (
-                  <PieceCard key={piece._id} piece={piece} />
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-10">
-                {typePieces.filter((p) => !p.jewelrySubtype).length > 0 && (
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-                    {typePieces
-                      .filter((p) => !p.jewelrySubtype)
-                      .map((piece) => (
-                        <PieceCard key={piece._id} piece={piece} />
-                      ))}
-                  </div>
-                )}
-                {typeSubtypes.map((sub) => {
-                  const subset = typePieces.filter(
-                    (p) => p.jewelrySubtype?._id === sub._id,
-                  )
-                  if (!subset.length) return null
-                  return (
-                    <div key={sub._id} id={sub.slug} className="scroll-mt-28">
-                      <h4 className="mb-4 text-xs uppercase tracking-[0.14em]">
-                        {t(sub.title, locale)}
-                      </h4>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-                        {subset.map((piece) => (
-                          <PieceCard key={piece._id} piece={piece} />
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
+            <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+              {items.map((piece) => (
+                <PieceCard key={piece._id} piece={piece} />
+              ))}
+            </div>
           </div>
         ))}
 

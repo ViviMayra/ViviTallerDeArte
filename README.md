@@ -39,13 +39,13 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 3. Open `/studio`, fill **Ajustes**, **Inicio**, pieces, etc.
 4. On a piece document, use the document action **Traducir al inglés** after saving Spanish fields.
 
-### Studio sidebar
+### Studio sidebar (simple for Mayra)
 
-- **Piezas** → Joyería / Cerámica / Ilustraciones / Pintura
-- **Taxonomía** → jewelry types & subtypes, optional category subsections
-- **Carruseles joyería**
-- **Exhibiciones**
-- **Inicio / About / Ajustes**
+- **Joyería** → Piezas · Subsecciones (opcional) · Carruseles  
+- **Cerámica / Ilustraciones / Pintura** → Piezas · Subsecciones (opcional)  
+- **Exhibiciones · Inicio · About · Ajustes**
+
+She only fills **Spanish**. Use document action **Traducir al inglés** after saving (needs `SANITY_API_WRITE_TOKEN`). English fields stay hidden in Studio; the public site still has ES/EN.
 
 ## GitHub + Vercel (her ownership)
 

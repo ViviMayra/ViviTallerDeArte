@@ -4,24 +4,18 @@ export const piece = defineType({
   name: 'piece',
   title: 'Pieza',
   type: 'document',
+  groups: [
+    {name: 'content', title: 'Contenido', default: true},
+    {name: 'organize', title: 'Organizar'},
+    {name: 'seo', title: 'SEO'},
+  ],
   fields: [
-    defineField({
-      name: 'title',
-      title: 'Título',
-      type: 'localizedString',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {source: 'title.es'},
-      validation: (Rule) => Rule.required(),
-    }),
     defineField({
       name: 'photos',
       title: 'Fotos',
+      description: 'La primera foto es la principal. Arrastra para reordenar.',
       type: 'array',
+      group: 'content',
       of: [
         defineArrayMember({
           type: 'image',
@@ -29,31 +23,40 @@ export const piece = defineType({
           fields: [
             defineField({
               name: 'alt',
-              title: 'Texto alternativo',
+              title: 'Descripción corta de la foto',
               type: 'localizedString',
             }),
           ],
         }),
       ],
-      validation: (Rule) => Rule.min(1),
+      validation: (Rule) => Rule.min(1).error('Agrega al menos una foto'),
+    }),
+    defineField({
+      name: 'title',
+      title: 'Nombre de la pieza',
+      type: 'localizedString',
+      group: 'content',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'description',
       title: 'Descripción',
       type: 'localizedText',
+      group: 'content',
     }),
     defineField({
       name: 'details',
       title: 'Detalles',
-      description: 'Lista tipo viñetas (material, tamaño, técnica…)',
+      description: 'Ej: Plata 925, Hecho a mano… (un renglón por detalle)',
       type: 'array',
+      group: 'content',
       of: [
         defineArrayMember({
           type: 'object',
           fields: [
             defineField({
               name: 'es',
-              title: 'Español',
+              title: 'Detalle',
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
@@ -61,11 +64,10 @@ export const piece = defineType({
               name: 'en',
               title: 'English',
               type: 'string',
+              hidden: true,
             }),
           ],
-          preview: {
-            select: {title: 'es'},
-          },
+          preview: {select: {title: 'es'}},
         }),
       ],
     }),
@@ -73,12 +75,14 @@ export const piece = defineType({
       name: 'price',
       title: 'Precio (S/)',
       type: 'number',
+      group: 'content',
       validation: (Rule) => Rule.required().min(0),
     }),
     defineField({
       name: 'category',
       title: 'Categoría',
       type: 'string',
+      group: 'organize',
       options: {
         list: [
           {title: 'Joyería', value: 'joyeria'},
@@ -92,8 +96,10 @@ export const piece = defineType({
     }),
     defineField({
       name: 'gender',
-      title: 'Género',
+      title: '¿Para quién?',
+      description: 'Solo joyería: Mujer u Hombre.',
       type: 'string',
+      group: 'organize',
       options: {
         list: [
           {title: 'Mujer', value: 'mujer'},
@@ -102,38 +108,45 @@ export const piece = defineType({
         layout: 'radio',
       },
       hidden: ({document}) => document?.category !== 'joyeria',
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const doc = context.document as {category?: string} | undefined
+          if (doc?.category === 'joyeria' && !value) {
+            return 'Elige Mujer u Hombre'
+          }
+          return true
+        }),
     }),
     defineField({
-      name: 'jewelryType',
-      title: 'Tipo',
+      name: 'section',
+      title: 'Subsección (opcional)',
+      description:
+        'Si quieres agrupar (ej. Aretes). Créala antes en Subsecciones de esta categoría. Si no usas subsecciones, déjalo vacío.',
       type: 'reference',
-      to: [{type: 'jewelryType'}],
-      hidden: ({document}) => document?.category !== 'joyeria',
-    }),
-    defineField({
-      name: 'jewelrySubtype',
-      title: 'Subtipo',
-      type: 'reference',
-      to: [{type: 'jewelrySubtype'}],
-      hidden: ({document}) => document?.category !== 'joyeria',
-    }),
-    defineField({
-      name: 'subsection',
-      title: 'Subsección',
-      type: 'reference',
-      to: [{type: 'categorySubsection'}],
-      hidden: ({document}) =>
-        !document?.category || document.category === 'joyeria',
+      group: 'organize',
+      to: [{type: 'section'}],
+      options: {
+        filter: ({document}) => {
+          if (!document?.category) {
+            return {filter: 'false'}
+          }
+          return {
+            filter: 'category == $category',
+            params: {category: document.category},
+          }
+        },
+      },
     }),
     defineField({
       name: 'status',
       title: 'Estado',
       type: 'string',
+      group: 'organize',
       options: {
         list: [
-          {title: 'Disponible', value: 'available'},
-          {title: 'Vendido', value: 'sold'},
-          {title: 'Oculto', value: 'hidden'},
+          {title: 'Disponible (se puede comprar)', value: 'available'},
+          {title: 'Vendido (se ve, no se puede comprar)', value: 'sold'},
+          {title: 'Oculto (no aparece en la web)', value: 'hidden'},
         ],
         layout: 'radio',
       },
@@ -141,18 +154,19 @@ export const piece = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'seo',
-      title: 'SEO',
-      type: 'seo',
+      name: 'slug',
+      title: 'URL',
+      description: 'Haz clic en “Generate” a partir del nombre.',
+      type: 'slug',
+      group: 'organize',
+      options: {source: 'title.es'},
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'translateNote',
-      title: 'Traducir al inglés',
-      description:
-        'Guarda el documento, luego usa el botón “Traducir al inglés” en la barra superior del Studio (o visita /studio y ejecuta la acción). También puedes llamar POST /api/translate con el documentId.',
-      type: 'string',
-      readOnly: true,
-      initialValue: 'Completa los campos en español, guarda, luego traduce.',
+      name: 'seo',
+      title: 'SEO (opcional)',
+      type: 'seo',
+      group: 'seo',
     }),
   ],
   preview: {
@@ -164,9 +178,11 @@ export const piece = defineType({
       price: 'price',
     },
     prepare({title, media, category, status, price}) {
+      const statusLabel =
+        status === 'sold' ? 'Vendido' : status === 'hidden' ? 'Oculto' : 'Disponible'
       return {
         title: title || 'Sin título',
-        subtitle: `${category || ''} · S/ ${price ?? '—'} · ${status || ''}`,
+        subtitle: `S/ ${price ?? '—'} · ${statusLabel}`,
         media,
       }
     },

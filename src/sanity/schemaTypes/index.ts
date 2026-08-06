@@ -4,11 +4,7 @@ import {
   localizedString,
   localizedText,
 } from './objects/localizedString'
-import {
-  categorySubsection,
-  jewelrySubtype,
-  jewelryType,
-} from './documents/jewelryType'
+import {section} from './documents/section'
 import {piece} from './documents/piece'
 import {exhibition} from './documents/exhibition'
 import {homePage} from './documents/homePage'
@@ -21,9 +17,7 @@ export const schemaTypes = [
   localizedText,
   localizedBlockContent,
   seo,
-  jewelryType,
-  jewelrySubtype,
-  categorySubsection,
+  section,
   piece,
   exhibition,
   homePage,

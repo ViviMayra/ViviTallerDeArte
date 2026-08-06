@@ -10,8 +10,8 @@ type Body = {
 async function translateTexts(texts: string[]): Promise<string[]> {
   const apiKey = process.env.TRANSLATE_API_KEY
   if (!apiKey) {
-    // Deterministic placeholder so Studio still works without a key:
-    // copy Spanish as English draft for manual editing.
+    // Without an API key, copy Spanish → English so the site has EN strings;
+    // Mayra (or you) can refine later, or add TRANSLATE_API_KEY for real MT.
     return texts.map((text) => text)
   }
 
@@ -58,6 +58,17 @@ async function translateTexts(texts: string[]): Promise<string[]> {
   return parsed
 }
 
+function queueLocalized(
+  queue: {key: string; value: string}[],
+  path: string,
+  value: {es?: string; en?: string} | undefined,
+  overwrite = true,
+) {
+  if (!value?.es) return
+  if (!overwrite && value.en) return
+  queue.push({key: `${path}.en`, value: value.es})
+}
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Body
@@ -83,7 +94,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            'Sanity write token / project not configured. Set NEXT_PUBLIC_SANITY_PROJECT_ID and SANITY_API_WRITE_TOKEN.',
+            'Falta SANITY_API_WRITE_TOKEN en .env.local (token Editor en sanity.io/manage → API).',
         },
         {status: 400},
       )
@@ -99,41 +110,83 @@ export async function POST(request: Request) {
 
     const doc = await writeClient.getDocument(body.documentId)
     if (!doc) {
-      return NextResponse.json({error: 'Document not found'}, {status: 404})
+      return NextResponse.json(
+        {error: 'Documento no encontrado. Guarda primero, luego traduce.'},
+        {status: 404},
+      )
     }
 
-    const patch: Record<string, string> = {}
     const queue: {key: string; value: string}[] = []
 
-    if (doc.title?.es && !doc.title?.en) {
-      queue.push({key: 'title.en', value: doc.title.es})
-    }
-    if (doc.description?.es && !doc.description?.en) {
-      queue.push({key: 'description.en', value: doc.description.es})
-    }
+    queueLocalized(queue, 'title', doc.title)
+    queueLocalized(queue, 'description', doc.description)
+    queueLocalized(queue, 'place', doc.place)
+    queueLocalized(queue, 'summary', doc.summary)
+    queueLocalized(queue, 'heroEyebrow', doc.heroEyebrow)
+
     if (Array.isArray(doc.details)) {
-      doc.details.forEach((detail: {es?: string; en?: string}, index: number) => {
-        if (detail?.es && !detail?.en) {
-          queue.push({key: `details[${index}].en`, value: detail.es})
-        }
-      })
+      doc.details.forEach(
+        (detail: {es?: string; en?: string}, index: number) => {
+          if (detail?.es) {
+            queue.push({key: `details[${index}].en`, value: detail.es})
+          }
+        },
+      )
     }
 
-    if (!queue.length) {
+    if (Array.isArray(doc.sections)) {
+      doc.sections.forEach(
+        (
+          section: {
+            title?: {es?: string; en?: string}
+            text?: {es?: string; en?: string}
+          },
+          index: number,
+        ) => {
+          queueLocalized(queue, `sections[${index}].title`, section.title)
+          queueLocalized(queue, `sections[${index}].text`, section.text)
+        },
+      )
+    }
+
+    // About portable text: copy Spanish blocks to English if empty
+    if (doc.body?.es && (!doc.body.en || doc.body.en.length === 0)) {
+      // Can't easily MT portable text without API; copy structure as fallback
+      // Real MT would need block walk — for now set via client
+    }
+
+    if (!queue.length && !(doc.body?.es && (!doc.body?.en || !doc.body.en.length))) {
       return NextResponse.json({
         ok: true,
-        message: 'Nothing to translate (English fields already filled).',
+        message: 'No había texto nuevo para traducir.',
       })
     }
 
-    const translated = await translateTexts(queue.map((q) => q.value))
-    queue.forEach((item, i) => {
-      patch[item.key] = translated[i]
+    const patch = writeClient.patch(body.documentId)
+
+    if (queue.length) {
+      const translated = await translateTexts(queue.map((q) => q.value))
+      const setPayload: Record<string, string> = {}
+      queue.forEach((item, i) => {
+        setPayload[item.key] = translated[i]
+      })
+      patch.set(setPayload)
+    }
+
+    if (doc.body?.es && (!doc.body.en || doc.body.en.length === 0)) {
+      // Copy Spanish portable text as English baseline (images/structure preserved)
+      patch.set({'body.en': doc.body.es})
+    }
+
+    await patch.commit()
+
+    return NextResponse.json({
+      ok: true,
+      patched: queue.map((q) => q.key),
+      message: process.env.TRANSLATE_API_KEY
+        ? 'Inglés generado.'
+        : 'Inglés copiado del español (agrega TRANSLATE_API_KEY para traducción automática real).',
     })
-
-    await writeClient.patch(body.documentId).set(patch).commit()
-
-    return NextResponse.json({ok: true, patched: Object.keys(patch)})
   } catch (error) {
     return NextResponse.json(
       {

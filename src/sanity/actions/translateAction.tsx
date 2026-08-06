@@ -1,47 +1,53 @@
 import {useState} from 'react'
-import {useClient, type DocumentActionComponent} from 'sanity'
+import type {DocumentActionComponent} from 'sanity'
 import {useToast} from '@sanity/ui'
 
+/**
+ * Fills hidden English fields from Spanish.
+ * Mayra only edits Spanish; visitors still get ES/EN on the site.
+ */
 export const translateAction: DocumentActionComponent = (props) => {
-  const {id, type, onComplete} = props
-  const client = useClient({apiVersion: '2025-01-01'})
+  const {id, onComplete, draft, published} = props
   const toast = useToast()
   const [loading, setLoading] = useState(false)
 
-  if (!['piece', 'exhibition', 'homePage', 'aboutPage', 'jewelryType', 'jewelrySubtype', 'categorySubsection'].includes(type)) {
-    return null
-  }
+  const docId = draft?._id || published?._id || id
 
   return {
     label: loading ? 'Traduciendo…' : 'Traducir al inglés',
+    title:
+      'Completa todo en español, guarda, y haz clic aquí. El inglés se llena solo.',
+    tone: 'positive',
+    disabled: loading,
     onHandle: async () => {
       setLoading(true)
       try {
-        // Ensure latest draft is available
-        await client.fetch(`*[_id == $id][0]._id`, {id})
-        const response = await fetch('/api/translate', {
+        const targetId = docId
+
+        let response = await fetch('/api/translate', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({documentId: id.replace(/^drafts\./, '')}),
+          body: JSON.stringify({documentId: targetId}),
         })
-        // Also try draft id if published id fails
+
         if (!response.ok) {
-          const retry = await fetch('/api/translate', {
+          const publishedId = String(targetId).replace(/^drafts\./, '')
+          response = await fetch('/api/translate', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({documentId: id}),
+            body: JSON.stringify({documentId: publishedId}),
           })
-          const data = await retry.json()
-          if (!retry.ok) throw new Error(data.error || 'Error')
-        } else {
-          const data = await response.json()
-          if (data.error) throw new Error(data.error)
         }
+
+        const data = await response.json()
+        if (!response.ok) throw new Error(data.error || 'Error al traducir')
+
         toast.push({
           status: 'success',
-          title: 'Traducción lista',
+          title: 'Listo',
           description:
-            'Campos en inglés actualizados. Revisa y ajusta si hace falta.',
+            data.message ||
+            'Inglés actualizado. Puedes seguir editando en español cuando quieras.',
         })
       } catch (error) {
         toast.push({
@@ -50,7 +56,7 @@ export const translateAction: DocumentActionComponent = (props) => {
           description:
             error instanceof Error
               ? error.message
-              : 'Configura SANITY_API_WRITE_TOKEN y TRANSLATE_API_KEY',
+              : 'Pide ayuda para configurar el token de traducción.',
         })
       } finally {
         setLoading(false)

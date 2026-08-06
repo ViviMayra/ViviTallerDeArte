@@ -1,13 +1,14 @@
 import {defineField, defineType} from 'sanity'
 
+/** Spanish is what Mayra edits. English is filled by “Traducir al inglés” and stays hidden. */
 export const localizedString = defineType({
   name: 'localizedString',
-  title: 'Texto (ES / EN)',
+  title: 'Texto',
   type: 'object',
   fields: [
     defineField({
       name: 'es',
-      title: 'Español',
+      title: 'Texto',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
@@ -15,18 +16,19 @@ export const localizedString = defineType({
       name: 'en',
       title: 'English',
       type: 'string',
+      hidden: true,
     }),
   ],
 })
 
 export const localizedText = defineType({
   name: 'localizedText',
-  title: 'Texto largo (ES / EN)',
+  title: 'Texto largo',
   type: 'object',
   fields: [
     defineField({
       name: 'es',
-      title: 'Español',
+      title: 'Texto',
       type: 'text',
       rows: 4,
       validation: (Rule) => Rule.required(),
@@ -36,18 +38,19 @@ export const localizedText = defineType({
       title: 'English',
       type: 'text',
       rows: 4,
+      hidden: true,
     }),
   ],
 })
 
 export const localizedBlockContent = defineType({
   name: 'localizedBlockContent',
-  title: 'Contenido (ES / EN)',
+  title: 'Contenido',
   type: 'object',
   fields: [
     defineField({
       name: 'es',
-      title: 'Español',
+      title: 'Contenido',
       type: 'array',
       of: [
         {type: 'block'},
@@ -68,6 +71,7 @@ export const localizedBlockContent = defineType({
       name: 'en',
       title: 'English',
       type: 'array',
+      hidden: true,
       of: [
         {type: 'block'},
         {

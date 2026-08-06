@@ -22,12 +22,11 @@ export type Category =
   | 'ilustraciones'
   | 'pintura'
 
-export type TaxonomyRef = {
+export type SectionRef = {
   _id: string
   title: LocalizedString
   slug: string
   order?: number
-  parentId?: string
   category?: string
 }
 
@@ -42,9 +41,7 @@ export type Piece = {
   category: Category
   gender?: 'mujer' | 'hombre'
   status: PieceStatus
-  jewelryType?: TaxonomyRef | null
-  jewelrySubtype?: TaxonomyRef | null
-  subsection?: TaxonomyRef | null
+  section?: SectionRef | null
   seo?: {
     title?: string
     description?: string

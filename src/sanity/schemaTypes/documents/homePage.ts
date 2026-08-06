@@ -7,25 +7,26 @@ export const homePage = defineType({
   fields: [
     defineField({
       name: 'heroImage',
-      title: 'Imagen principal (hero)',
+      title: 'Foto grande de portada',
       type: 'image',
       options: {hotspot: true},
       fields: [
         defineField({
           name: 'alt',
-          title: 'Texto alternativo',
+          title: 'Descripción corta de la foto',
           type: 'localizedString',
         }),
       ],
     }),
     defineField({
       name: 'heroEyebrow',
-      title: 'Texto sobre el hero',
+      title: 'Texto debajo del logo en la portada',
       type: 'localizedString',
     }),
     defineField({
       name: 'sections',
-      title: 'Bloques de categoría',
+      title: 'Secciones de la página (Joyería, Cerámica…)',
+      description: 'Cada bloque: foto + texto + enlace al catálogo.',
       type: 'array',
       of: [
         defineArrayMember({

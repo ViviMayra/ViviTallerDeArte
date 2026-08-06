@@ -3,8 +3,8 @@ import type {
   Exhibition,
   HomePage,
   Piece,
+  SectionRef,
   Settings,
-  TaxonomyRef,
 } from './types'
 
 export const demoSettings: Settings = {
@@ -74,31 +74,23 @@ export const demoHome: HomePage = {
   },
 }
 
-const aretes: TaxonomyRef = {
-  _id: 'type-aretes',
+const aretes: SectionRef = {
+  _id: 'sec-aretes',
   title: {es: 'Aretes', en: 'Earrings'},
   slug: 'aretes',
   order: 1,
+  category: 'joyeria',
 }
 
-const anillos: TaxonomyRef = {
-  _id: 'type-anillos',
+const anillos: SectionRef = {
+  _id: 'sec-anillos',
   title: {es: 'Anillos', en: 'Rings'},
   slug: 'anillos',
   order: 2,
+  category: 'joyeria',
 }
 
-export const demoJewelryTypes: TaxonomyRef[] = [aretes, anillos]
-
-export const demoJewelrySubtypes: TaxonomyRef[] = [
-  {
-    _id: 'sub-florales',
-    title: {es: 'Florales', en: 'Floral'},
-    slug: 'florales',
-    order: 1,
-    parentId: 'type-aretes',
-  },
-]
+export const demoSections: SectionRef[] = [aretes, anillos]
 
 export const demoPieces: Piece[] = [
   {
@@ -109,8 +101,7 @@ export const demoPieces: Piece[] = [
     category: 'joyeria',
     gender: 'mujer',
     status: 'available',
-    jewelryType: aretes,
-    jewelrySubtype: demoJewelrySubtypes[0],
+    section: aretes,
     description: {
       es: 'Aretes artesanales con motivo lunar, hechos a mano.',
       en: 'Handmade artisan earrings with a lunar motif.',
@@ -129,7 +120,7 @@ export const demoPieces: Piece[] = [
     category: 'joyeria',
     gender: 'mujer',
     status: 'sold',
-    jewelryType: anillos,
+    section: anillos,
     description: {
       es: 'Anillo con textura solar. Pieza única.',
       en: 'Ring with solar texture. One of a kind.',

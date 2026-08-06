@@ -1,86 +1,65 @@
-import type {StructureResolver} from 'sanity/structure'
+import type {StructureBuilder, StructureResolver} from 'sanity/structure'
+
+function categoryBranch(
+  S: StructureBuilder,
+  title: string,
+  category: 'joyeria' | 'ceramica' | 'ilustraciones' | 'pintura',
+  extraItems: ReturnType<StructureBuilder['listItem']>[] = [],
+) {
+  return S.listItem()
+    .title(title)
+    .child(
+      S.list()
+        .title(title)
+        .items([
+          S.listItem()
+            .title('Piezas')
+            .schemaType('piece')
+            .child(
+              S.documentList()
+                .title(`Piezas · ${title}`)
+                .filter('_type == "piece" && category == $category')
+                .params({category})
+                .initialValueTemplates([
+                  S.initialValueTemplateItem(`piece-${category}`),
+                ])
+                .defaultOrdering([{field: 'title.es', direction: 'asc'}]),
+            ),
+          S.listItem()
+            .title('Subsecciones (opcional)')
+            .schemaType('section')
+            .child(
+              S.documentList()
+                .title(`Subsecciones · ${title}`)
+                .filter('_type == "section" && category == $category')
+                .params({category})
+                .initialValueTemplates([
+                  S.initialValueTemplateItem(`section-${category}`),
+                ])
+                .defaultOrdering([{field: 'order', direction: 'asc'}]),
+            ),
+          ...extraItems,
+        ]),
+    )
+}
 
 export const structure: StructureResolver = (S) =>
   S.list()
-    .title('Contenido')
+    .title('VIVI')
     .items([
-      S.listItem()
-        .title('Piezas')
-        .child(
-          S.list()
-            .title('Piezas')
-            .items([
-              S.listItem()
-                .title('Joyería')
-                .child(
-                  S.documentList()
-                    .title('Joyería')
-                    .filter('_type == "piece" && category == "joyeria"')
-                    .defaultOrdering([{field: 'title.es', direction: 'asc'}]),
-                ),
-              S.listItem()
-                .title('Cerámica')
-                .child(
-                  S.documentList()
-                    .title('Cerámica')
-                    .filter('_type == "piece" && category == "ceramica"')
-                    .defaultOrdering([{field: 'title.es', direction: 'asc'}]),
-                ),
-              S.listItem()
-                .title('Ilustraciones')
-                .child(
-                  S.documentList()
-                    .title('Ilustraciones')
-                    .filter('_type == "piece" && category == "ilustraciones"')
-                    .defaultOrdering([{field: 'title.es', direction: 'asc'}]),
-                ),
-              S.listItem()
-                .title('Pintura')
-                .child(
-                  S.documentList()
-                    .title('Pintura')
-                    .filter('_type == "piece" && category == "pintura"')
-                    .defaultOrdering([{field: 'title.es', direction: 'asc'}]),
-                ),
-              S.divider(),
-              S.listItem()
-                .title('Todas las piezas')
-                .child(
-                  S.documentTypeList('piece').title('Todas las piezas'),
-                ),
-            ]),
-        ),
-      S.listItem()
-        .title('Taxonomía')
-        .child(
-          S.list()
-            .title('Taxonomía')
-            .items([
-              S.listItem()
-                .title('Tipos de joyería')
-                .schemaType('jewelryType')
-                .child(S.documentTypeList('jewelryType').title('Tipos')),
-              S.listItem()
-                .title('Subtipos de joyería')
-                .schemaType('jewelrySubtype')
-                .child(S.documentTypeList('jewelrySubtype').title('Subtipos')),
-              S.listItem()
-                .title('Subsecciones (otras categorías)')
-                .schemaType('categorySubsection')
-                .child(
-                  S.documentTypeList('categorySubsection').title(
-                    'Subsecciones',
-                  ),
-                ),
-            ]),
-        ),
-      S.listItem()
-        .title('Carruseles joyería')
-        .child(
-          S.document()
-            .schemaType('jewelryCarousels')
-            .documentId('jewelryCarousels'),
-        ),
+      categoryBranch(S, 'Joyería', 'joyeria', [
+        S.listItem()
+          .title('Carruseles (fotos bajo el catálogo)')
+          .child(
+            S.document()
+              .schemaType('jewelryCarousels')
+              .documentId('jewelryCarousels'),
+          ),
+      ]),
+      categoryBranch(S, 'Cerámica', 'ceramica'),
+      categoryBranch(S, 'Ilustraciones', 'ilustraciones'),
+      categoryBranch(S, 'Pintura', 'pintura'),
+      S.divider(),
       S.listItem()
         .title('Exhibiciones')
         .schemaType('exhibition')

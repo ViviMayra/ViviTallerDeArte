@@ -4,7 +4,7 @@ import {NextIntlClientProvider, hasLocale} from 'next-intl'
 import {getMessages, setRequestLocale} from 'next-intl/server'
 import {Figtree, Syne} from 'next/font/google'
 import {CartProvider} from '@/lib/cart'
-import {getSettings, getJewelryTaxonomy, getSubsections} from '@/lib/content'
+import {getSettings, getSections} from '@/lib/content'
 import {Header} from '@/components/Header'
 import {Footer} from '@/components/Footer'
 import {CartDrawer} from '@/components/CartDrawer'
@@ -51,12 +51,13 @@ export default async function LocaleLayout({
 
   const messages = await getMessages()
   const settings = await getSettings()
-  const {types} = await getJewelryTaxonomy()
-  const [ceramicaSubs, ilustracionesSubs, pinturaSubs] = await Promise.all([
-    getSubsections('ceramica'),
-    getSubsections('ilustraciones'),
-    getSubsections('pintura'),
-  ])
+  const [joyeriaSections, ceramicaSections, ilustracionesSections, pinturaSections] =
+    await Promise.all([
+      getSections('joyeria'),
+      getSections('ceramica'),
+      getSections('ilustraciones'),
+      getSections('pintura'),
+    ])
 
   const localBusiness = {
     '@context': 'https://schema.org',
@@ -96,10 +97,10 @@ export default async function LocaleLayout({
           <CartProvider>
             <JsonLd data={localBusiness} />
             <Header
-              jewelryTypes={types}
-              ceramicaSubs={ceramicaSubs}
-              ilustracionesSubs={ilustracionesSubs}
-              pinturaSubs={pinturaSubs}
+              joyeriaSections={joyeriaSections}
+              ceramicaSections={ceramicaSections}
+              ilustracionesSections={ilustracionesSections}
+              pinturaSections={pinturaSections}
             />
             <main className="flex-1">{children}</main>
             <Footer settings={settings} />

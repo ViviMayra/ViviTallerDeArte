@@ -5,21 +5,21 @@ import {useTranslations, useLocale} from 'next-intl'
 import {useState} from 'react'
 import {Link, usePathname} from '@/i18n/navigation'
 import {useCart} from '@/lib/cart'
-import type {TaxonomyRef} from '@/lib/types'
+import type {SectionRef} from '@/lib/types'
 import {t} from '@/lib/locale'
 
 type Props = {
-  jewelryTypes?: TaxonomyRef[]
-  ceramicaSubs?: TaxonomyRef[]
-  ilustracionesSubs?: TaxonomyRef[]
-  pinturaSubs?: TaxonomyRef[]
+  joyeriaSections?: SectionRef[]
+  ceramicaSections?: SectionRef[]
+  ilustracionesSections?: SectionRef[]
+  pinturaSections?: SectionRef[]
 }
 
 export function Header({
-  jewelryTypes = [],
-  ceramicaSubs = [],
-  ilustracionesSubs = [],
-  pinturaSubs = [],
+  joyeriaSections = [],
+  ceramicaSections = [],
+  ilustracionesSections = [],
+  pinturaSections = [],
 }: Props) {
   const tr = useTranslations('nav')
   const common = useTranslations('common')
@@ -39,9 +39,9 @@ export function Header({
       items: [
         {label: tr('women'), href: '/joyeria#mujer'},
         {label: tr('men'), href: '/joyeria#hombre'},
-        ...jewelryTypes.map((type) => ({
-          label: t(type.title, locale),
-          href: `/joyeria#${type.slug}`,
+        ...joyeriaSections.map((section) => ({
+          label: t(section.title, locale),
+          href: `/joyeria#${section.slug}`,
         })),
       ],
     },
@@ -49,7 +49,7 @@ export function Header({
       key: 'ceramica',
       label: tr('ceramica'),
       href: '/ceramica',
-      items: ceramicaSubs.map((s) => ({
+      items: ceramicaSections.map((s) => ({
         label: t(s.title, locale),
         href: `/ceramica#${s.slug}`,
       })),
@@ -58,7 +58,7 @@ export function Header({
       key: 'ilustraciones',
       label: tr('ilustraciones'),
       href: '/ilustraciones',
-      items: ilustracionesSubs.map((s) => ({
+      items: ilustracionesSections.map((s) => ({
         label: t(s.title, locale),
         href: `/ilustraciones#${s.slug}`,
       })),
@@ -67,7 +67,7 @@ export function Header({
       key: 'pintura',
       label: tr('pintura'),
       href: '/pintura',
-      items: pinturaSubs.map((s) => ({
+      items: pinturaSections.map((s) => ({
         label: t(s.title, locale),
         href: `/pintura#${s.slug}`,
       })),

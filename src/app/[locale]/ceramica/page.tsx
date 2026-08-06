@@ -1,6 +1,6 @@
 import {getTranslations, setRequestLocale} from 'next-intl/server'
 import {CategoryCatalog} from '@/components/CategoryCatalog'
-import {getPiecesByCategory, getSubsections} from '@/lib/content'
+import {getPiecesByCategory, getSections} from '@/lib/content'
 
 export default async function CeramicsPage({
   params,
@@ -10,9 +10,9 @@ export default async function CeramicsPage({
   const {locale} = await params
   setRequestLocale(locale)
   const nav = await getTranslations('nav')
-  const [pieces, subsections] = await Promise.all([
+  const [pieces, sections] = await Promise.all([
     getPiecesByCategory('ceramica'),
-    getSubsections('ceramica'),
+    getSections('ceramica'),
   ])
 
   return (
@@ -20,7 +20,7 @@ export default async function CeramicsPage({
       title={nav('ceramica')}
       category="ceramica"
       pieces={pieces}
-      subsections={subsections}
+      sections={sections}
     />
   )
 }
