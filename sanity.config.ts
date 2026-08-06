@@ -27,29 +27,34 @@ export default defineConfig({
         const id = String(template.id)
         return (
           id !== 'piece' &&
-          id !== 'section' &&
+          id !== 'piece-by-category' &&
           !id.startsWith('piece-') &&
+          id !== 'section' &&
           !id.startsWith('section-')
         )
       }),
-      ...categories.map((category) => ({
-        id: `piece-${category.id}`,
+      // One template — category comes from the list you clicked + in
+      {
+        id: 'piece-by-category',
         title: 'Nueva pieza',
         schemaType: 'piece' as const,
-        value: {
-          category: category.id,
-          status: 'available',
-        },
-      })),
+        parameters: [{name: 'category', type: 'string' as const}],
+        value: (params: {category?: string}) => ({
+          category: params.category,
+          status: 'available' as const,
+        }),
+      },
     ],
   },
   document: {
     newDocumentOptions: (prev, {creationContext}) => {
+      // Never offer “pick a category” from the top-right global + menu
       if (creationContext.type === 'global') {
         return prev.filter(
           (template) =>
-            !String(template.templateId).startsWith('piece-') &&
-            template.templateId !== 'piece',
+            template.templateId !== 'piece' &&
+            template.templateId !== 'piece-by-category' &&
+            !String(template.templateId).startsWith('piece-'),
         )
       }
       return prev

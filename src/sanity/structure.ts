@@ -33,10 +33,12 @@ function categoryBranch(
             .child(
               S.documentList()
                 .title(`Piezas · ${title}`)
+                .schemaType('piece')
                 .filter('_type == "piece" && category == $category')
                 .params({category})
+                // Single create option for this category — no 4-card picker
                 .initialValueTemplates([
-                  S.initialValueTemplateItem(`piece-${category}`),
+                  S.initialValueTemplateItem('piece-by-category', {category}),
                 ])
                 .defaultOrdering([{field: 'title.es', direction: 'asc'}]),
             ),
