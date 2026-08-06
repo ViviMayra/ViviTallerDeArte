@@ -39,7 +39,14 @@ export async function getSettings(): Promise<Settings> {
 export async function getHomePage(): Promise<HomePage> {
   if (!hasSanityConfig) return demoHome
   const data = await sanityFetch<HomePage>(homePageQuery)
-  return data?.sections?.length ? data : demoHome
+  // Use the Sanity Inicio doc even when Secciones is still empty
+  // (previously empty sections forced the whole demo homepage, ignoring her tagline/photo)
+  if (!data) return demoHome
+  return {
+    ...data,
+    heroImage: data.heroImage || demoHome.heroImage,
+    sections: data.sections || [],
+  }
 }
 
 export async function getAboutPage(): Promise<AboutPage> {
