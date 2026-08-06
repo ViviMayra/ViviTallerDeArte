@@ -1,5 +1,20 @@
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 
+function carouselItem(
+  S: StructureBuilder,
+  category: 'ceramica' | 'ilustraciones' | 'pintura',
+  title: string,
+) {
+  return S.listItem()
+    .title('Carrusel (opcional)')
+    .child(
+      S.document()
+        .schemaType('categoryCarousel')
+        .documentId(`carousel-${category}`)
+        .title(`Carrusel · ${title}`),
+    )
+}
+
 function categoryBranch(
   S: StructureBuilder,
   title: string,
@@ -49,16 +64,23 @@ export const structure: StructureResolver = (S) =>
     .items([
       categoryBranch(S, 'Joyería', 'joyeria', [
         S.listItem()
-          .title('Carruseles (fotos bajo el catálogo)')
+          .title('Carruseles (opcional)')
           .child(
             S.document()
               .schemaType('jewelryCarousels')
-              .documentId('jewelryCarousels'),
+              .documentId('jewelryCarousels')
+              .title('Carruseles de joyería'),
           ),
       ]),
-      categoryBranch(S, 'Cerámica', 'ceramica'),
-      categoryBranch(S, 'Ilustraciones', 'ilustraciones'),
-      categoryBranch(S, 'Pintura', 'pintura'),
+      categoryBranch(S, 'Cerámica', 'ceramica', [
+        carouselItem(S, 'ceramica', 'Cerámica'),
+      ]),
+      categoryBranch(S, 'Ilustraciones', 'ilustraciones', [
+        carouselItem(S, 'ilustraciones', 'Ilustraciones'),
+      ]),
+      categoryBranch(S, 'Pintura', 'pintura', [
+        carouselItem(S, 'pintura', 'Pintura'),
+      ]),
       S.divider(),
       S.listItem()
         .title('Exhibiciones')

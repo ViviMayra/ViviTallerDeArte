@@ -11,6 +11,7 @@ import {homePage} from './documents/homePage'
 import {aboutPage} from './documents/aboutPage'
 import {settings} from './documents/settings'
 import {jewelryCarousels} from './documents/jewelryCarousels'
+import {categoryCarousel} from './documents/categoryCarousel'
 
 export const schemaTypes = [
   localizedString,
@@ -24,4 +25,5 @@ export const schemaTypes = [
   aboutPage,
   settings,
   jewelryCarousels,
+  categoryCarousel,
 ]

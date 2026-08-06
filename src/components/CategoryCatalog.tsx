@@ -1,18 +1,21 @@
 import {getLocale, getTranslations} from 'next-intl/server'
 import {JumpNav} from '@/components/JumpNav'
 import {PieceCard} from '@/components/PieceCard'
+import {ImageCarousel} from '@/components/ImageCarousel'
 import {t} from '@/lib/locale'
-import type {Category, Locale, Piece, SectionRef} from '@/lib/types'
+import type {Category, Locale, Piece, SanityImage, SectionRef} from '@/lib/types'
 
 export async function CategoryCatalog({
   title,
   pieces,
   sections,
+  carouselSlides = [],
 }: {
   title: string
   category: Category
   pieces: Piece[]
   sections: SectionRef[]
+  carouselSlides?: SanityImage[]
 }) {
   const locale = (await getLocale()) as Locale
   const common = await getTranslations('common')
@@ -73,6 +76,10 @@ export async function CategoryCatalog({
               )
             })}
           </>
+        )}
+
+        {carouselSlides.length > 0 && (
+          <ImageCarousel slides={carouselSlides} locale={locale} />
         )}
       </div>
     </div>

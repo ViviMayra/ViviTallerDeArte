@@ -94,6 +94,10 @@ export const jewelryCarouselsQuery = groq`*[_type == "jewelryCarousels"][0]{
   menSlides[] ${imageFields}
 }`
 
+export const categoryCarouselQuery = groq`*[_type == "categoryCarousel" && _id in [$id, $draftId]][0]{
+  slides[] ${imageFields}
+}`
+
 export const exhibitionsQuery = groq`*[_type == "exhibition"] | order(order asc, year desc){
   _id,
   title ${localizedString},

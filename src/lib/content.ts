@@ -18,8 +18,10 @@ import type {
 } from './types'
 import {hasSanityConfig} from '@/sanity/env'
 import {sanityFetch} from '@/sanity/lib/client'
+import type {SanityImage} from './types'
 import {
   aboutPageQuery,
+  categoryCarouselQuery,
   exhibitionBySlugQuery,
   exhibitionsQuery,
   homePageQuery,
@@ -94,6 +96,18 @@ export async function getJewelryCarousels() {
   if (!hasSanityConfig) return demoCarousels
   const data = await sanityFetch<typeof demoCarousels>(jewelryCarouselsQuery)
   return data || demoCarousels
+}
+
+export async function getCategoryCarousel(
+  category: Exclude<Category, 'joyeria'>,
+): Promise<SanityImage[]> {
+  if (!hasSanityConfig) return []
+  const id = `carousel-${category}`
+  const data = await sanityFetch<{slides?: SanityImage[]}>(
+    categoryCarouselQuery,
+    {id, draftId: `drafts.${id}`},
+  )
+  return data?.slides || []
 }
 
 export async function getExhibitions(): Promise<Exhibition[]> {
