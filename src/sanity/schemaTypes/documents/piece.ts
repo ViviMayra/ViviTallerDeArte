@@ -1,4 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {AutoSlugInput, HiddenSlugField} from '../../components/AutoSlugInput'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 
 export const piece = defineType({
@@ -108,9 +109,9 @@ export const piece = defineType({
     defineField({
       name: 'slug',
       title: 'URL',
-      description: 'Haz clic en “Generate” a partir del nombre.',
       type: 'slug',
       options: {source: 'title.es'},
+      components: {input: AutoSlugInput, field: HiddenSlugField},
       validation: (Rule) => Rule.required(),
     }),
     defineField({
