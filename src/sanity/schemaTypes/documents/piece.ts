@@ -1,5 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
-import {AutoSlugInput, HiddenSlugField} from '../../components/AutoSlugInput'
+import {AutoSlugInput, QuietSlugField} from '../../components/AutoSlugInput'
 import {DetailsInput} from '../../components/DetailsInput'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 import {PieceTypeInput} from '../../components/PieceTypeInput'
@@ -14,6 +14,19 @@ export const piece = defineType({
       title: 'Nombre de la pieza',
       type: 'localizedString',
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'slug',
+      title: 'URL',
+      type: 'slug',
+      options: {source: 'title.es'},
+      components: {input: AutoSlugInput, field: QuietSlugField},
+      validation: (Rule) =>
+        Rule.custom((value) => {
+          const current = (value as {current?: string} | undefined)?.current
+          if (current?.trim()) return true
+          return 'Escribe el nombre arriba — la URL se crea sola'
+        }),
     }),
     defineField({
       name: 'description',
@@ -110,18 +123,11 @@ export const piece = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'slug',
-      title: 'URL',
-      type: 'slug',
-      options: {source: 'title.es'},
-      components: {input: AutoSlugInput, field: HiddenSlugField},
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
       name: 'category',
       title: 'Categoría',
       type: 'string',
-      hidden: true,
+      // Only show if missing — otherwise Publish is blocked with no visible field
+      hidden: ({value}) => Boolean(value),
       options: {
         list: [
           {title: 'Joyería', value: 'joyeria'},
@@ -130,7 +136,7 @@ export const piece = defineType({
           {title: 'Pintura', value: 'pintura'},
         ],
       },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('Elige la categoría'),
     }),
     defineField({
       name: 'seo',

@@ -1,5 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
-import {AutoSlugInput, HiddenSlugField} from '../../components/AutoSlugInput'
+import {AutoSlugInput, QuietSlugField} from '../../components/AutoSlugInput'
 
 export const exhibition = defineType({
   name: 'exhibition',
@@ -17,8 +17,13 @@ export const exhibition = defineType({
       title: 'URL',
       type: 'slug',
       options: {source: 'title.es'},
-      components: {input: AutoSlugInput, field: HiddenSlugField},
-      validation: (Rule) => Rule.required(),
+      components: {input: AutoSlugInput, field: QuietSlugField},
+      validation: (Rule) =>
+        Rule.custom((value) => {
+          const current = (value as {current?: string} | undefined)?.current
+          if (current?.trim()) return true
+          return 'Escribe el nombre arriba — la URL se crea sola'
+        }),
     }),
     defineField({
       name: 'photos',
