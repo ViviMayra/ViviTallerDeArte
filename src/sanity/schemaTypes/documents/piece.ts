@@ -74,7 +74,7 @@ export const piece = defineType({
     defineField({
       name: 'details',
       title: 'Detalles',
-      description: 'Un renglón por detalle. Ejemplo:\nPlata 925\nHecho a mano',
+      description: 'Un detalle por caja. Ejemplo: Plata 925',
       type: 'array',
       of: [{type: 'string'}],
       components: {input: DetailsInput},
