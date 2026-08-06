@@ -1,5 +1,6 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {AutoSlugInput, HiddenSlugField} from '../../components/AutoSlugInput'
+import {DetailsInput} from '../../components/DetailsInput'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 
 export const piece = defineType({
@@ -73,10 +74,10 @@ export const piece = defineType({
     defineField({
       name: 'details',
       title: 'Detalles',
-      description:
-        'Un renglón por detalle. Ej: Plata 925. Pulsa Enter o + para agregar otro.',
+      description: 'Un renglón por detalle. Ejemplo:\nPlata 925\nHecho a mano',
       type: 'array',
       of: [{type: 'string'}],
+      components: {input: DetailsInput},
     }),
     defineField({
       name: 'detailsEn',
