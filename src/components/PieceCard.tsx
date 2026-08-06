@@ -1,5 +1,6 @@
 import {getLocale, getTranslations} from 'next-intl/server'
 import {Link} from '@/i18n/navigation'
+import {SoldBadge} from '@/components/SoldBadge'
 import {formatPrice, t} from '@/lib/locale'
 import {getImageAlt, getImageUrl} from '@/lib/images'
 import type {Locale, Piece} from '@/lib/types'
@@ -22,14 +23,14 @@ export async function PieceCard({piece}: {piece: Piece}) {
           <img
             src={src}
             alt={getImageAlt(image, locale, t(piece.title, locale))}
-            className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${sold ? 'grayscale-[30%] brightness-95' : ''}`}
+            className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${
+              sold
+                ? 'group-hover:grayscale-[30%] group-hover:brightness-95'
+                : ''
+            }`}
           />
         ) : null}
-        {sold && (
-          <span className="absolute left-3 top-3 bg-foreground/80 px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-background">
-            {common('sold')}
-          </span>
-        )}
+        {sold && <SoldBadge label={common('sold')} />}
       </div>
       <div className="mt-3 text-center">
         <h3 className="text-sm uppercase tracking-[0.08em]">

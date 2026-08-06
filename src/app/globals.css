@@ -73,12 +73,8 @@ body {
   transform: translateY(-3px);
 }
 
-.piece-card.is-sold {
-  opacity: 0.72;
-}
-
 .piece-card.is-sold:hover {
-  transform: none;
+  transform: translateY(-3px);
 }
 
 @keyframes fade-up {
