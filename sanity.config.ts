@@ -6,13 +6,6 @@ import {structure} from './src/sanity/structure'
 import {projectId, dataset} from './src/sanity/env'
 import {translateAction} from './src/sanity/actions/translateAction'
 
-const categories = [
-  {id: 'joyeria', title: 'Joyería'},
-  {id: 'ceramica', title: 'Cerámica'},
-  {id: 'ilustraciones', title: 'Ilustraciones'},
-  {id: 'pintura', title: 'Pintura'},
-] as const
-
 export default defineConfig({
   name: 'vivi',
   title: 'VIVI Taller de Arte',
