@@ -10,6 +10,7 @@
     "cart": "Carrito",
     "women": "Mujer",
     "men": "Hombre",
+    "general": "General",
     "viewCatalog": "Ver catálogo"
   },
   "common": {
@@ -29,6 +30,7 @@
     "jumpTo": "Ir a",
     "seeMen": "Ver hombres",
     "seeWomen": "Ver mujeres",
+    "seeGeneral": "Ver general",
     "notFound": "No encontramos esta página",
     "backHome": "Volver al inicio"
   },

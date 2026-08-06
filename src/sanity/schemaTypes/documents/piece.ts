@@ -11,6 +11,30 @@ export const piece = defineType({
   ],
   fields: [
     defineField({
+      name: 'gender',
+      title: 'Tipo de joyería',
+      description: 'Elige primero: para mujer, para hombre, o general (para cualquiera).',
+      type: 'string',
+      group: 'content',
+      options: {
+        list: [
+          {title: 'Mujer', value: 'mujer'},
+          {title: 'Hombre', value: 'hombre'},
+          {title: 'General (para cualquiera)', value: 'general'},
+        ],
+        layout: 'radio',
+      },
+      hidden: ({document}) => document?.category !== 'joyeria',
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const doc = context.document as {category?: string} | undefined
+          if (doc?.category === 'joyeria' && !value) {
+            return 'Elige Mujer, Hombre o General'
+          }
+          return true
+        }),
+    }),
+    defineField({
       name: 'photos',
       title: 'Fotos',
       description: 'La primera foto es la principal. Arrastra para reordenar.',
@@ -83,6 +107,7 @@ export const piece = defineType({
       title: 'Categoría',
       type: 'string',
       group: 'organize',
+      hidden: true,
       options: {
         list: [
           {title: 'Joyería', value: 'joyeria'},
@@ -90,40 +115,16 @@ export const piece = defineType({
           {title: 'Ilustraciones', value: 'ilustraciones'},
           {title: 'Pintura', value: 'pintura'},
         ],
-        layout: 'radio',
       },
       validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'gender',
-      title: '¿Para quién?',
-      description: 'Solo joyería: Mujer u Hombre.',
-      type: 'string',
-      group: 'organize',
-      options: {
-        list: [
-          {title: 'Mujer', value: 'mujer'},
-          {title: 'Hombre', value: 'hombre'},
-        ],
-        layout: 'radio',
-      },
-      hidden: ({document}) => document?.category !== 'joyeria',
-      validation: (Rule) =>
-        Rule.custom((value, context) => {
-          const doc = context.document as {category?: string} | undefined
-          if (doc?.category === 'joyeria' && !value) {
-            return 'Elige Mujer u Hombre'
-          }
-          return true
-        }),
     }),
     defineField({
       name: 'section',
       title: 'Subsección (opcional)',
       description:
-        'Si quieres agrupar (ej. Aretes). Créala antes en Subsecciones de esta categoría. Si no usas subsecciones, déjalo vacío.',
+        'Si quieres agrupar (ej. Aretes). Créala antes en Subsecciones. Si no, déjalo vacío.',
       type: 'reference',
-      group: 'organize',
+      group: 'content',
       to: [{type: 'section'}],
       options: {
         filter: ({document}) => {
@@ -141,7 +142,7 @@ export const piece = defineType({
       name: 'status',
       title: 'Estado',
       type: 'string',
-      group: 'organize',
+      group: 'content',
       options: {
         list: [
           {title: 'Disponible (se puede comprar)', value: 'available'},
@@ -173,16 +174,20 @@ export const piece = defineType({
     select: {
       title: 'title.es',
       media: 'photos.0',
-      category: 'category',
+      gender: 'gender',
       status: 'status',
       price: 'price',
     },
-    prepare({title, media, category, status, price}) {
+    prepare({title, media, gender, status, price}) {
       const statusLabel =
         status === 'sold' ? 'Vendido' : status === 'hidden' ? 'Oculto' : 'Disponible'
+      const genderLabel =
+        gender === 'hombre' ? 'Hombre' : gender === 'general' ? 'General' : gender === 'mujer' ? 'Mujer' : ''
       return {
         title: title || 'Sin título',
-        subtitle: `S/ ${price ?? '—'} · ${statusLabel}`,
+        subtitle: [genderLabel, `S/ ${price ?? '—'}`, statusLabel]
+          .filter(Boolean)
+          .join(' · '),
         media,
       }
     },

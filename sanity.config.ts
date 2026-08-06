@@ -34,7 +34,7 @@ export default defineConfig({
       }),
       ...categories.map((category) => ({
         id: `piece-${category.id}`,
-        title: `Pieza · ${category.title}`,
+        title: 'Nueva pieza',
         schemaType: 'piece' as const,
         value: {
           category: category.id,
@@ -43,7 +43,7 @@ export default defineConfig({
       })),
       ...categories.map((category) => ({
         id: `section-${category.id}`,
-        title: `Subsección · ${category.title}`,
+        title: 'Nueva subsección',
         schemaType: 'section' as const,
         value: {
           category: category.id,
@@ -53,6 +53,20 @@ export default defineConfig({
     ],
   },
   document: {
+    // Hide global “new piece” that would force picking a category.
+    // New pieces are created from each category list (already tagged).
+    newDocumentOptions: (prev, {creationContext}) => {
+      if (creationContext.type === 'global') {
+        return prev.filter(
+          (template) =>
+            !String(template.templateId).startsWith('piece-') &&
+            !String(template.templateId).startsWith('section-') &&
+            template.templateId !== 'piece' &&
+            template.templateId !== 'section',
+        )
+      }
+      return prev
+    },
     actions: (prev, context) => {
       const translateTypes = [
         'piece',
@@ -68,3 +82,4 @@ export default defineConfig({
     },
   },
 })
+

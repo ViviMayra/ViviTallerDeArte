@@ -26,6 +26,7 @@ export default async function JoyeriaPage({
       sections={sections}
       womenSlides={carousels.womenSlides || []}
       menSlides={carousels.menSlides || []}
+      generalSlides={carousels.generalSlides || []}
     />
   )
 }

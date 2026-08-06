@@ -245,4 +245,7 @@ export const demoCarousels = {
   menSlides: [
     {url: '/demo/carousel-3.svg', alt: {es: 'Joyería hombre', en: 'Men’s jewelry'}},
   ],
+  generalSlides: [
+    {url: '/demo/carousel-1.svg', alt: {es: 'Joyería general', en: 'General jewelry'}},
+  ],
 }

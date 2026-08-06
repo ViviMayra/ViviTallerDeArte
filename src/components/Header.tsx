@@ -39,6 +39,7 @@ export function Header({
       items: [
         {label: tr('women'), href: '/joyeria#mujer'},
         {label: tr('men'), href: '/joyeria#hombre'},
+        {label: tr('general'), href: '/joyeria#general'},
         ...joyeriaSections.map((section) => ({
           label: t(section.title, locale),
           href: `/joyeria#${section.slug}`,

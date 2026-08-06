@@ -39,7 +39,7 @@ export type Piece = {
   details?: LocalizedString[]
   price: number
   category: Category
-  gender?: 'mujer' | 'hombre'
+  gender?: 'mujer' | 'hombre' | 'general'
   status: PieceStatus
   section?: SectionRef | null
   seo?: {

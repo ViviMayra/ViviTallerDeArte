@@ -5,27 +5,35 @@ import {ImageCarousel} from '@/components/ImageCarousel'
 import {t} from '@/lib/locale'
 import type {Locale, Piece, SanityImage, SectionRef} from '@/lib/types'
 
+type GenderId = 'mujer' | 'hombre' | 'general'
+
 export async function JewelryCatalog({
   pieces,
   sections,
   womenSlides,
   menSlides,
+  generalSlides,
 }: {
   pieces: Piece[]
   sections: SectionRef[]
   womenSlides: SanityImage[]
   menSlides: SanityImage[]
+  generalSlides: SanityImage[]
 }) {
   const locale = (await getLocale()) as Locale
   const nav = await getTranslations('nav')
   const common = await getTranslations('common')
 
-  const women = pieces.filter((p) => p.gender === 'mujer' || !p.gender)
+  const women = pieces.filter((p) => p.gender === 'mujer')
   const men = pieces.filter((p) => p.gender === 'hombre')
+  const general = pieces.filter(
+    (p) => p.gender === 'general' || !p.gender,
+  )
 
   const jumpItems = [
     {id: 'mujer', label: nav('women')},
     {id: 'hombre', label: nav('men')},
+    {id: 'general', label: nav('general')},
     ...sections.map((section) => ({
       id: section.slug,
       label: t(section.title, locale),
@@ -33,11 +41,13 @@ export async function JewelryCatalog({
   ]
 
   function renderGenderBlock(
-    id: 'mujer' | 'hombre',
+    id: GenderId,
     title: string,
     genderPieces: Piece[],
     slides: SanityImage[],
   ) {
+    if (!genderPieces.length && !slides.length) return null
+
     const withSections = sections
       .map((section) => ({
         section,
@@ -53,16 +63,23 @@ export async function JewelryCatalog({
           <h2 className="font-[family-name:var(--font-display)] text-2xl uppercase tracking-[0.12em] md:text-3xl">
             {title}
           </h2>
-          {id === 'mujer' && men.length > 0 && (
-            <a href="#hombre" className="catalog-link">
-              {common('seeMen')} →
-            </a>
-          )}
-          {id === 'hombre' && women.length > 0 && (
-            <a href="#mujer" className="catalog-link">
-              {common('seeWomen')} →
-            </a>
-          )}
+          <div className="flex flex-wrap gap-4">
+            {id !== 'mujer' && women.length > 0 && (
+              <a href="#mujer" className="catalog-link">
+                {common('seeWomen')} →
+              </a>
+            )}
+            {id !== 'hombre' && men.length > 0 && (
+              <a href="#hombre" className="catalog-link">
+                {common('seeMen')} →
+              </a>
+            )}
+            {id !== 'general' && general.length > 0 && (
+              <a href="#general" className="catalog-link">
+                {common('seeGeneral')} →
+              </a>
+            )}
+          </div>
         </div>
 
         {plain.length > 0 && (
@@ -74,7 +91,7 @@ export async function JewelryCatalog({
         )}
 
         {withSections.map(({section, items}) => (
-          <div key={section._id} id={section.slug} className="mb-14 scroll-mt-28">
+          <div key={`${id}-${section._id}`} id={section.slug} className="mb-14 scroll-mt-28">
             <h3 className="mb-6 text-sm uppercase tracking-[0.16em] text-muted">
               {t(section.title, locale)}
             </h3>
@@ -102,6 +119,7 @@ export async function JewelryCatalog({
       <div className="mx-auto max-w-7xl space-y-24 px-4 py-10 md:px-8">
         {renderGenderBlock('mujer', nav('women'), women, womenSlides)}
         {renderGenderBlock('hombre', nav('men'), men, menSlides)}
+        {renderGenderBlock('general', nav('general'), general, generalSlides)}
       </div>
     </div>
   )

@@ -5,7 +5,7 @@ const slideField = (name: string, title: string) =>
     name,
     title,
     description:
-      'Opcional. Si no hay fotos, ese carrusel no se muestra. Aparece debajo del catálogo.',
+      'Opcional. Si no hay fotos, ese carrusel no se muestra. Aparece debajo de esa sección del catálogo.',
     type: 'array',
     of: [
       defineArrayMember({
@@ -29,6 +29,7 @@ export const jewelryCarousels = defineType({
   fields: [
     slideField('womenSlides', 'Carrusel debajo de Mujer'),
     slideField('menSlides', 'Carrusel debajo de Hombre'),
+    slideField('generalSlides', 'Carrusel debajo de General'),
   ],
   preview: {
     prepare() {

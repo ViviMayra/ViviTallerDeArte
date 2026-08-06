@@ -24,6 +24,7 @@ export const section = defineType({
       name: 'category',
       title: 'Categoría',
       type: 'string',
+      hidden: true,
       options: {
         list: [
           {title: 'Joyería', value: 'joyeria'},
@@ -31,10 +32,8 @@ export const section = defineType({
           {title: 'Ilustraciones', value: 'ilustraciones'},
           {title: 'Pintura', value: 'pintura'},
         ],
-        layout: 'radio',
       },
       validation: (Rule) => Rule.required(),
-      readOnly: ({document}) => Boolean(document?.category),
     }),
     defineField({
       name: 'order',

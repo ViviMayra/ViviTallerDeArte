@@ -10,6 +10,7 @@
     "cart": "Cart",
     "women": "Women",
     "men": "Men",
+    "general": "General",
     "viewCatalog": "View catalog"
   },
   "common": {
@@ -29,6 +30,7 @@
     "jumpTo": "Jump to",
     "seeMen": "See men’s",
     "seeWomen": "See women’s",
+    "seeGeneral": "See general",
     "notFound": "We couldn’t find this page",
     "backHome": "Back home"
   },

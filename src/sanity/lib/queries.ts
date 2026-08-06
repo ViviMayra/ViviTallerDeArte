@@ -91,7 +91,8 @@ export const sectionsByCategoryQuery = groq`*[_type == "section" && category == 
 
 export const jewelryCarouselsQuery = groq`*[_type == "jewelryCarousels"][0]{
   womenSlides[] ${imageFields},
-  menSlides[] ${imageFields}
+  menSlides[] ${imageFields},
+  generalSlides[] ${imageFields}
 }`
 
 export const categoryCarouselQuery = groq`*[_type == "categoryCarousel" && _id in [$id, $draftId]][0]{
