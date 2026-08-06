@@ -41,11 +41,11 @@ function categoryBranch(
                 .defaultOrdering([{field: 'title.es', direction: 'asc'}]),
             ),
           S.listItem()
-            .title('Subsecciones (opcional)')
+            .title('Tipos de pieza (opcional)')
             .schemaType('section')
             .child(
               S.documentList()
-                .title(`Subsecciones · ${title}`)
+                .title(`Tipos de pieza · ${title}`)
                 .filter('_type == "section" && category == $category')
                 .params({category})
                 .initialValueTemplates([

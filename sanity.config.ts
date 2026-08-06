@@ -43,7 +43,7 @@ export default defineConfig({
       })),
       ...categories.map((category) => ({
         id: `section-${category.id}`,
-        title: 'Nueva subsección',
+        title: 'Nuevo tipo (ej. Aretes)',
         schemaType: 'section' as const,
         value: {
           category: category.id,

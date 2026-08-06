@@ -29,6 +29,25 @@ export const piece = defineType({
         }),
     }),
     defineField({
+      name: 'section',
+      title: 'Tipo de pieza (opcional)',
+      description:
+        'Ejemplos: Aretes, Pulseras, Anillos, Collares… Créalos en “Subsecciones” de esta categoría. Si no usas grupos, déjalo vacío.',
+      type: 'reference',
+      to: [{type: 'section'}],
+      options: {
+        filter: ({document}) => {
+          if (!document?.category) {
+            return {filter: 'false'}
+          }
+          return {
+            filter: 'category == $category',
+            params: {category: document.category},
+          }
+        },
+      },
+    }),
+    defineField({
       name: 'photos',
       title: 'Fotos',
       description: 'La primera foto es la principal. Arrastra para reordenar.',
@@ -90,25 +109,6 @@ export const piece = defineType({
       title: 'Precio (S/)',
       type: 'number',
       validation: (Rule) => Rule.required().min(0),
-    }),
-    defineField({
-      name: 'section',
-      title: 'Subsección (opcional)',
-      description:
-        'Si quieres agrupar (ej. Aretes). Créala antes en Subsecciones. Si no, déjalo vacío.',
-      type: 'reference',
-      to: [{type: 'section'}],
-      options: {
-        filter: ({document}) => {
-          if (!document?.category) {
-            return {filter: 'false'}
-          }
-          return {
-            filter: 'category == $category',
-            params: {category: document.category},
-          }
-        },
-      },
     }),
     defineField({
       name: 'status',

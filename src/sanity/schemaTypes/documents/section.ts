@@ -8,8 +8,9 @@ export const section = defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Nombre de la subsección',
-      description: 'Ejemplo: Aretes, Anillos, Cuencos…',
+      title: 'Nombre del tipo de pieza',
+      description:
+        'Ejemplos para joyería: Aretes, Pulseras, Anillos, Collares. Para cerámica: Cuencos, Jarrones…',
       type: 'localizedString',
       validation: (Rule) => Rule.required(),
     }),
