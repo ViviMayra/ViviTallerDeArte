@@ -24,8 +24,8 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
     description:
       piece.seo?.description || t(piece.description, locale) || undefined,
     openGraph: {
-      images: getImageUrl(piece.seo?.image || piece.photos?.[0])
-        ? [getImageUrl(piece.seo?.image || piece.photos?.[0])!]
+      images: getImageUrl(piece.photos?.[0])
+        ? [getImageUrl(piece.photos?.[0])!]
         : undefined,
     },
     alternates: {

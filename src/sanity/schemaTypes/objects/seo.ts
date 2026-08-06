@@ -17,11 +17,6 @@ export const seo = defineType({
       type: 'text',
       rows: 3,
     }),
-    defineField({
-      name: 'image',
-      title: 'Imagen al compartir (opcional)',
-      type: 'image',
-      options: {hotspot: true},
-    }),
   ],
 })
+
