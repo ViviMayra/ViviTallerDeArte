@@ -1,10 +1,12 @@
 import {defineField, defineType} from 'sanity'
+import {SpanishStringInput} from '../../components/SpanishStringInput'
 
 /** Spanish is what Mayra edits. English is filled by “Traducir al inglés” and stays hidden. */
 export const localizedString = defineType({
   name: 'localizedString',
   title: 'Texto',
   type: 'object',
+  components: {input: SpanishStringInput},
   fields: [
     defineField({
       name: 'es',
@@ -25,6 +27,7 @@ export const localizedText = defineType({
   name: 'localizedText',
   title: 'Texto largo',
   type: 'object',
+  components: {input: SpanishStringInput},
   fields: [
     defineField({
       name: 'es',
@@ -48,6 +51,7 @@ export const optionalLocalizedString = defineType({
   name: 'optionalLocalizedString',
   title: 'Texto opcional',
   type: 'object',
+  components: {input: SpanishStringInput},
   fields: [
     defineField({
       name: 'es',
@@ -62,7 +66,6 @@ export const optionalLocalizedString = defineType({
     }),
   ],
 })
-
 
 export const localizedBlockContent = defineType({
   name: 'localizedBlockContent',

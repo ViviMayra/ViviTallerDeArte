@@ -104,7 +104,11 @@ export default async function PiecePage({params}: Props) {
               <h2 className="text-sm font-medium">{common('details')}:</h2>
               <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted">
                 {piece.details.map((detail, i) => (
-                  <li key={i}>{t(detail, locale)}</li>
+                  <li key={i}>
+                    {locale === 'en' && piece.detailsEn?.[i]
+                      ? piece.detailsEn[i]
+                      : detail}
+                  </li>
                 ))}
               </ul>
             </div>

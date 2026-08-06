@@ -33,7 +33,8 @@ export type Piece = {
   slug: string
   photos?: SanityImage[]
   description?: LocalizedText
-  details?: LocalizedString[]
+  details?: string[]
+  detailsEn?: string[]
   price: number
   category: Category
   gender?: 'mujer' | 'hombre' | 'general'

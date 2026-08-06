@@ -1,4 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 
 /** Optional photo carousel under a category catalog (cerámica, ilustraciones, pintura). */
 export const categoryCarousel = defineType({
@@ -10,17 +11,18 @@ export const categoryCarousel = defineType({
       name: 'slides',
       title: 'Fotos del carrusel',
       description:
-        'Opcional. Si no agregas fotos, el carrusel no aparece en la web. Arrastra para reordenar.',
+        'Opcional. Si no agregas fotos, el carrusel no aparece en la web. Al editar una foto, usa Continuar.',
       type: 'array',
       of: [
         defineArrayMember({
           type: 'image',
           options: {hotspot: true},
+          components: {input: ImageInputWithContinue},
           fields: [
             defineField({
               name: 'alt',
               title: 'Descripción corta de la foto',
-              type: 'localizedString',
+              type: 'optionalLocalizedString',
             }),
           ],
         }),

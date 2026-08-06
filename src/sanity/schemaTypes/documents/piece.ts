@@ -1,4 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 
 export const piece = defineType({
   name: 'piece',
@@ -38,17 +39,19 @@ export const piece = defineType({
     defineField({
       name: 'photos',
       title: 'Fotos',
-      description: 'La primera foto es la principal. Arrastra para reordenar.',
+      description:
+        'La primera foto es la principal. Arrastra para reordenar. Al editar una foto, usa Continuar cuando termines.',
       type: 'array',
       of: [
         defineArrayMember({
           type: 'image',
           options: {hotspot: true},
+          components: {input: ImageInputWithContinue},
           fields: [
             defineField({
               name: 'alt',
               title: 'Descripción corta de la foto',
-              type: 'localizedString',
+              type: 'optionalLocalizedString',
             }),
           ],
         }),
@@ -69,28 +72,17 @@ export const piece = defineType({
     defineField({
       name: 'details',
       title: 'Detalles',
-      description: 'Ej: Plata 925, Hecho a mano… (un renglón por detalle)',
+      description:
+        'Un renglón por detalle. Ej: Plata 925. Pulsa Enter o + para agregar otro.',
       type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          fields: [
-            defineField({
-              name: 'es',
-              title: 'Detalle',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'en',
-              title: 'English',
-              type: 'string',
-              hidden: true,
-            }),
-          ],
-          preview: {select: {title: 'es'}},
-        }),
-      ],
+      of: [{type: 'string'}],
+    }),
+    defineField({
+      name: 'detailsEn',
+      title: 'Details (English)',
+      type: 'array',
+      of: [{type: 'string'}],
+      hidden: true,
     }),
     defineField({
       name: 'price',

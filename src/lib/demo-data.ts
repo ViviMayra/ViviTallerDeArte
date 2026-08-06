@@ -87,10 +87,8 @@ export const demoPieces: Piece[] = [
       es: 'Aretes artesanales con motivo lunar, hechos a mano.',
       en: 'Handmade artisan earrings with a lunar motif.',
     },
-    details: [
-      {es: 'Plata 925', en: 'Sterling silver 925'},
-      {es: 'Hecho a mano en Perú', en: 'Handmade in Peru'},
-    ],
+    details: ['Plata 925', 'Hecho a mano en Perú'],
+    detailsEn: ['Sterling silver 925', 'Handmade in Peru'],
     photos: [{url: '/demo/piece-1.svg', alt: {es: 'Aretes Luna', en: 'Luna Earrings'}}],
   },
   {
@@ -106,10 +104,8 @@ export const demoPieces: Piece[] = [
       es: 'Anillo con textura solar. Pieza única.',
       en: 'Ring with solar texture. One of a kind.',
     },
-    details: [
-      {es: 'Pieza única', en: 'One of a kind'},
-      {es: 'Plata y bronce', en: 'Silver and bronze'},
-    ],
+    details: ['Pieza única', 'Plata y bronce'],
+    detailsEn: ['One of a kind', 'Silver and bronze'],
     photos: [{url: '/demo/piece-2.svg', alt: {es: 'Anillo Sol', en: 'Sol Ring'}}],
   },
   {
@@ -125,7 +121,8 @@ export const demoPieces: Piece[] = [
       es: 'Cadena masculina con dije geométrico.',
       en: 'Men’s chain with a geometric pendant.',
     },
-    details: [{es: 'Largo ajustable', en: 'Adjustable length'}],
+    details: ['Largo ajustable'],
+    detailsEn: ['Adjustable length'],
     photos: [{url: '/demo/piece-3.svg', alt: {es: 'Cadena Andes', en: 'Andes Chain'}}],
   },
   {
@@ -140,7 +137,8 @@ export const demoPieces: Piece[] = [
       es: 'Cuenco de cerámica esmaltada en tonos tierra.',
       en: 'Glazed ceramic bowl in earth tones.',
     },
-    details: [{es: 'Cerámica esmaltada', en: 'Glazed ceramic'}],
+    details: ['Cerámica esmaltada'],
+    detailsEn: ['Glazed ceramic'],
     photos: [{url: '/demo/piece-4.svg', alt: {es: 'Cuenco Tierra', en: 'Tierra Bowl'}}],
   },
   {

@@ -1,21 +1,23 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 
 const slideField = (name: string, title: string) =>
   defineField({
     name,
     title,
     description:
-      'Opcional. Si no hay fotos, ese carrusel no se muestra. Aparece debajo de esa sección del catálogo.',
+      'Opcional. Si no hay fotos, ese carrusel no se muestra. Al editar una foto, usa Continuar.',
     type: 'array',
     of: [
       defineArrayMember({
         type: 'image',
         options: {hotspot: true},
+        components: {input: ImageInputWithContinue},
         fields: [
           defineField({
             name: 'alt',
             title: 'Descripción corta de la foto',
-            type: 'localizedString',
+            type: 'optionalLocalizedString',
           }),
         ],
       }),

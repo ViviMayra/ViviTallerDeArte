@@ -10,8 +10,6 @@ type Body = {
 async function translateTexts(texts: string[]): Promise<string[]> {
   const apiKey = process.env.TRANSLATE_API_KEY
   if (!apiKey) {
-    // Without an API key, copy Spanish → English so the site has EN strings;
-    // Mayra (or you) can refine later, or add TRANSLATE_API_KEY for real MT.
     return texts.map((text) => text)
   }
 
@@ -62,10 +60,8 @@ function queueLocalized(
   queue: {key: string; value: string}[],
   path: string,
   value: {es?: string; en?: string} | undefined,
-  overwrite = true,
 ) {
   if (!value?.es) return
-  if (!overwrite && value.en) return
   queue.push({key: `${path}.en`, value: value.es})
 }
 
@@ -125,16 +121,6 @@ export async function POST(request: Request) {
     queueLocalized(queue, 'heroEyebrow', doc.heroEyebrow)
     queueLocalized(queue, 'pieceType', doc.pieceType)
 
-    if (Array.isArray(doc.details)) {
-      doc.details.forEach(
-        (detail: {es?: string; en?: string}, index: number) => {
-          if (detail?.es) {
-            queue.push({key: `details[${index}].en`, value: detail.es})
-          }
-        },
-      )
-    }
-
     if (Array.isArray(doc.sections)) {
       doc.sections.forEach(
         (
@@ -150,13 +136,18 @@ export async function POST(request: Request) {
       )
     }
 
-    // About portable text: copy Spanish blocks to English if empty
-    if (doc.body?.es && (!doc.body.en || doc.body.en.length === 0)) {
-      // Can't easily MT portable text without API; copy structure as fallback
-      // Real MT would need block walk — for now set via client
-    }
+    const spanishDetails = Array.isArray(doc.details)
+      ? doc.details.filter(
+          (d: unknown): d is string =>
+            typeof d === 'string' && d.trim().length > 0,
+        )
+      : []
 
-    if (!queue.length && !(doc.body?.es && (!doc.body?.en || !doc.body.en.length))) {
+    const shouldCopyBody =
+      Boolean(doc.body?.es) &&
+      (!doc.body?.en || doc.body.en.length === 0)
+
+    if (!queue.length && !spanishDetails.length && !shouldCopyBody) {
       return NextResponse.json({
         ok: true,
         message: 'No había texto nuevo para traducir.',
@@ -164,26 +155,28 @@ export async function POST(request: Request) {
     }
 
     const patch = writeClient.patch(body.documentId)
+    const setPayload: Record<string, unknown> = {}
 
     if (queue.length) {
       const translated = await translateTexts(queue.map((q) => q.value))
-      const setPayload: Record<string, string> = {}
       queue.forEach((item, i) => {
         setPayload[item.key] = translated[i]
       })
-      patch.set(setPayload)
     }
 
-    if (doc.body?.es && (!doc.body.en || doc.body.en.length === 0)) {
-      // Copy Spanish portable text as English baseline (images/structure preserved)
-      patch.set({'body.en': doc.body.es})
+    if (spanishDetails.length) {
+      setPayload.detailsEn = await translateTexts(spanishDetails)
     }
 
-    await patch.commit()
+    if (shouldCopyBody) {
+      setPayload['body.en'] = doc.body.es
+    }
+
+    await patch.set(setPayload).commit()
 
     return NextResponse.json({
       ok: true,
-      patched: queue.map((q) => q.key),
+      patched: Object.keys(setPayload),
       message: process.env.TRANSLATE_API_KEY
         ? 'Inglés generado.'
         : 'Inglés copiado del español (agrega TRANSLATE_API_KEY para traducción automática real).',
