@@ -4,18 +4,12 @@ export const piece = defineType({
   name: 'piece',
   title: 'Pieza',
   type: 'document',
-  groups: [
-    {name: 'content', title: 'Contenido', default: true},
-    {name: 'organize', title: 'Organizar'},
-    {name: 'seo', title: 'SEO'},
-  ],
   fields: [
     defineField({
       name: 'gender',
       title: 'Tipo de joyería',
       description: 'Elige primero: para mujer, para hombre, o general (para cualquiera).',
       type: 'string',
-      group: 'content',
       options: {
         list: [
           {title: 'Mujer', value: 'mujer'},
@@ -39,7 +33,6 @@ export const piece = defineType({
       title: 'Fotos',
       description: 'La primera foto es la principal. Arrastra para reordenar.',
       type: 'array',
-      group: 'content',
       of: [
         defineArrayMember({
           type: 'image',
@@ -59,21 +52,18 @@ export const piece = defineType({
       name: 'title',
       title: 'Nombre de la pieza',
       type: 'localizedString',
-      group: 'content',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'description',
       title: 'Descripción',
       type: 'localizedText',
-      group: 'content',
     }),
     defineField({
       name: 'details',
       title: 'Detalles',
       description: 'Ej: Plata 925, Hecho a mano… (un renglón por detalle)',
       type: 'array',
-      group: 'content',
       of: [
         defineArrayMember({
           type: 'object',
@@ -99,24 +89,7 @@ export const piece = defineType({
       name: 'price',
       title: 'Precio (S/)',
       type: 'number',
-      group: 'content',
       validation: (Rule) => Rule.required().min(0),
-    }),
-    defineField({
-      name: 'category',
-      title: 'Categoría',
-      type: 'string',
-      group: 'organize',
-      hidden: true,
-      options: {
-        list: [
-          {title: 'Joyería', value: 'joyeria'},
-          {title: 'Cerámica', value: 'ceramica'},
-          {title: 'Ilustraciones', value: 'ilustraciones'},
-          {title: 'Pintura', value: 'pintura'},
-        ],
-      },
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'section',
@@ -124,7 +97,6 @@ export const piece = defineType({
       description:
         'Si quieres agrupar (ej. Aretes). Créala antes en Subsecciones. Si no, déjalo vacío.',
       type: 'reference',
-      group: 'content',
       to: [{type: 'section'}],
       options: {
         filter: ({document}) => {
@@ -142,7 +114,6 @@ export const piece = defineType({
       name: 'status',
       title: 'Estado',
       type: 'string',
-      group: 'content',
       options: {
         list: [
           {title: 'Disponible (se puede comprar)', value: 'available'},
@@ -159,15 +130,28 @@ export const piece = defineType({
       title: 'URL',
       description: 'Haz clic en “Generate” a partir del nombre.',
       type: 'slug',
-      group: 'organize',
       options: {source: 'title.es'},
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'category',
+      title: 'Categoría',
+      type: 'string',
+      hidden: true,
+      options: {
+        list: [
+          {title: 'Joyería', value: 'joyeria'},
+          {title: 'Cerámica', value: 'ceramica'},
+          {title: 'Ilustraciones', value: 'ilustraciones'},
+          {title: 'Pintura', value: 'pintura'},
+        ],
+      },
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'seo',
       title: 'SEO (opcional)',
       type: 'seo',
-      group: 'seo',
     }),
   ],
   preview: {
@@ -182,7 +166,13 @@ export const piece = defineType({
       const statusLabel =
         status === 'sold' ? 'Vendido' : status === 'hidden' ? 'Oculto' : 'Disponible'
       const genderLabel =
-        gender === 'hombre' ? 'Hombre' : gender === 'general' ? 'General' : gender === 'mujer' ? 'Mujer' : ''
+        gender === 'hombre'
+          ? 'Hombre'
+          : gender === 'general'
+            ? 'General'
+            : gender === 'mujer'
+              ? 'Mujer'
+              : ''
       return {
         title: title || 'Sin título',
         subtitle: [genderLabel, `S/ ${price ?? '—'}`, statusLabel]
