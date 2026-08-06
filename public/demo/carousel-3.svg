@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <rect width="1200" height="700" fill="#ebe4d6"/>
+  <rect x="80" y="80" width="1040" height="540" fill="#d8c49a" opacity="0.5"/>
+  <text x="600" y="370" text-anchor="middle" font-family="Georgia, serif" font-size="42" fill="#3a3a3a">Carousel 3</text>
+</svg>

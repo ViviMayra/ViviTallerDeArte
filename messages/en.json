@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "Home",
+    "joyeria": "Jewelry",
+    "ceramica": "Ceramics",
+    "ilustraciones": "Illustrations",
+    "pintura": "Painting",
+    "exhibiciones": "Exhibitions",
+    "about": "About",
+    "cart": "Cart",
+    "women": "Women",
+    "men": "Men",
+    "viewCatalog": "View catalog"
+  },
+  "common": {
+    "sold": "Sold",
+    "available": "Available",
+    "addToCart": "Add to cart",
+    "inCart": "In cart",
+    "share": "Share",
+    "back": "Back",
+    "details": "Details",
+    "related": "You may also like",
+    "checkoutWhatsApp": "Checkout on WhatsApp",
+    "emptyCart": "Your cart is empty",
+    "remove": "Remove",
+    "total": "Total",
+    "language": "ES",
+    "jumpTo": "Jump to",
+    "seeMen": "See men’s",
+    "seeWomen": "See women’s",
+    "notFound": "We couldn’t find this page",
+    "backHome": "Back home"
+  },
+  "home": {
+    "brand": "VIVI",
+    "tagline": "Art Workshop"
+  },
+  "cart": {
+    "title": "Cart",
+    "close": "Close"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "instagram": "Instagram",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "maps": "Google Maps"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "joyeria": "Joyería",
+    "ceramica": "Cerámica",
+    "ilustraciones": "Ilustraciones",
+    "pintura": "Pintura",
+    "exhibiciones": "Exhibiciones",
+    "about": "About",
+    "cart": "Carrito",
+    "women": "Mujer",
+    "men": "Hombre",
+    "viewCatalog": "Ver catálogo"
+  },
+  "common": {
+    "sold": "Vendido",
+    "available": "Disponible",
+    "addToCart": "Agregar al carrito",
+    "inCart": "En el carrito",
+    "share": "Compartir",
+    "back": "Volver",
+    "details": "Detalles",
+    "related": "También podría interesarte",
+    "checkoutWhatsApp": "Checkout por WhatsApp",
+    "emptyCart": "Tu carrito está vacío",
+    "remove": "Quitar",
+    "total": "Total",
+    "language": "EN",
+    "jumpTo": "Ir a",
+    "seeMen": "Ver hombres",
+    "seeWomen": "Ver mujeres",
+    "notFound": "No encontramos esta página",
+    "backHome": "Volver al inicio"
+  },
+  "home": {
+    "brand": "VIVI",
+    "tagline": "Taller de Arte"
+  },
+  "cart": {
+    "title": "Carrito",
+    "close": "Cerrar"
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados",
+    "instagram": "Instagram",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "maps": "Google Maps"
+  }
+}

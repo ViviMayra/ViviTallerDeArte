@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf8f4;
+  --foreground: #2c2c2c;
+  --muted: #6b6560;
+  --ochre: #c4a35a;
+  --ochre-deep: #a8843d;
+  --line: #e5dfd4;
+  --sold: #9a9590;
+  --surface: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-ochre: var(--ochre);
+  --color-ochre-deep: var(--ochre-deep);
+  --color-line: var(--line);
+  --color-sold: var(--sold);
+  --color-surface: var(--surface);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--ochre) 35%, white);
+}
+
+.nav-link {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--ochre-deep);
+}
+
+.catalog-link {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: var(--ochre-deep);
+  transition: transform 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.catalog-link:hover {
+  transform: translateX(4px);
+  color: var(--foreground);
+}
+
+.piece-card {
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.piece-card:hover {
+  transform: translateY(-3px);
+}
+
+.piece-card.is-sold {
+  opacity: 0.72;
+}
+
+.piece-card.is-sold:hover {
+  transform: none;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s ease both;
+}
+
+.animate-fade-up-delay {
+  animation: fade-up 0.8s ease 0.12s both;
+}
