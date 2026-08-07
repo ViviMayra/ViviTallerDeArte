@@ -30,6 +30,7 @@ import {facebookUrl, instagramUrl, tiktokUrl} from '@/lib/social'
 import {routing} from '@/i18n/routing'
 import type {Locale} from '@/lib/types'
 import {Analytics} from '@vercel/analytics/next'
+import {SpeedInsights} from '@vercel/speed-insights/next'
 import '../globals.css'
 
 const siteUrl = getSiteUrl()
@@ -208,6 +209,7 @@ export default async function LocaleLayout({
           </CartProvider>
         </NextIntlClientProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

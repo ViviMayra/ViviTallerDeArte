@@ -16,6 +16,7 @@
     "@sanity/ui": "^3.5.1",
     "@sanity/vision": "^6.9.1",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "ai": "^7.0.56",
     "next": "16.3.0",
     "next-intl": "^4.13.5",
