@@ -26,8 +26,8 @@
     "emptyCart": "Your cart is empty",
     "remove": "Remove",
     "total": "Total",
-    "language": "English",
-    "switchLanguage": "Switch to Español",
+    "language": "Spanish",
+    "switchLanguage": "Switch to Spanish",
     "jumpTo": "Jump to",
     "seeMen": "See men’s",
     "seeWomen": "See women’s",
@@ -37,7 +37,8 @@
   },
   "home": {
     "brand": "VIVI",
-    "tagline": "Art Workshop"
+    "tagline": "Art Workshop",
+    "featured": "Featured"
   },
   "cart": {
     "title": "Cart",

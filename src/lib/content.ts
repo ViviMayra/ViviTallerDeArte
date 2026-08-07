@@ -42,10 +42,24 @@ export async function getHomePage(): Promise<HomePage> {
   // Use the Sanity Inicio doc even when Secciones is still empty
   // (previously empty sections forced the whole demo homepage, ignoring her tagline/photo)
   if (!data) return demoHome
+
+  const sections =
+    data.sections && data.sections.length > 0
+      ? data.sections
+      : demoHome.sections
+  const featuredCarousel =
+    data.featuredCarousel && data.featuredCarousel.length > 0
+      ? data.featuredCarousel
+      : demoHome.featuredCarousel
+
   return {
     ...data,
     heroImage: data.heroImage || demoHome.heroImage,
-    sections: data.sections || [],
+    heroEyebrow: data.heroEyebrow || demoHome.heroEyebrow,
+    featuredCarouselTitle:
+      data.featuredCarouselTitle || demoHome.featuredCarouselTitle,
+    featuredCarousel,
+    sections,
   }
 }
 

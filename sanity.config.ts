@@ -9,7 +9,7 @@ import {translateAction} from './src/sanity/actions/translateAction'
 export default defineConfig({
   name: 'vivi',
   title: 'VIVI Taller de Arte',
-  projectId: projectId || 'placeholder',
+  projectId,
   dataset,
   basePath: '/studio',
   plugins: [structureTool({structure}), visionTool()],

@@ -1,4 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 
 export const homePage = defineType({
   name: 'homePage',
@@ -22,6 +23,75 @@ export const homePage = defineType({
       name: 'heroEyebrow',
       title: 'Texto debajo del logo en la portada',
       type: 'localizedString',
+    }),
+    defineField({
+      name: 'featuredCarouselTitle',
+      title: 'Título del carrusel destacado (opcional)',
+      description: 'Aparece encima del carrusel en la página de inicio.',
+      type: 'localizedString',
+    }),
+    defineField({
+      name: 'featuredCarousel',
+      title: 'Carrusel destacado',
+      description:
+        'Opcional. Mezcla fotos y/o piezas del catálogo. Si está vacío, el carrusel no aparece.',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'photoSlide',
+          title: 'Foto',
+          fields: [
+            defineField({
+              name: 'image',
+              title: 'Foto',
+              type: 'image',
+              options: {hotspot: true},
+              components: {input: ImageInputWithContinue},
+              fields: [
+                defineField({
+                  name: 'alt',
+                  title: 'Descripción corta de la foto',
+                  type: 'optionalLocalizedString',
+                }),
+              ],
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: {media: 'image', alt: 'image.alt.es'},
+            prepare({media, alt}) {
+              return {title: alt || 'Foto', media}
+            },
+          },
+        }),
+        defineArrayMember({
+          type: 'object',
+          name: 'pieceSlide',
+          title: 'Pieza del catálogo',
+          fields: [
+            defineField({
+              name: 'piece',
+              title: 'Pieza',
+              type: 'reference',
+              to: [{type: 'piece'}],
+              options: {
+                filter: 'status != "hidden"',
+              },
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: {
+              title: 'piece.title.es',
+              media: 'piece.photos.0',
+            },
+            prepare({title, media}) {
+              return {title: title || 'Pieza', media}
+            },
+          },
+        }),
+      ],
     }),
     defineField({
       name: 'sections',

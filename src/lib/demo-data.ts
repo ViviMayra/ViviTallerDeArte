@@ -24,12 +24,62 @@ export const demoHome: HomePage = {
     es: 'Taller de Arte',
     en: 'Art Workshop',
   },
+  featuredCarouselTitle: {
+    es: 'Destacados',
+    en: 'Featured',
+  },
+  featuredCarousel: [
+    {
+      _key: 'demo-photo-1',
+      _type: 'photoSlide',
+      image: {
+        url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1600&q=80',
+        alt: {es: 'Joyería artesanal', en: 'Artisan jewelry'},
+      },
+    },
+    {
+      _key: 'demo-photo-2',
+      _type: 'photoSlide',
+      image: {
+        url: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1600&q=80',
+        alt: {es: 'Cerámica hecha a mano', en: 'Handmade ceramics'},
+      },
+    },
+    {
+      _key: 'demo-photo-3',
+      _type: 'photoSlide',
+      image: {
+        url: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1600&q=80',
+        alt: {es: 'Ilustración y arte', en: 'Illustration and art'},
+      },
+    },
+    {
+      _key: 'demo-photo-4',
+      _type: 'photoSlide',
+      image: {
+        url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1600&q=80',
+        alt: {es: 'Pintura', en: 'Painting'},
+      },
+    },
+    {
+      _key: 'demo-photo-5',
+      _type: 'photoSlide',
+      image: {
+        url: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=1600&q=80',
+        alt: {es: 'Taller creativo', en: 'Creative workshop'},
+      },
+    },
+  ],
   sections: [
     {
       title: {es: 'Joyería', en: 'Jewelry'},
       text: {
         es: 'Piezas hechas a mano en plata y materiales naturales.',
         en: 'Handmade pieces in silver and natural materials.',
+      },
+      image: {
+        url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80',
+        alt: {es: 'Joyería', en: 'Jewelry'},
       },
       link: 'joyeria',
     },
@@ -39,6 +89,10 @@ export const demoHome: HomePage = {
         es: 'Formas únicas para el hogar y el ritual cotidiano.',
         en: 'Unique forms for the home and everyday ritual.',
       },
+      image: {
+        url: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&q=80',
+        alt: {es: 'Cerámica', en: 'Ceramics'},
+      },
       link: 'ceramica',
     },
     {
@@ -46,6 +100,10 @@ export const demoHome: HomePage = {
       text: {
         es: 'Dibujos e ilustraciones con identidad propia.',
         en: 'Drawings and illustrations with their own voice.',
+      },
+      image: {
+        url: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1200&q=80',
+        alt: {es: 'Ilustraciones', en: 'Illustrations'},
       },
       link: 'ilustraciones',
     },
@@ -55,6 +113,10 @@ export const demoHome: HomePage = {
         es: 'Obras pictóricas disponibles para consulta.',
         en: 'Paintings available for inquiry.',
       },
+      image: {
+        url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200&q=80',
+        alt: {es: 'Pintura', en: 'Painting'},
+      },
       link: 'pintura',
     },
     {
@@ -62,6 +124,10 @@ export const demoHome: HomePage = {
       text: {
         es: 'Concursos y muestras en las que ha participado VIVI.',
         en: 'Contests and shows VIVI has taken part in.',
+      },
+      image: {
+        url: 'https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=1200&q=80',
+        alt: {es: 'Exhibiciones', en: 'Exhibitions'},
       },
       link: 'exhibiciones',
     },

@@ -26,7 +26,7 @@
     "emptyCart": "Tu carrito está vacío",
     "remove": "Quitar",
     "total": "Total",
-    "language": "Español",
+    "language": "English",
     "switchLanguage": "Cambiar a English",
     "jumpTo": "Ir a",
     "seeMen": "Ver hombres",
@@ -37,7 +37,8 @@
   },
   "home": {
     "brand": "VIVI",
-    "tagline": "Taller de Arte"
+    "tagline": "Taller de Arte",
+    "featured": "Destacados"
   },
   "cart": {
     "title": "Carrito",

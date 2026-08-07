@@ -21,6 +21,21 @@ export const settingsQuery = groq`*[_type == "settings"][0]{
 export const homePageQuery = groq`*[_type == "homePage"][0]{
   heroImage ${imageFields},
   heroEyebrow ${localizedString},
+  featuredCarouselTitle ${localizedString},
+  featuredCarousel[]{
+    _key,
+    _type,
+    image ${imageFields},
+    piece->{
+      _id,
+      title ${localizedString},
+      "slug": slug.current,
+      photos[] ${imageFields},
+      price,
+      category,
+      status
+    }
+  },
   sections[]{
     title ${localizedString},
     text ${localizedText},

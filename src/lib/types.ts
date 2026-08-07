@@ -81,9 +81,28 @@ export type HomeSection = {
   link: string
 }
 
+export type FeaturedCarouselSlide =
+  | {
+      _key: string
+      _type: 'photoSlide'
+      image?: SanityImage
+      piece?: never
+    }
+  | {
+      _key: string
+      _type: 'pieceSlide'
+      piece?: Pick<
+        Piece,
+        '_id' | 'title' | 'slug' | 'photos' | 'price' | 'category' | 'status'
+      > | null
+      image?: never
+    }
+
 export type HomePage = {
   heroImage?: SanityImage
   heroEyebrow?: LocalizedString
+  featuredCarouselTitle?: LocalizedString
+  featuredCarousel?: FeaturedCarouselSlide[]
   sections?: HomeSection[]
   seo?: {
     title?: string

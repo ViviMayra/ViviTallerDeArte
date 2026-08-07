@@ -1,6 +1,7 @@
 import type {Metadata} from 'next'
 import {getLocale, getTranslations, setRequestLocale} from 'next-intl/server'
 import {Link} from '@/i18n/navigation'
+import {FeaturedCarousel} from '@/components/FeaturedCarousel'
 import {getHomePage} from '@/lib/content'
 import {t} from '@/lib/locale'
 import {getImageAlt, getImageUrl} from '@/lib/images'
@@ -67,6 +68,12 @@ export default async function HomePage({
         </div>
       </section>
 
+      <FeaturedCarousel
+        slides={home.featuredCarousel || []}
+        title={t(home.featuredCarouselTitle, locale)}
+        locale={locale}
+      />
+
       <section className="mx-auto max-w-7xl px-4 py-20 md:px-8 md:py-28">
         <div className="space-y-24 md:space-y-32">
           {(home.sections || []).map((section, index) => {
@@ -79,20 +86,22 @@ export default async function HomePage({
                   imageLeft ? '' : 'md:[&>*:first-child]:order-2'
                 }`}
               >
-                <div className="aspect-[4/5] overflow-hidden bg-line">
+                <div className="aspect-[4/5] bg-gradient-to-br from-[#f3efe6] to-[#d9c39a] p-2.5 md:p-3">
                   {src ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={src}
-                      alt={getImageAlt(
-                        section.image,
-                        locale,
-                        t(section.title, locale),
-                      )}
-                      className="h-full w-full object-cover"
-                    />
+                    <div className="h-full w-full overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={src}
+                        alt={getImageAlt(
+                          section.image,
+                          locale,
+                          t(section.title, locale),
+                        )}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
                   ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-[#f3efe6] to-[#d9c39a] font-[family-name:var(--font-display)] text-3xl text-foreground/40">
+                    <div className="flex h-full items-center justify-center font-[family-name:var(--font-display)] text-3xl text-foreground/40">
                       {t(section.title, locale)}
                     </div>
                   )}

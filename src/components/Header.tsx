@@ -347,7 +347,7 @@ function LanguageSwitch({
       href={pathname}
       locale={otherLocale}
       onClick={onNavigate}
-      className="inline-flex items-center gap-1.5 text-[0.72rem] tracking-[0.08em] text-foreground transition-colors hover:text-ochre-deep"
+      className="inline-flex items-center gap-1.5 text-[0.72rem] tracking-[0.04em] text-foreground transition-colors hover:text-ochre-deep"
       aria-label={common('switchLanguage')}
       title={common('switchLanguage')}
     >

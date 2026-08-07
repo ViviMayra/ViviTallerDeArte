@@ -3,6 +3,9 @@ export const apiVersion =
 
 export const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
 
-export const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || ''
+// Public project id — keep a real default so Studio never boots as "placeholder"
+// if NEXT_PUBLIC_* is missing from a Vercel build.
+export const projectId =
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '25hzbdf6'
 
-export const hasSanityConfig = Boolean(projectId && projectId !== 'placeholder')
+export const hasSanityConfig = Boolean(projectId)
