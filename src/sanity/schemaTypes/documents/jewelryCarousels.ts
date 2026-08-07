@@ -6,7 +6,7 @@ const slideField = (name: string, title: string) =>
     name,
     title,
     description:
-      'Opcional. Si no hay fotos, ese carrusel no se muestra. Recomendado: 1920×1080 px (16:9); otras medidas también funcionan. Al editar una foto, usa Continuar; si no carga, usa Quitar foto.',
+      'Opcional. Si no hay fotos, ese carrusel no se muestra. Fotos en tarjetas cuadradas (se ven varias a la vez). Recomendado: ~900×900 px (1:1); otras medidas también funcionan con el punto de enfoque. Al editar una foto, usa Continuar; si no carga, usa Quitar foto.',
     type: 'array',
     of: [
       defineArrayMember({

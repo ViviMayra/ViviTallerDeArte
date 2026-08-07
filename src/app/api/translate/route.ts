@@ -34,7 +34,7 @@ async function translateTexts(texts: string[]): Promise<string[]> {
         {
           role: 'system',
           content:
-            'You translate Spanish product copy for an art/jewelry atelier into natural English. Return ONLY a JSON array of strings in the same order. Keep proper nouns.',
+            'You translate Spanish product copy for an art/jewelry atelier into natural English. Return ONLY a JSON array of strings in the same order. Keep proper nouns. Preserve line breaks exactly when present.',
         },
         {
           role: 'user',

@@ -24,6 +24,10 @@ export const demoHome: HomePage = {
     es: 'Taller de Arte',
     en: 'Art Workshop',
   },
+  heroSubline: {
+    es: 'Piezas hechas a mano en Perú',
+    en: 'Handmade pieces in Peru',
+  },
   featuredCarouselTitle: {
     es: 'Destacados',
     en: 'Featured',

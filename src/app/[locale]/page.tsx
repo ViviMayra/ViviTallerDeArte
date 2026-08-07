@@ -65,6 +65,11 @@ export default async function HomePage({
           <p className="animate-fade-up-delay mt-3 text-sm uppercase tracking-[0.22em] text-foreground/90">
             {t(home.heroEyebrow, locale, homeT('tagline'))}
           </p>
+          {t(home.heroSubline, locale) ? (
+            <p className="animate-fade-up-delay mt-2 max-w-md font-[family-name:var(--font-body)] text-xs tracking-[0.04em] text-foreground/75 md:text-sm">
+              {t(home.heroSubline, locale)}
+            </p>
+          ) : null}
         </div>
       </section>
 

@@ -11,7 +11,7 @@ export const categoryCarousel = defineType({
       name: 'slides',
       title: 'Fotos del carrusel',
       description:
-        'Opcional. Si no agregas fotos, el carrusel no aparece en la web. Recomendado: 1920×1080 px (16:9); otras medidas también funcionan. Al editar una foto, usa Continuar; si no carga, usa Quitar foto.',
+        'Opcional. Si no agregas fotos, el carrusel no aparece en la web. Fotos en tarjetas cuadradas (se ven varias a la vez). Recomendado: ~900×900 px (1:1); otras medidas también funcionan con el punto de enfoque. Al editar una foto, usa Continuar; si no carga, usa Quitar foto.',
       type: 'array',
       of: [
         defineArrayMember({

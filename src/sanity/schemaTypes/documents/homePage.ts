@@ -24,8 +24,17 @@ export const homePage = defineType({
     }),
     defineField({
       name: 'heroEyebrow',
-      title: 'Texto debajo del logo en la portada',
+      title: 'Texto debajo del logo (línea principal)',
+      description:
+        'Ej. “Creado por Mayra”. Estilo: mayúsculas, espaciado amplio.',
       type: 'localizedString',
+    }),
+    defineField({
+      name: 'heroSubline',
+      title: 'Segunda línea debajo del logo (opcional)',
+      description:
+        'Opcional. Aparece más pequeña y con otra tipografía, debajo de la línea principal.',
+      type: 'optionalLocalizedString',
     }),
     defineField({
       name: 'featuredCarouselTitle',
@@ -37,7 +46,7 @@ export const homePage = defineType({
       name: 'featuredCarousel',
       title: 'Carrusel destacado',
       description:
-        'Opcional. Mezcla fotos y/o piezas del catálogo. Si está vacío, el carrusel no aparece. Fotos: recomendado 1920×1080 px (16:9); otras medidas también funcionan.',
+        'Opcional. Mezcla fotos y/o piezas del catálogo (aparecen como tarjetas cuadradas). Si está vacío, el carrusel no aparece. Fotos: recomendado ~900×900 px (1:1); otras medidas también funcionan con el punto de enfoque.',
       type: 'array',
       of: [
         defineArrayMember({
@@ -49,7 +58,7 @@ export const homePage = defineType({
               name: 'image',
               title: 'Foto',
               description:
-                'Recomendado: 1920×1080 px (16:9). Si es otra medida, ajusta el punto de enfoque. Usa Continuar cuando termines; Quitar foto si no carga.',
+                'Recomendado: ~900×900 px (cuadrada). Otras medidas funcionan; ajusta el punto de enfoque. Usa Continuar cuando termines; Quitar foto si no carga.',
               type: 'image',
               options: {hotspot: true},
               components: {input: ImageInputWithContinue},

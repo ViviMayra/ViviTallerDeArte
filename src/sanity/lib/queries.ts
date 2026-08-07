@@ -21,6 +21,7 @@ export const settingsQuery = groq`*[_type == "settings"][0]{
 export const homePageQuery = groq`*[_type == "homePage"][0]{
   heroImage ${imageFields},
   heroEyebrow ${localizedString},
+  heroSubline ${localizedString},
   featuredCarouselTitle ${localizedString},
   featuredCarousel[]{
     _key,

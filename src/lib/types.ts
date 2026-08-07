@@ -101,6 +101,7 @@ export type FeaturedCarouselSlide =
 export type HomePage = {
   heroImage?: SanityImage
   heroEyebrow?: LocalizedString
+  heroSubline?: LocalizedString
   featuredCarouselTitle?: LocalizedString
   featuredCarousel?: FeaturedCarouselSlide[]
   sections?: HomeSection[]

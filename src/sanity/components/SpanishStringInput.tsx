@@ -15,7 +15,7 @@ export function SpanishStringInput(props: ObjectInputProps) {
     return (
       <TextArea
         {...elementProps}
-        rows={4}
+        rows={3}
         value={value.es || ''}
         onChange={(event) => {
           const next = event.currentTarget.value

@@ -56,6 +56,7 @@ export async function getHomePage(): Promise<HomePage> {
     ...data,
     heroImage: data.heroImage || demoHome.heroImage,
     heroEyebrow: data.heroEyebrow || demoHome.heroEyebrow,
+    heroSubline: data.heroSubline,
     featuredCarouselTitle:
       data.featuredCarouselTitle || demoHome.featuredCarouselTitle,
     featuredCarousel,
