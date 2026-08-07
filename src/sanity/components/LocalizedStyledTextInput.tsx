@@ -1,7 +1,9 @@
 'use client'
 
 import {useEffect, useRef} from 'react'
+import {Button, Card, Flex, Stack, Text} from '@sanity/ui'
 import {set, unset, type ObjectInputProps} from 'sanity'
+import {dismissStudioFocus} from './dismissStudioFocus'
 
 type Localized = {es?: unknown; en?: unknown}
 
@@ -30,8 +32,8 @@ function stringToBlocks(text: string, prefix: string) {
 }
 
 /**
- * Auto-migrates old `{ es: "texto" }` hero strings into rich-text blocks
- * so Studio stops showing “Invalid property value”.
+ * Auto-migrates old `{ es: "texto" }` hero strings into rich-text blocks,
+ * and shows Continuar so focus leaves the editor (Publish stays clickable).
  */
 export function LocalizedStyledTextInput(props: ObjectInputProps) {
   const {value, onChange, renderDefault} = props
@@ -70,5 +72,33 @@ export function LocalizedStyledTextInput(props: ObjectInputProps) {
     }
   }, [value, onChange])
 
-  return renderDefault(props)
+  return (
+    <Stack space={3}>
+      {renderDefault(props)}
+      <Text size={1} muted>
+        Si no puedes hacer Publish, pulsa Continuar para salir del editor de
+        texto.
+      </Text>
+      <Card
+        padding={2}
+        radius={2}
+        shadow={1}
+        style={{
+          position: 'sticky',
+          bottom: 0,
+          zIndex: 30,
+          background: 'var(--card-bg-color)',
+        }}
+      >
+        <Flex justify="flex-end">
+          <Button
+            text="Continuar"
+            tone="primary"
+            type="button"
+            onClick={() => dismissStudioFocus(props.onPathFocus)}
+          />
+        </Flex>
+      </Card>
+    </Stack>
+  )
 }

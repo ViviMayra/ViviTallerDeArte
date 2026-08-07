@@ -3,6 +3,7 @@ import {HERO_FONTS, HERO_SIZES} from '@/lib/hero-fonts'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 import {LocalizedStyledTextInput} from '../../components/LocalizedStyledTextInput'
 import {SpanishStringInput} from '../../components/SpanishStringInput'
+import {TextStyleAnnotationInput} from '../../components/TextStyleAnnotationInput'
 
 /** Short rich text for hero lines — bold, real fonts, numeric sizes. */
 const styledTextBlock = defineArrayMember({
@@ -20,6 +21,7 @@ const styledTextBlock = defineArrayMember({
         name: 'textStyle',
         type: 'object',
         title: 'Fuente y tamaño',
+        components: {input: TextStyleAnnotationInput},
         fields: [
           defineField({
             name: 'font',

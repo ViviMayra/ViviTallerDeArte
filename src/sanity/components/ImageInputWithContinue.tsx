@@ -3,6 +3,7 @@
 import {RemoveIcon} from '@sanity/icons/Remove'
 import {Button, Card, Flex, Stack, Text} from '@sanity/ui'
 import {unset, type ObjectInputProps} from 'sanity'
+import {dismissStudioFocus} from './dismissStudioFocus'
 
 type ImageValue = {
   asset?: {_ref?: string; _type?: string}
@@ -16,18 +17,7 @@ export function ImageInputWithContinue(props: ObjectInputProps) {
   const hasPhoto = Boolean(value?.asset) || isUploading
   const progress = value?._upload?.progress
 
-  const leaveEditor = () => {
-    // Blur first so hotspot/crop panels release focus traps
-    if (typeof document !== 'undefined') {
-      const active = document.activeElement
-      if (active instanceof HTMLElement) active.blur()
-    }
-    props.onPathFocus([])
-    // Second pass after paint — Studio sometimes needs it to close nested panels
-    requestAnimationFrame(() => {
-      props.onPathFocus([])
-    })
-  }
+  const leaveEditor = () => dismissStudioFocus(props.onPathFocus)
 
   const clearPhoto = () => {
     props.onChange(unset())

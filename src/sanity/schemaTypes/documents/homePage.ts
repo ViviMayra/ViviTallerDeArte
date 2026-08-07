@@ -26,14 +26,14 @@ export const homePage = defineType({
       name: 'heroEyebrow',
       title: 'Texto debajo del logo (línea principal)',
       description:
-        'Por defecto se ve como antes. Selecciona texto → “Fuente y tamaño” para elegir fuente (incl. cursiva) y tamaño en número (12, 16, 24…).',
+        'Selecciona texto → “Fuente y tamaño” (fuente + número). Cuando termines, pulsa Continuar y luego Publish.',
       type: 'localizedStyledText',
     }),
     defineField({
       name: 'heroSubline',
       title: 'Segunda línea debajo del logo (opcional)',
       description:
-        'Opcional. Igual: “Fuente y tamaño” con fuentes reales y tamaño numérico.',
+        'Opcional. Igual: “Fuente y tamaño”, luego Continuar, luego Publish.',
       type: 'optionalLocalizedStyledText',
     }),
     defineField({
