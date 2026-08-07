@@ -4,8 +4,12 @@ export const metadata = {
 
 export default function StudioLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="es">
-      <body style={{margin: 0}}>{children}</body>
+    // suppressHydrationWarning: browser extensions (e.g. Grammarly) inject
+    // attributes on <html>/<body> before React hydrates.
+    <html lang="es" suppressHydrationWarning>
+      <body style={{margin: 0}} suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   )
 }
