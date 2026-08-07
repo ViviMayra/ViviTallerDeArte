@@ -89,18 +89,10 @@ export const aboutPage = defineType({
               align: 'align',
               media: 'image',
             },
-            prepare({
-              blocks,
-              align,
-              media,
-            }: {
-              blocks?: {_type?: string; children?: {text?: string}[]}[]
-              align?: string
-              media?: unknown
-            }) {
+            prepare({blocks, align, media}) {
               const firstText = (blocks || [])
-                .find((block) => block?._type === 'block')
-                ?.children?.map((child) => child.text || '')
+                .find((block: {_type?: string}) => block?._type === 'block')
+                ?.children?.map((child: {text?: string}) => child.text || '')
                 .join('')
                 .trim()
               const place =
