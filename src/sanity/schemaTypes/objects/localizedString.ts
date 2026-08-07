@@ -1,5 +1,6 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
+import {LocalizedStyledTextInput} from '../../components/LocalizedStyledTextInput'
 import {SpanishStringInput} from '../../components/SpanishStringInput'
 
 /** Short rich text for hero lines — bold, font, size. No headings/lists/images. */
@@ -121,6 +122,7 @@ export const localizedStyledText = defineType({
   name: 'localizedStyledText',
   title: 'Texto con formato',
   type: 'object',
+  components: {input: LocalizedStyledTextInput},
   fields: [
     defineField({
       name: 'es',
@@ -145,6 +147,7 @@ export const optionalLocalizedStyledText = defineType({
   name: 'optionalLocalizedStyledText',
   title: 'Texto con formato (opcional)',
   type: 'object',
+  components: {input: LocalizedStyledTextInput},
   fields: [
     defineField({
       name: 'es',
