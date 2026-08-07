@@ -205,6 +205,15 @@ export const localizedBlockContent = defineType({
               type: 'string',
               title: 'Texto alternativo',
             }),
+            defineField({
+              name: 'widthPercent',
+              title: 'Ancho (%)',
+              description:
+                'Porcentaje del ancho de la sección. Ej: 50 = la mitad. Deja vacío o 100 para ocupar todo.',
+              type: 'number',
+              initialValue: 100,
+              validation: (Rule) => Rule.min(10).max(100).integer(),
+            }),
           ],
         },
       ],
@@ -225,6 +234,15 @@ export const localizedBlockContent = defineType({
               name: 'alt',
               type: 'string',
               title: 'Alt text',
+            }),
+            defineField({
+              name: 'widthPercent',
+              title: 'Width (%)',
+              description:
+                'Percent of the section width. Example: 50 = half. Leave empty or 100 for full width.',
+              type: 'number',
+              initialValue: 100,
+              validation: (Rule) => Rule.min(10).max(100).integer(),
             }),
           ],
         },

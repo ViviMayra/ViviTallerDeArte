@@ -3,17 +3,25 @@ import type {Locale} from '@/lib/types'
 import {getImageAlt, getImageUrl} from '@/lib/images'
 import type {SanityImage} from '@/lib/types'
 
+function imageWidthPercent(value: SanityImage): number {
+  const raw = value.widthPercent
+  if (typeof raw !== 'number' || Number.isNaN(raw)) return 100
+  return Math.min(100, Math.max(10, Math.round(raw)))
+}
+
 const components = (locale: Locale): PortableTextComponents => ({
   types: {
     image: ({value}: {value: SanityImage}) => {
       const src = getImageUrl(value, 1400)
       if (!src) return null
+      const widthPercent = imageWidthPercent(value)
       return (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={src}
           alt={getImageAlt(value, locale)}
-          className="my-8 w-full object-cover"
+          className="my-8 max-w-full object-cover"
+          style={{width: `${widthPercent}%`}}
         />
       )
     },
