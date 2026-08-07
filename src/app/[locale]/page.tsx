@@ -62,7 +62,7 @@ export default async function HomePage({
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
         <div className="relative mx-auto flex min-h-[78vh] max-w-7xl flex-col justify-end px-4 pb-16 md:px-8">
           <div className="hero-titles flex w-full max-w-xl flex-col items-start text-left">
-            <p className="animate-fade-up w-full self-start font-[family-name:var(--font-display)] text-5xl tracking-[0.2em] md:text-7xl">
+            <p className="animate-fade-up w-full self-start -ml-1 font-[family-name:var(--font-display)] text-5xl tracking-[0.2em] md:-ml-1.5 md:text-7xl">
               {homeT('brand')}
             </p>
             <HeroStyledText
