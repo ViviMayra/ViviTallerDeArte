@@ -8,7 +8,6 @@ export const categoryCarousel = defineType({
   title: 'Carrusel del catálogo',
   type: 'document',
   fields: [
-    translateButtonField,
     defineField({
       name: 'slides',
       title: 'Fotos del carrusel',
@@ -30,6 +29,7 @@ export const categoryCarousel = defineType({
         }),
       ],
     }),
+    translateButtonField,
   ],
   preview: {
     prepare() {

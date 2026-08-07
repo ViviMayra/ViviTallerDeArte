@@ -10,7 +10,6 @@ export const piece = defineType({
   title: 'Pieza',
   type: 'document',
   fields: [
-    translateButtonField,
     defineField({
       name: 'title',
       title: 'Nombre de la pieza',
@@ -150,6 +149,7 @@ export const piece = defineType({
       title: 'SEO (opcional)',
       type: 'seo',
     }),
+    translateButtonField,
   ],
   preview: {
     select: {

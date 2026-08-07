@@ -7,7 +7,6 @@ export const homePage = defineType({
   title: 'Página de inicio',
   type: 'document',
   fields: [
-    translateButtonField,
     defineField({
       name: 'heroImage',
       title: 'Foto grande de portada',
@@ -179,6 +178,7 @@ export const homePage = defineType({
       title: 'SEO',
       type: 'seo',
     }),
+    translateButtonField,
   ],
   preview: {
     prepare() {

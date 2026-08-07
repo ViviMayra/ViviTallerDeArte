@@ -6,7 +6,6 @@ export const aboutPage = defineType({
   title: 'About / Nosotros',
   type: 'document',
   fields: [
-    translateButtonField,
     defineField({
       name: 'title',
       title: 'Título de página',
@@ -64,6 +63,7 @@ export const aboutPage = defineType({
       title: 'SEO',
       type: 'seo',
     }),
+    translateButtonField,
   ],
   preview: {
     prepare() {

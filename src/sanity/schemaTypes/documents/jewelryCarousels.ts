@@ -30,10 +30,10 @@ export const jewelryCarousels = defineType({
   title: 'Carruseles de joyería',
   type: 'document',
   fields: [
-    translateButtonField,
     slideField('womenSlides', 'Carrusel debajo de Mujer'),
     slideField('menSlides', 'Carrusel debajo de Hombre'),
     slideField('generalSlides', 'Carrusel debajo de General'),
+    translateButtonField,
   ],
   preview: {
     prepare() {

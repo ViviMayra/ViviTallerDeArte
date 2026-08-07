@@ -8,7 +8,6 @@ export const exhibition = defineType({
   title: 'Exhibición',
   type: 'document',
   fields: [
-    translateButtonField,
     defineField({
       name: 'title',
       title: 'Nombre de la exhibición',
@@ -86,6 +85,7 @@ export const exhibition = defineType({
       title: 'SEO',
       type: 'seo',
     }),
+    translateButtonField,
   ],
   orderings: [
     {
