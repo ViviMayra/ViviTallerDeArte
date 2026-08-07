@@ -1,5 +1,25 @@
 import type {Locale, LocalizedStyledText} from './types'
 
+/** Flatten portable text blocks (or null) to a single plain string. */
+export function blocksToPlainText(blocks: unknown[] | null): string {
+  if (!blocks?.length) return ''
+  return blocks
+    .map((block) => {
+      if (!block || typeof block !== 'object') return ''
+      const children = (block as {children?: unknown}).children
+      if (!Array.isArray(children)) return ''
+      return children
+        .map((child) => {
+          if (!child || typeof child !== 'object') return ''
+          const text = (child as {text?: unknown}).text
+          return typeof text === 'string' ? text : ''
+        })
+        .join('')
+    })
+    .filter(Boolean)
+    .join(' ')
+}
+
 export function plainTextToBlocks(text: string) {
   return [
     {

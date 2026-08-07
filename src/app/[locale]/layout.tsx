@@ -22,6 +22,7 @@ import {JsonLd} from '@/components/JsonLd'
 import {getImageUrl} from '@/lib/images'
 import {routing} from '@/i18n/routing'
 import type {Locale} from '@/lib/types'
+import {Analytics} from '@vercel/analytics/next'
 import '../globals.css'
 
 const bodyFont = Figtree({
@@ -62,6 +63,13 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
   ),
+  openGraph: {
+    type: 'website',
+    siteName: 'VIVI Taller de Arte',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 }
 
 export function generateStaticParams() {
@@ -160,6 +168,7 @@ export default async function LocaleLayout({
             <CartDrawer whatsapp={settings.whatsapp || '51954734273'} />
           </CartProvider>
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   )
