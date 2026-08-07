@@ -40,7 +40,7 @@ export function LocalizedStyledTextInput(props: ObjectInputProps) {
   const migrated = useRef(false)
 
   useEffect(() => {
-    if (migrated.current) return
+    if (migrated.current || props.readOnly) return
     if (!value || typeof value !== 'object') return
 
     const current = value as Localized
@@ -65,12 +65,16 @@ export function LocalizedStyledTextInput(props: ObjectInputProps) {
       next.en = current.en
     }
 
-    if (next.es === undefined && next.en === undefined) {
-      onChange(unset())
-    } else {
-      onChange(set(next))
+    try {
+      if (next.es === undefined && next.en === undefined) {
+        onChange(unset())
+      } else {
+        onChange(set(next))
+      }
+    } catch {
+      // Ignore read-only patch attempts
     }
-  }, [value, onChange])
+  }, [value, onChange, props.readOnly])
 
   return (
     <Stack space={3}>

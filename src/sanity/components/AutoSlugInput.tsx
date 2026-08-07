@@ -20,22 +20,32 @@ export function AutoSlugInput(props: ObjectInputProps) {
   const current = (props.value as SlugValue | undefined)?.current
   const {onChange} = useFormCallbacks()
   const lastWritten = useRef<string | undefined>(current)
+  const readOnly = Boolean(props.readOnly)
 
   useEffect(() => {
+    // Published / locked docs throw if we patch — skip until there's a draft
+    if (readOnly) return
+
     const next = slugify(titleEs || '')
     if (!next) {
       if (lastWritten.current) {
         lastWritten.current = undefined
-        onChange(PatchEvent.from(unset(['slug'])))
+        try {
+          onChange(PatchEvent.from(unset(['slug'])))
+        } catch {
+          // Document became read-only mid-render
+        }
       }
       return
     }
     if (next === current || next === lastWritten.current) return
     lastWritten.current = next
-    onChange(
-      PatchEvent.from(set({_type: 'slug', current: next}, ['slug'])),
-    )
-  }, [titleEs, current, onChange])
+    try {
+      onChange(PatchEvent.from(set({_type: 'slug', current: next}, ['slug'])))
+    } catch {
+      // Ignore read-only patch attempts (e.g. viewing published version)
+    }
+  }, [titleEs, current, onChange, readOnly])
 
   return (
     <Stack space={2}>
