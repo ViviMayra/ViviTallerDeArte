@@ -106,7 +106,8 @@ export function Header({
           <img
             src={logoSrc}
             alt="VIVI Taller de Arte"
-            className="h-20 w-auto md:h-28"
+            className="h-24 w-auto max-w-[260px] object-contain object-left md:h-32 md:max-w-[340px]"
+            decoding="async"
           />
         </Link>
 

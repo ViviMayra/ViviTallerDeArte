@@ -6,7 +6,8 @@ export const client = hasSanityConfig
       projectId,
       dataset,
       apiVersion,
-      useCdn: true,
+      // Published content should show promptly after Studio Publish.
+      useCdn: false,
     })
   : null
 
@@ -16,7 +17,10 @@ export async function sanityFetch<T>(
 ): Promise<T | null> {
   if (!client) return null
   try {
-    return await client.fetch<T>(query, params)
+    return await client.fetch<T>(query, params, {
+      // Keep Studio publishes visible quickly on the site.
+      next: {revalidate: 0, tags: ['sanity']},
+    })
   } catch {
     return null
   }

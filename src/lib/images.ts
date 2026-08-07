@@ -6,7 +6,7 @@ import {urlFor} from '@/sanity/lib/image'
 export function getImageUrl(
   image: SanityImage | undefined | null,
   width = 1200,
-  options?: {fit?: 'crop' | 'max'},
+  options?: {fit?: 'crop' | 'max'; quality?: number; autoFormat?: boolean},
 ): string | undefined {
   if (!image) return undefined
   if (image.url) return image.url
@@ -14,7 +14,10 @@ export function getImageUrl(
   if (!builder) return undefined
   const fit = options?.fit || 'crop'
   // Hotspot/crop from Studio guides the fill when the photo isn’t the ideal size.
-  return builder.width(width).fit(fit).auto('format').url()
+  let req = builder.width(width).fit(fit)
+  if (options?.quality != null) req = req.quality(options.quality)
+  if (options?.autoFormat !== false) req = req.auto('format')
+  return req.url()
 }
 
 export function getImageAlt(

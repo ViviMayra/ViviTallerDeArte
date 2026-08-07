@@ -81,7 +81,11 @@ export default async function LocaleLayout({
     telephone: settings.whatsapp ? `+${settings.whatsapp}` : undefined,
     url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
     image:
-      getImageUrl(settings.logo, 1200, {fit: 'max'}) ||
+      getImageUrl(settings.logo, 1600, {
+        fit: 'max',
+        quality: 100,
+        autoFormat: false,
+      }) ||
       `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`,
     address: settings.address
       ? {
@@ -103,8 +107,13 @@ export default async function LocaleLayout({
     ].filter(Boolean),
   }
 
+  // High-res PNG for crisp logo on retina; skip auto-format so it stays sharp.
   const logoSrc =
-    getImageUrl(settings.logo, 600, {fit: 'max'}) || '/logo.png'
+    getImageUrl(settings.logo, 1600, {
+      fit: 'max',
+      quality: 100,
+      autoFormat: false,
+    }) || '/logo.png'
 
   return (
     <html
@@ -122,7 +131,7 @@ export default async function LocaleLayout({
               ilustracionesTypes={ilustracionesTypes}
               pinturaTypes={pinturaTypes}
             />
-            <main className="flex-1 pt-28 md:pt-36">{children}</main>
+            <main className="flex-1 pt-32 md:pt-40">{children}</main>
             <Footer settings={settings} />
             <CartDrawer whatsapp={settings.whatsapp || '51954734273'} />
           </CartProvider>

@@ -49,7 +49,7 @@ export default async function HomePage({
 
   return (
     <div>
-      <section className="relative -mt-28 min-h-[78vh] w-full overflow-hidden md:-mt-36">
+      <section className="relative -mt-32 min-h-[78vh] w-full overflow-hidden md:-mt-40">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={heroSrc}
