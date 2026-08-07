@@ -7,19 +7,25 @@ export function isPlainObject(value: unknown): value is Record<string, unknown> 
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }
 
+const LOCALIZED_META_KEYS = new Set(['_type', '_key'])
+
+function isLocalizedFieldKeys(keys: string[]) {
+  return keys.every(
+    (key) => key === 'es' || key === 'en' || LOCALIZED_META_KEYS.has(key),
+  )
+}
+
 /** `{ es: string, en?: string }` — localizedString / localizedText / optionalLocalizedString */
 export function isLocalizedString(value: unknown): value is LocalizedString {
   if (!isPlainObject(value) || typeof value.es !== 'string') return false
-  const keys = Object.keys(value)
-  if (!keys.every((key) => key === 'es' || key === 'en')) return false
+  if (!isLocalizedFieldKeys(Object.keys(value))) return false
   return value.en === undefined || typeof value.en === 'string'
 }
 
 /** `{ es: PortableText[], en?: PortableText[] }` — localizedBlockContent / styled text */
 export function isLocalizedBlocks(value: unknown): value is LocalizedBlocks {
   if (!isPlainObject(value) || !Array.isArray(value.es)) return false
-  const keys = Object.keys(value)
-  return keys.every((key) => key === 'es' || key === 'en')
+  return isLocalizedFieldKeys(Object.keys(value))
 }
 
 export function collectSpanTexts(blocks: unknown[]): string[] {
