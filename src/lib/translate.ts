@@ -5,18 +5,20 @@ const SYSTEM_PROMPT =
   'You translate Spanish product copy for an art/jewelry atelier into natural English. Return ONLY a JSON array of strings in the same order. Keep proper nouns. Preserve line breaks exactly when present. Do not wrap the array in markdown.'
 
 /**
- * Free Gemini models via Google AI Studio (GOOGLE_GENERATIVE_AI_API_KEY).
- * Tried in order when the previous model errors / is rate-limited.
- * Prefer Gemini 3.x — 2.5 Flash is closed to many new free-tier keys.
+ * Free Gemini models via Google AI Studio.
+ * Tried in order — if one is closed to new keys / rate-limited / retired, the next runs.
+ * Prefer Gemini 3.x aliases; keep “latest” aliases as soft landing pads.
  */
 const DEFAULT_GEMINI_MODELS = [
   'gemini-3.5-flash',
   'gemini-3.5-flash-lite',
+  'gemini-3.6-flash',
   'gemini-3.1-flash-lite',
   'gemini-flash-latest',
+  'gemini-flash-lite-latest',
 ]
 
-/** Optional paid/credit backups via Vercel AI Gateway. */
+/** Optional credit backups via Vercel AI Gateway. */
 const DEFAULT_GATEWAY_MODELS = [
   'google/gemini-3.5-flash',
   'google/gemini-3.1-flash-lite',
@@ -71,26 +73,123 @@ function errorMessage(error: unknown): string {
   return String(error)
 }
 
+/**
+ * Normalize Google AI Studio / Gemini keys.
+ * Accepts legacy `AIza…` keys and newer `AQ.…` keys; strips quotes / Bearer / whitespace.
+ * Never reject based on prefix — Google has changed formats before.
+ */
+export function normalizeGeminiApiKey(raw: string | undefined): string | undefined {
+  if (!raw) return undefined
+  let key = raw.trim()
+  if (
+    (key.startsWith('"') && key.endsWith('"')) ||
+    (key.startsWith("'") && key.endsWith("'"))
+  ) {
+    key = key.slice(1, -1).trim()
+  }
+  if (/^bearer\s+/i.test(key)) {
+    key = key.replace(/^bearer\s+/i, '').trim()
+  }
+  // Common paste mistake: trailing newline or zero-width chars
+  key = key.replace(/[\u200B-\u200D\uFEFF]/g, '').trim()
+  return key || undefined
+}
+
 function geminiApiKey(): string | undefined {
-  return (
-    process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
-    process.env.GEMINI_API_KEY ||
-    undefined
+  return normalizeGeminiApiKey(
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY,
   )
 }
 
-async function translateViaGemini(texts: string[]): Promise<TranslateResult> {
+function geminiModels(): string[] {
+  return parseModelsEnv(
+    process.env.TRANSLATE_GEMINI_MODELS,
+    DEFAULT_GEMINI_MODELS,
+  )
+}
+
+/**
+ * Direct Google Generative Language REST call.
+ * Most reliable with newer `AQ.` Studio keys — no SDK prefix assumptions.
+ */
+async function translateViaGeminiRest(
+  texts: string[],
+): Promise<TranslateResult> {
+  const apiKey = geminiApiKey()
+  if (!apiKey) {
+    throw new Error('Missing GOOGLE_GENERATIVE_AI_API_KEY')
+  }
+
+  const models = geminiModels()
+  let lastError: Error | null = null
+
+  for (const model of models) {
+    try {
+      const url = new URL(
+        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+      )
+      url.searchParams.set('key', apiKey)
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          systemInstruction: {parts: [{text: SYSTEM_PROMPT}]},
+          contents: [{role: 'user', parts: [{text: JSON.stringify(texts)}]}],
+          generationConfig: {temperature: 0.2},
+        }),
+      })
+
+      const bodyText = await response.text()
+      if (!response.ok) {
+        lastError = new Error(
+          `Gemini REST ${model} ${response.status}: ${bodyText.slice(0, 220)}`,
+        )
+        console.warn(`[translate] ${lastError.message}`)
+        continue
+      }
+
+      const json = JSON.parse(bodyText) as {
+        candidates?: {content?: {parts?: {text?: string}[]}}[]
+      }
+      const text =
+        json.candidates
+          ?.flatMap((c) => c.content?.parts || [])
+          .map((p) => p.text || '')
+          .join('') || ''
+
+      if (!text.trim()) {
+        lastError = new Error(`Gemini REST ${model} returned empty text`)
+        continue
+      }
+
+      return {
+        translations: parseJsonArray(text, texts.length),
+        mode: 'ai',
+        model: `google/${model}`,
+      }
+    } catch (error) {
+      lastError =
+        error instanceof Error ? error : new Error(`Gemini REST ${model} failed`)
+      console.warn(
+        `[translate] Gemini REST failed (${model}):`,
+        errorMessage(error),
+      )
+    }
+  }
+
+  throw lastError || new Error('All Gemini REST models failed')
+}
+
+/** AI SDK Google provider — second Gemini path if REST somehow fails. */
+async function translateViaGeminiSdk(texts: string[]): Promise<TranslateResult> {
   const apiKey = geminiApiKey()
   if (!apiKey) {
     throw new Error('Missing GOOGLE_GENERATIVE_AI_API_KEY')
   }
 
   const google = createGoogleGenerativeAI({apiKey})
-  const models = parseModelsEnv(
-    process.env.TRANSLATE_GEMINI_MODELS,
-    DEFAULT_GEMINI_MODELS,
-  )
-
+  const models = geminiModels()
   let lastError: Error | null = null
 
   for (const model of models) {
@@ -109,12 +208,15 @@ async function translateViaGemini(texts: string[]): Promise<TranslateResult> {
       }
     } catch (error) {
       lastError =
-        error instanceof Error ? error : new Error(`Gemini ${model} failed`)
-      console.warn(`[translate] Gemini model failed (${model}):`, errorMessage(error))
+        error instanceof Error ? error : new Error(`Gemini SDK ${model} failed`)
+      console.warn(
+        `[translate] Gemini SDK model failed (${model}):`,
+        errorMessage(error),
+      )
     }
   }
 
-  throw lastError || new Error('All Gemini models failed')
+  throw lastError || new Error('All Gemini SDK models failed')
 }
 
 async function translateViaGateway(texts: string[]): Promise<TranslateResult> {
@@ -125,7 +227,6 @@ async function translateViaGateway(texts: string[]): Promise<TranslateResult> {
   const [primary, ...fallbacks] = models
   if (!primary) throw new Error('No translate models configured')
 
-  // gateway() wrapper is required for providerOptions.gateway model failover
   const {text, finalStep} = await generateText({
     model: gateway(primary),
     temperature: 0.2,
@@ -228,7 +329,6 @@ async function translateViaMyMemory(texts: string[]): Promise<TranslateResult> {
   const translations: string[] = []
 
   for (const text of texts) {
-    // Keep requests short — MyMemory URL length limits
     const chunk = text.length > 450 ? text.slice(0, 450) : text
     const url = new URL('https://api.mymemory.translated.net/get')
     url.searchParams.set('q', chunk)
@@ -266,11 +366,16 @@ async function translateViaMyMemory(texts: string[]): Promise<TranslateResult> {
 }
 
 /**
- * Translate Spanish strings → English with model failover.
- * Never throws for empty input. On total AI failure, returns a copy fallback
- * so Studio editors still get English fields filled.
+ * Translate Spanish → English with layered failover.
+ * Never throws for empty input. On total failure, copies Spanish (button still “works”).
  *
- * Order: Gemini (free) → AI Gateway → MyMemory → copy Spanish.
+ * Order:
+ * 1. Gemini REST (best for new AQ. keys) — try each model
+ * 2. Gemini AI SDK — try each model again
+ * 3. Vercel AI Gateway
+ * 4. OpenAI-compatible gateway URL (if keyed)
+ * 5. MyMemory
+ * 6. Copy Spanish
  */
 export async function translateTexts(texts: string[]): Promise<TranslateResult> {
   if (!texts.length) {
@@ -278,42 +383,44 @@ export async function translateTexts(texts: string[]): Promise<TranslateResult> 
   }
 
   const errors: string[] = []
+  const key = geminiApiKey()
 
-  // 1) Free Gemini via Google AI Studio key (primary + Gemini model backups)
-  if (geminiApiKey()) {
+  if (key) {
     try {
-      return await translateViaGemini(texts)
+      return await translateViaGeminiRest(texts)
     } catch (error) {
-      errors.push(errorMessage(error))
+      errors.push(`rest: ${errorMessage(error)}`)
+    }
+
+    try {
+      return await translateViaGeminiSdk(texts)
+    } catch (error) {
+      errors.push(`sdk: ${errorMessage(error)}`)
     }
   } else {
     errors.push('No GOOGLE_GENERATIVE_AI_API_KEY in env')
   }
 
-  // 2) AI SDK → Vercel AI Gateway (OIDC on Vercel, or AI_GATEWAY_API_KEY locally)
   try {
     return await translateViaGateway(texts)
   } catch (error) {
-    errors.push(errorMessage(error))
+    errors.push(`gateway: ${errorMessage(error)}`)
   }
 
-  // 3) Direct OpenAI-compatible chat completions (TRANSLATE_API_KEY / gateway key)
   if (process.env.TRANSLATE_API_KEY || process.env.AI_GATEWAY_API_KEY) {
     try {
       return await translateViaOpenAICompatible(texts)
     } catch (error) {
-      errors.push(errorMessage(error))
+      errors.push(`openai-compat: ${errorMessage(error)}`)
     }
   }
 
-  // 4) Free machine translation so Studio still gets real English without AI keys
   try {
     return await translateViaMyMemory(texts)
   } catch (error) {
-    errors.push(errorMessage(error))
+    errors.push(`mymemory: ${errorMessage(error)}`)
   }
 
-  // 5) Last resort — copy Spanish so the button never hard-fails for Mayra
   const fallbackReason = errors.filter(Boolean).join(' | ')
   console.warn('[translate] Falling back to Spanish copy:', fallbackReason)
   return {
