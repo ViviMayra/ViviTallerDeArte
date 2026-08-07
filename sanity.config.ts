@@ -34,9 +34,11 @@ export default defineConfig({
           !id.startsWith('section-')
         )
       }),
+      // One template per category. Structure wires only the matching one into
+      // each Piezas list so + creates that category with no picker.
       ...PIECE_CATEGORIES.map((category) => ({
         id: `piece-${category.id}`,
-        title: `Nueva pieza · ${category.title}`,
+        title: 'Nueva pieza',
         schemaType: 'piece' as const,
         value: {
           category: category.id,

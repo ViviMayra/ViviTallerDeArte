@@ -38,11 +38,13 @@ function categoryBranch(
             .title('Piezas')
             .schemaType('piece')
             .child(
-              S.documentTypeList('piece')
+              // documentList (not documentTypeList) so Create uses only this
+              // category’s template — no “pick Cerámica / Joyería / …” picker
+              S.documentList()
                 .title(`Piezas · ${title}`)
+                .schemaType('piece')
                 .filter('_type == "piece" && category == $category')
                 .params({category})
-                // Non-parameterized template — keeps the + / Nueva pieza button visible
                 .initialValueTemplates([
                   S.initialValueTemplateItem(`piece-${category}`),
                 ])
