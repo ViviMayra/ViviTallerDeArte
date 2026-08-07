@@ -9,46 +9,16 @@ const styledTextBlock = defineArrayMember({
   styles: [{title: 'Normal', value: 'normal'}],
   lists: [],
   marks: {
+    // Default fonts stay as before (body). She mainly changes size / emphasis.
     decorators: [
       {title: 'Negrita', value: 'strong'},
       {title: 'Cursiva', value: 'em'},
       {title: 'Subrayado', value: 'underline'},
+      {title: 'Pequeño', value: 'sizeSm'},
+      {title: 'Grande', value: 'sizeLg'},
+      {title: 'Muy grande', value: 'sizeXl'},
     ],
-    annotations: [
-      {
-        name: 'textStyle',
-        type: 'object',
-        title: 'Fuente y tamaño',
-        fields: [
-          defineField({
-            name: 'font',
-            title: 'Fuente',
-            type: 'string',
-            options: {
-              list: [
-                {title: 'Cuerpo', value: 'body'},
-                {title: 'Título (decorativa)', value: 'display'},
-              ],
-              layout: 'radio',
-            },
-          }),
-          defineField({
-            name: 'size',
-            title: 'Tamaño',
-            type: 'string',
-            options: {
-              list: [
-                {title: 'Pequeño', value: 'sm'},
-                {title: 'Normal', value: 'md'},
-                {title: 'Grande', value: 'lg'},
-                {title: 'Muy grande', value: 'xl'},
-              ],
-              layout: 'radio',
-            },
-          }),
-        ],
-      },
-    ],
+    annotations: [],
   },
 })
 
@@ -128,7 +98,7 @@ export const localizedStyledText = defineType({
       name: 'es',
       title: 'Texto',
       description:
-        'Selecciona texto y usa la barra: Negrita, Cursiva, o “Fuente y tamaño”.',
+        'La fuente ya está elegida. Selecciona texto → Pequeño / Grande / Muy grande (también Negrita / Cursiva).',
       type: 'array',
       of: [styledTextBlock],
       validation: (Rule) => Rule.required().min(1),
@@ -153,7 +123,7 @@ export const optionalLocalizedStyledText = defineType({
       name: 'es',
       title: 'Texto',
       description:
-        'Opcional. Selecciona texto y usa la barra: Negrita, Cursiva, o “Fuente y tamaño”.',
+        'Opcional. La fuente ya está elegida. Selecciona texto → Pequeño / Grande / Muy grande.',
       type: 'array',
       of: [styledTextBlock],
     }),

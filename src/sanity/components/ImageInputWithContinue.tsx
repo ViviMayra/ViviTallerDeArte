@@ -1,7 +1,7 @@
 'use client'
 
 import {RemoveIcon} from '@sanity/icons/Remove'
-import {Button, Flex, Stack, Text} from '@sanity/ui'
+import {Button, Card, Flex, Stack, Text} from '@sanity/ui'
 import {unset, type ObjectInputProps} from 'sanity'
 
 type ImageValue = {
@@ -16,9 +16,22 @@ export function ImageInputWithContinue(props: ObjectInputProps) {
   const hasPhoto = Boolean(value?.asset) || isUploading
   const progress = value?._upload?.progress
 
+  const leaveEditor = () => {
+    // Blur first so hotspot/crop panels release focus traps
+    if (typeof document !== 'undefined') {
+      const active = document.activeElement
+      if (active instanceof HTMLElement) active.blur()
+    }
+    props.onPathFocus([])
+    // Second pass after paint — Studio sometimes needs it to close nested panels
+    requestAnimationFrame(() => {
+      props.onPathFocus([])
+    })
+  }
+
   const clearPhoto = () => {
     props.onChange(unset())
-    props.onPathFocus([])
+    leaveEditor()
   }
 
   return (
@@ -31,25 +44,37 @@ export function ImageInputWithContinue(props: ObjectInputProps) {
           Si se queda trabada, usa Quitar foto e intenta de nuevo.
         </Text>
       ) : null}
-      <Flex justify="flex-end" gap={2} wrap="wrap">
-        {hasPhoto ? (
+      <Card
+        padding={2}
+        radius={2}
+        shadow={1}
+        style={{
+          position: 'sticky',
+          bottom: 0,
+          zIndex: 30,
+          background: 'var(--card-bg-color)',
+        }}
+      >
+        <Flex justify="flex-end" gap={2} wrap="wrap">
+          {hasPhoto ? (
+            <Button
+              text="Quitar foto"
+              icon={RemoveIcon}
+              tone="critical"
+              mode="ghost"
+              type="button"
+              onClick={clearPhoto}
+            />
+          ) : null}
           <Button
-            text="Quitar foto"
-            icon={RemoveIcon}
-            tone="critical"
-            mode="ghost"
-            onClick={clearPhoto}
+            text="Continuar"
+            tone="primary"
+            mode="default"
+            type="button"
+            onClick={leaveEditor}
           />
-        ) : null}
-        <Button
-          text="Continuar"
-          tone="primary"
-          mode="default"
-          onClick={() => {
-            props.onPathFocus([])
-          }}
-        />
-      </Flex>
+        </Flex>
+      </Card>
     </Stack>
   )
 }
