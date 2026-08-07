@@ -21,17 +21,18 @@ const fontClass: Record<NonNullable<TextStyleValue['font']>, string> = {
 
 function components(variant: Variant): PortableTextComponents {
   const baseSize = variant === 'primary' ? 'text-sm' : 'text-xs md:text-sm'
+  // Same tracking on both lines so every line shares one left edge with VIVI
   const baseFont =
-    variant === 'primary'
-      ? 'font-[family-name:var(--font-body)] uppercase tracking-[0.22em]'
-      : 'font-[family-name:var(--font-body)] tracking-[0.04em]'
+    'font-[family-name:var(--font-body)] uppercase tracking-[0.2em]'
   const baseColor =
     variant === 'primary' ? 'text-foreground/90' : 'text-foreground/75'
 
   return {
     block: {
       normal: ({children}) => (
-        <p className={`m-0 ${baseSize} ${baseFont} ${baseColor}`}>{children}</p>
+        <p className={`m-0 text-left ${baseSize} ${baseFont} ${baseColor}`}>
+          {children}
+        </p>
       ),
     },
     marks: {
@@ -43,7 +44,7 @@ function components(variant: Variant): PortableTextComponents {
         const classes = [
           style.font ? fontClass[style.font] : '',
           style.size ? sizeClass[style.size] : '',
-          // Display font reads better without the line’s default wide tracking
+          // Keep left edge; only drop wide tracking for display font
           style.font === 'display' ? 'normal-case tracking-normal' : '',
         ]
           .filter(Boolean)
@@ -65,7 +66,7 @@ export function HeroStyledText({
 }) {
   if (!value?.length) return null
   return (
-    <div className={`space-y-1 ${className}`.trim()}>
+    <div className={`space-y-1 text-left ${className}`.trim()}>
       <PortableText value={value} components={components(variant)} />
     </div>
   )
