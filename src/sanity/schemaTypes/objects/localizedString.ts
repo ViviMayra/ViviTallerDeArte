@@ -1,24 +1,54 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {HERO_FONTS, HERO_SIZES} from '@/lib/hero-fonts'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 import {LocalizedStyledTextInput} from '../../components/LocalizedStyledTextInput'
 import {SpanishStringInput} from '../../components/SpanishStringInput'
 
-/** Short rich text for hero lines — bold, font, size. No headings/lists/images. */
+/** Short rich text for hero lines — bold, real fonts, numeric sizes. */
 const styledTextBlock = defineArrayMember({
   type: 'block',
   styles: [{title: 'Normal', value: 'normal'}],
   lists: [],
   marks: {
-    // Default fonts stay as before (body). She mainly changes size / emphasis.
     decorators: [
       {title: 'Negrita', value: 'strong'},
       {title: 'Cursiva', value: 'em'},
       {title: 'Subrayado', value: 'underline'},
-      {title: 'Pequeño', value: 'sizeSm'},
-      {title: 'Grande', value: 'sizeLg'},
-      {title: 'Muy grande', value: 'sizeXl'},
     ],
-    annotations: [],
+    annotations: [
+      {
+        name: 'textStyle',
+        type: 'object',
+        title: 'Fuente y tamaño',
+        fields: [
+          defineField({
+            name: 'font',
+            title: 'Fuente',
+            type: 'string',
+            options: {
+              list: HERO_FONTS.map((font) => ({
+                title: font.title,
+                value: font.value,
+              })),
+              layout: 'radio',
+            },
+            initialValue: 'body',
+          }),
+          defineField({
+            name: 'size',
+            title: 'Tamaño (número)',
+            type: 'number',
+            options: {
+              list: HERO_SIZES.map((size) => ({
+                title: String(size),
+                value: size,
+              })),
+              layout: 'dropdown',
+            },
+          }),
+        ],
+      },
+    ],
   },
 })
 
@@ -98,7 +128,7 @@ export const localizedStyledText = defineType({
       name: 'es',
       title: 'Texto',
       description:
-        'La fuente ya está elegida. Selecciona texto → Pequeño / Grande / Muy grande (también Negrita / Cursiva).',
+        'Selecciona texto → botón “Fuente y tamaño”: elige fuente y un número (12, 14, 16…). También Negrita / Cursiva.',
       type: 'array',
       of: [styledTextBlock],
       validation: (Rule) => Rule.required().min(1),
@@ -123,7 +153,7 @@ export const optionalLocalizedStyledText = defineType({
       name: 'es',
       title: 'Texto',
       description:
-        'Opcional. La fuente ya está elegida. Selecciona texto → Pequeño / Grande / Muy grande.',
+        'Opcional. Selecciona texto → “Fuente y tamaño” (fuente + número).',
       type: 'array',
       of: [styledTextBlock],
     }),

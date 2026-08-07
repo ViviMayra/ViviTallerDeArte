@@ -1,21 +1,47 @@
 import {PortableText, type PortableTextComponents} from '@portabletext/react'
+import {HERO_FONT_VARS, type HeroFontValue} from '@/lib/hero-fonts'
 
 type Variant = 'primary' | 'secondary'
 
 type TextStyleValue = {
-  font?: 'body' | 'display'
-  size?: 'sm' | 'md' | 'lg' | 'xl'
+  font?: HeroFontValue | string
+  size?: number | string
 }
 
-const sizeClass = {
+const legacySizeClass = {
   sm: 'text-xs md:text-sm',
   md: 'text-sm md:text-base',
   lg: 'text-base md:text-lg',
   xl: 'text-lg md:text-xl',
 } as const
 
+function fontFamily(font?: string) {
+  const key = (font || 'body') as HeroFontValue
+  const cssVar = HERO_FONT_VARS[key] || HERO_FONT_VARS.body
+  return `var(${cssVar}), Georgia, serif`
+}
+
+function resolveSize(size: TextStyleValue['size']): {
+  px?: number
+  legacyClass?: string
+} {
+  if (typeof size === 'number' && !Number.isNaN(size)) {
+    return {px: size}
+  }
+  if (typeof size === 'string') {
+    if (size in legacySizeClass) {
+      return {
+        legacyClass: legacySizeClass[size as keyof typeof legacySizeClass],
+      }
+    }
+    const asNum = Number(size)
+    if (!Number.isNaN(asNum) && asNum > 0) return {px: asNum}
+  }
+  return {}
+}
+
 function components(variant: Variant): PortableTextComponents {
-  // Previous defaults: body font; primary = uppercase wide tracking, secondary = softer
+  // Defaults match the previous look until she overrides with Fuente y tamaño
   const baseSize = variant === 'primary' ? 'text-sm' : 'text-xs md:text-sm'
   const baseFont =
     variant === 'primary'
@@ -36,34 +62,48 @@ function components(variant: Variant): PortableTextComponents {
       strong: ({children}) => <strong className="font-semibold">{children}</strong>,
       em: ({children}) => <em className="italic">{children}</em>,
       underline: ({children}) => <span className="underline">{children}</span>,
-      sizeSm: ({children}) => <span className={sizeClass.sm}>{children}</span>,
-      sizeLg: ({children}) => <span className={sizeClass.lg}>{children}</span>,
-      sizeXl: ({children}) => <span className={sizeClass.xl}>{children}</span>,
-      // Legacy marks (older Studio builds) — still render if present
+      sizeSm: ({children}) => (
+        <span className={legacySizeClass.sm}>{children}</span>
+      ),
+      sizeLg: ({children}) => (
+        <span className={legacySizeClass.lg}>{children}</span>
+      ),
+      sizeXl: ({children}) => (
+        <span className={legacySizeClass.xl}>{children}</span>
+      ),
       fontDisplay: ({children}) => (
-        <span className="font-[family-name:var(--font-display)] normal-case tracking-normal">
+        <span
+          className="normal-case tracking-normal"
+          style={{fontFamily: fontFamily('display')}}
+        >
           {children}
         </span>
       ),
       textStyle: ({children, value}) => {
         const style = (value || {}) as TextStyleValue
-        const classes = [
-          style.font === 'display'
-            ? 'font-[family-name:var(--font-display)] normal-case tracking-normal'
-            : '',
-          style.size === 'sm'
-            ? sizeClass.sm
-            : style.size === 'lg'
-              ? sizeClass.lg
-              : style.size === 'xl'
-                ? sizeClass.xl
-                : style.size === 'md'
-                  ? sizeClass.md
-                  : '',
-        ]
-          .filter(Boolean)
-          .join(' ')
-        return <span className={classes}>{children}</span>
+        const {px, legacyClass} = resolveSize(style.size)
+        const usesDisplayLike =
+          style.font === 'display' ||
+          style.font === 'serif' ||
+          style.font === 'soft' ||
+          style.font === 'script'
+
+        return (
+          <span
+            className={[
+              usesDisplayLike ? 'normal-case tracking-normal' : '',
+              legacyClass || '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            style={{
+              fontFamily: fontFamily(style.font),
+              ...(px ? {fontSize: `${px}px`} : {}),
+            }}
+          >
+            {children}
+          </span>
+        )
       },
     },
   }

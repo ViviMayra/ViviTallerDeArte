@@ -2,7 +2,13 @@ import type {Metadata} from 'next'
 import {notFound} from 'next/navigation'
 import {NextIntlClientProvider, hasLocale} from 'next-intl'
 import {getMessages, setRequestLocale} from 'next-intl/server'
-import {Figtree, Syne} from 'next/font/google'
+import {
+  Cormorant_Garamond,
+  Figtree,
+  Great_Vibes,
+  Lora,
+  Syne,
+} from 'next/font/google'
 import {CartProvider} from '@/lib/cart'
 import {getSettings, getPiecesByCategory} from '@/lib/content'
 import {
@@ -26,6 +32,24 @@ const bodyFont = Figtree({
 const displayFont = Syne({
   subsets: ['latin'],
   variable: '--font-display',
+})
+
+const serifFont = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-serif',
+})
+
+const softSerifFont = Lora({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-soft',
+})
+
+const scriptFont = Great_Vibes({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-script',
 })
 
 export const metadata: Metadata = {
@@ -118,7 +142,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${bodyFont.variable} ${displayFont.variable} h-full`}
+      className={`${bodyFont.variable} ${displayFont.variable} ${serifFont.variable} ${softSerifFont.variable} ${scriptFont.variable} h-full`}
     >
       <body className="relative flex min-h-full flex-col antialiased">
         <NextIntlClientProvider messages={messages}>
