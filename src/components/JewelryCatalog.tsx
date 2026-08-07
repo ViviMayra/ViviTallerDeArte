@@ -7,8 +7,13 @@ import {
   genderTypeAnchor,
   pieceTypeSlug,
 } from '@/lib/piece-types'
+import {getImageUrl} from '@/lib/images'
 import {t} from '@/lib/locale'
 import type {Locale, Piece, SanityImage} from '@/lib/types'
+
+function hasCarouselPhotos(slides: SanityImage[]) {
+  return slides.some((slide) => Boolean(getImageUrl(slide, 900)))
+}
 
 type GenderId = 'mujer' | 'hombre' | 'general'
 
@@ -35,10 +40,10 @@ export async function JewelryCatalog({
 
   // Jump / main nav: Mujer + Hombre only (types live under those via hover)
   const jumpItems = [
-    ...(women.length || womenSlides.length
+    ...(women.length || hasCarouselPhotos(womenSlides)
       ? [{id: 'mujer', label: nav('women')}]
       : []),
-    ...(men.length || menSlides.length
+    ...(men.length || hasCarouselPhotos(menSlides)
       ? [{id: 'hombre', label: nav('men')}]
       : []),
   ]
@@ -49,7 +54,7 @@ export async function JewelryCatalog({
     genderPieces: Piece[],
     slides: SanityImage[],
   ) {
-    if (!genderPieces.length && !slides.length) return null
+    if (!genderPieces.length && !hasCarouselPhotos(slides)) return null
 
     const pieceTypes = collectPieceTypes(genderPieces, locale)
     const withTypes = pieceTypes

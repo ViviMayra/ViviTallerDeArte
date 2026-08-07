@@ -47,10 +47,6 @@ export async function getHomePage(): Promise<HomePage> {
     data.sections && data.sections.length > 0
       ? data.sections
       : demoHome.sections
-  const featuredCarousel =
-    data.featuredCarousel && data.featuredCarousel.length > 0
-      ? data.featuredCarousel
-      : demoHome.featuredCarousel
 
   return {
     ...data,
@@ -58,9 +54,9 @@ export async function getHomePage(): Promise<HomePage> {
     heroEyebrow: data.heroEyebrow || demoHome.heroEyebrow,
     // Optional — do not fall back to demo so an empty field stays empty
     heroSubline: data.heroSubline,
-    featuredCarouselTitle:
-      data.featuredCarouselTitle || demoHome.featuredCarouselTitle,
-    featuredCarousel,
+    // Empty carousel = hide on the site (no demo filler photos)
+    featuredCarouselTitle: data.featuredCarouselTitle,
+    featuredCarousel: data.featuredCarousel || [],
     sections,
   }
 }
@@ -115,7 +111,12 @@ export async function getRelatedPieces(
 export async function getJewelryCarousels() {
   if (!hasSanityConfig) return demoCarousels
   const data = await sanityFetch<typeof demoCarousels>(jewelryCarouselsQuery)
-  return data || demoCarousels
+  // No demo fallback — empty carousels stay hidden until Mayra adds photos
+  return {
+    womenSlides: data?.womenSlides || [],
+    menSlides: data?.menSlides || [],
+    generalSlides: data?.generalSlides || [],
+  }
 }
 
 export async function getCategoryCarousel(

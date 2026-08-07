@@ -78,9 +78,7 @@ export async function CategoryCatalog({
           </>
         )}
 
-        {carouselSlides.length > 0 && (
-          <ImageCarousel slides={carouselSlides} locale={locale} />
-        )}
+        <ImageCarousel slides={carouselSlides} locale={locale} />
       </div>
     </div>
   )
