@@ -11,7 +11,7 @@ export const homePage = defineType({
       name: 'heroImage',
       title: 'Foto grande de portada',
       description:
-        'Recomendado: horizontal 2400×1350 px (16:9). Otras medidas también funcionan; usa el punto de enfoque si recorta. Al editar la foto, usa Continuar cuando termines. Si no carga, usa Quitar foto.',
+        'Recomendado: horizontal 2400×1350 px (16:9) o similar. En el celular se muestra completa (ancha); en computador llena la pantalla. Usa el punto de enfoque si hace falta. Al editar la foto, usa Continuar cuando termines. Si no carga, usa Quitar foto.',
       type: 'image',
       options: {hotspot: true},
       components: {input: ImageInputWithContinue},

@@ -33,3 +33,13 @@ export function getImageAlt(
 ): string {
   return t(image?.alt, locale, fallback)
 }
+
+/** CSS object-position from Sanity hotspot (keeps focus when object-cover crops). */
+export function getImageObjectPosition(
+  image?: SanityImage | null,
+): string | undefined {
+  const x = image?.hotspot?.x
+  const y = image?.hotspot?.y
+  if (typeof x !== 'number' || typeof y !== 'number') return undefined
+  return `${Math.round(x * 1000) / 10}% ${Math.round(y * 1000) / 10}%`
+}

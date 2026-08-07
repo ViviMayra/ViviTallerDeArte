@@ -65,7 +65,7 @@ export function ImageCarousel({
 
   return (
     <div className="relative mt-10">
-      <div className="relative bg-gradient-to-b from-[#f3efe6]/80 to-transparent px-10 py-6 md:px-14 md:py-8">
+      <div className="relative bg-gradient-to-b from-[#f3efe6]/80 to-transparent px-8 py-5 sm:px-10 sm:py-6 md:px-14 md:py-8">
         <div ref={viewportRef} className="overflow-hidden">
           <div
             className="flex ease-out"

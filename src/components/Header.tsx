@@ -100,13 +100,13 @@ export function Header({
 
   return (
     <header className="absolute inset-x-0 top-0 z-40">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-5 md:px-10 md:py-7">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 md:px-10 md:py-7">
         <Link href="/" className="flex shrink-0 items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={logoSrc}
             alt="VIVI Taller de Arte"
-            className="h-24 w-auto max-w-[260px] object-contain object-left md:h-32 md:max-w-[340px]"
+            className="h-20 w-auto max-w-[220px] object-contain object-left md:h-32 md:max-w-[340px]"
             decoding="async"
           />
         </Link>

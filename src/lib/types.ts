@@ -18,6 +18,8 @@ export type SanityImage = {
   asset?: {_ref?: string; _type?: string; url?: string}
   alt?: LocalizedString
   url?: string
+  hotspot?: {x?: number; y?: number; height?: number; width?: number}
+  crop?: {top?: number; bottom?: number; left?: number; right?: number}
 }
 
 export type PieceStatus = 'available' | 'sold' | 'hidden'

@@ -87,7 +87,7 @@ export function FeaturedCarousel({slides, title, locale}: Props) {
       ) : null}
 
       <div className="relative">
-        <div className="relative bg-gradient-to-b from-[#f3efe6]/80 to-transparent px-10 py-8 md:px-14 md:py-12">
+        <div className="relative bg-gradient-to-b from-[#f3efe6]/80 to-transparent px-8 py-6 sm:px-10 sm:py-8 md:px-14 md:py-12">
           <div ref={viewportRef} className="overflow-hidden">
             <div
               className="flex ease-out"
