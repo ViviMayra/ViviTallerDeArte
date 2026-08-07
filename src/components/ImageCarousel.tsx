@@ -1,35 +1,14 @@
 'use client'
 
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useMemo, useRef, useState} from 'react'
 import type {Locale, SanityImage} from '@/lib/types'
 import {getImageAlt, getImageUrl} from '@/lib/images'
+import {
+  useCarouselVisibleCount,
+  useInfiniteCarousel,
+} from '@/lib/use-infinite-carousel'
 
 const GAP_PX = 16
-
-function useVisibleCount() {
-  const [visible, setVisible] = useState(1)
-
-  useEffect(() => {
-    const mqMd = window.matchMedia('(min-width: 768px)')
-    const mqSm = window.matchMedia('(min-width: 640px)')
-
-    const update = () => {
-      if (mqMd.matches) setVisible(3)
-      else if (mqSm.matches) setVisible(2)
-      else setVisible(1)
-    }
-
-    update()
-    mqMd.addEventListener('change', update)
-    mqSm.addEventListener('change', update)
-    return () => {
-      mqMd.removeEventListener('change', update)
-      mqSm.removeEventListener('change', update)
-    }
-  }, [])
-
-  return visible
-}
 
 export function ImageCarousel({
   slides,
@@ -38,14 +17,31 @@ export function ImageCarousel({
   slides: SanityImage[]
   locale: Locale
 }) {
-  const visibleCount = useVisibleCount()
+  const visibleCount = useCarouselVisibleCount()
   const viewportRef = useRef<HTMLDivElement>(null)
   const [viewportWidth, setViewportWidth] = useState(0)
-  const [index, setIndex] = useState(0)
 
-  const validSlides = slides.filter((slide) => Boolean(getImageUrl(slide, 900)))
-  const maxIndex = Math.max(0, validSlides.length - visibleCount)
-  const canNavigate = validSlides.length > visibleCount
+  const validSlides = useMemo(
+    () => slides.filter((slide) => Boolean(getImageUrl(slide, 900))),
+    [slides],
+  )
+
+  const {
+    index,
+    activeDot,
+    canNavigate,
+    transitionOn,
+    goPrev,
+    goNext,
+    goTo,
+    onTransitionEnd,
+    cloneCount,
+  } = useInfiniteCarousel(validSlides.length, visibleCount, 4500)
+
+  const trackSlides = useMemo(() => {
+    if (!cloneCount) return validSlides
+    return [...validSlides, ...validSlides.slice(0, cloneCount)]
+  }, [validSlides, cloneCount])
 
   useEffect(() => {
     const el = viewportRef.current
@@ -59,26 +55,7 @@ export function ImageCarousel({
     return () => observer.disconnect()
   }, [])
 
-  useEffect(() => {
-    setIndex((i) => Math.min(i, maxIndex))
-  }, [maxIndex, validSlides.length])
-
-  useEffect(() => {
-    if (!canNavigate) return
-    const id = window.setInterval(() => {
-      setIndex((i) => (i >= maxIndex ? 0 : i + 1))
-    }, 4500)
-    return () => window.clearInterval(id)
-  }, [canNavigate, maxIndex, index])
-
   if (!validSlides.length) return null
-
-  const goPrev = () => {
-    setIndex((i) => (i <= 0 ? maxIndex : i - 1))
-  }
-  const goNext = () => {
-    setIndex((i) => (i >= maxIndex ? 0 : i + 1))
-  }
 
   const cardWidth =
     viewportWidth > 0
@@ -91,15 +68,17 @@ export function ImageCarousel({
       <div className="relative bg-gradient-to-b from-[#f3efe6]/80 to-transparent px-10 py-6 md:px-14 md:py-8">
         <div ref={viewportRef} className="overflow-hidden">
           <div
-            className="flex transition-transform duration-500 ease-out"
+            className="flex ease-out"
             style={{
               gap: GAP_PX,
               transform: cardWidth > 0 ? `translateX(-${offset}px)` : undefined,
+              transition: transitionOn ? 'transform 500ms ease-out' : 'none',
             }}
+            onTransitionEnd={onTransitionEnd}
           >
-            {validSlides.map((slide, i) => (
+            {trackSlides.map((slide, i) => (
               <div
-                key={slide.asset?._ref || slide.url || `slide-${i}`}
+                key={`${slide.asset?._ref || slide.url || 'slide'}-${i}`}
                 className="shrink-0"
                 style={
                   cardWidth > 0
@@ -144,14 +123,14 @@ export function ImageCarousel({
 
       {canNavigate ? (
         <div className="mt-4 flex items-center justify-center gap-2">
-          {Array.from({length: maxIndex + 1}, (_, i) => (
+          {validSlides.map((slide, i) => (
             <button
-              key={i}
+              key={slide.asset?._ref || slide.url || `dot-${i}`}
               type="button"
               aria-label={`Slide ${i + 1}`}
-              onClick={() => setIndex(i)}
+              onClick={() => goTo(i)}
               className={`h-1.5 w-6 transition-colors ${
-                i === index ? 'bg-ochre' : 'bg-line'
+                i === activeDot ? 'bg-ochre' : 'bg-line'
               }`}
             />
           ))}
