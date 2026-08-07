@@ -3,32 +3,9 @@
 import {useState} from 'react'
 import {Button, Card, Flex, Stack, Text, useToast} from '@sanity/ui'
 import {TranslateIcon} from '@sanity/icons/Translate'
-import {useFormValue, type StringInputProps} from 'sanity'
-
-async function runTranslate(documentId: string) {
-  let response = await fetch('/api/translate', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({documentId}),
-  })
-
-  if (!response.ok) {
-    const publishedId = String(documentId).replace(/^drafts\./, '')
-    response = await fetch('/api/translate', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({documentId: publishedId}),
-    })
-  }
-
-  const data = (await response.json()) as {
-    error?: string
-    message?: string
-    mode?: string
-  }
-  if (!response.ok) throw new Error(data.error || 'Error al traducir')
-  return data
-}
+import {useClient, useFormValue, type StringInputProps} from 'sanity'
+import {apiVersion} from '../env'
+import {translateDocumentWithClient} from '../lib/translateDocument'
 
 /**
  * Big in-form button so Mayra always sees “Traducir al inglés”
@@ -36,6 +13,7 @@ async function runTranslate(documentId: string) {
  */
 export function TranslateToEnglishInput(_props: StringInputProps) {
   const toast = useToast()
+  const client = useClient({apiVersion})
   const [loading, setLoading] = useState(false)
   const documentId = useFormValue(['_id']) as string | undefined
 
@@ -51,7 +29,7 @@ export function TranslateToEnglishInput(_props: StringInputProps) {
 
     setLoading(true)
     try {
-      const data = await runTranslate(documentId)
+      const data = await translateDocumentWithClient(client, documentId)
       toast.push({
         status: data.mode === 'copy' ? 'warning' : 'success',
         title:

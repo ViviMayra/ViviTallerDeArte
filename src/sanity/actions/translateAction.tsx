@@ -1,7 +1,9 @@
 import {useState} from 'react'
-import type {DocumentActionComponent} from 'sanity'
+import {useClient, type DocumentActionComponent} from 'sanity'
 import {useToast} from '@sanity/ui'
 import {TranslateIcon} from '@sanity/icons/Translate'
+import {apiVersion} from '../env'
+import {translateDocumentWithClient} from '../lib/translateDocument'
 
 /**
  * Fills hidden English fields from Spanish.
@@ -11,6 +13,7 @@ import {TranslateIcon} from '@sanity/icons/Translate'
 export const translateAction: DocumentActionComponent = (props) => {
   const {id, onComplete, draft, published} = props
   const toast = useToast()
+  const client = useClient({apiVersion})
   const [loading, setLoading] = useState(false)
 
   const docId = draft?._id || published?._id || id
@@ -28,25 +31,7 @@ export const translateAction: DocumentActionComponent = (props) => {
     onHandle: async () => {
       setLoading(true)
       try {
-        const targetId = docId
-
-        let response = await fetch('/api/translate', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({documentId: targetId}),
-        })
-
-        if (!response.ok) {
-          const publishedId = String(targetId).replace(/^drafts\./, '')
-          response = await fetch('/api/translate', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({documentId: publishedId}),
-          })
-        }
-
-        const data = await response.json()
-        if (!response.ok) throw new Error(data.error || 'Error al traducir')
+        const data = await translateDocumentWithClient(client, String(docId))
 
         toast.push({
           status: data.mode === 'copy' ? 'warning' : 'success',
@@ -72,7 +57,7 @@ export const translateAction: DocumentActionComponent = (props) => {
           description:
             error instanceof Error
               ? error.message
-              : 'Pide ayuda para configurar el token de traducción.',
+              : 'No se pudo completar la traducción.',
         })
         setLoading(false)
         onComplete()
