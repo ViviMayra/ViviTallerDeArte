@@ -7,8 +7,8 @@ type Body = {
   texts?: {key: string; value: string}[]
 }
 
-type LocalizedString = {es?: string; en?: string}
-type LocalizedBlocks = {es?: unknown[]; en?: unknown[]}
+type LocalizedString = {es: string; en?: string}
+type LocalizedBlocks = {es: unknown[]; en?: unknown[]}
 
 async function translateTexts(texts: string[]): Promise<string[]> {
   const apiKey = process.env.TRANSLATE_API_KEY
@@ -87,18 +87,15 @@ function collectLocalized(
   if (value == null) return
 
   if (isLocalizedString(value)) {
-    if (value.es.trim()) {
-      stringQueue.push({key: `${path}.en`, value: value.es})
+    const spanish = value.es.trim()
+    if (spanish) {
+      stringQueue.push({key: `${path}.en`, value: spanish})
     }
     return
   }
 
   if (isLocalizedBlocks(value)) {
-    if (
-      value.es &&
-      value.es.length > 0 &&
-      (!value.en || value.en.length === 0)
-    ) {
+    if (value.es.length > 0 && (!value.en || value.en.length === 0)) {
       blockPaths.push(path)
     }
     return
