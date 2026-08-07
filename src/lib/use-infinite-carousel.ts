@@ -104,7 +104,12 @@ export function useCarouselTrackpad({
   onNext,
   pause,
   resume,
-  threshold = 40,
+  /** Wheel delta needed before advancing one slide (higher = slower). */
+  threshold = 90,
+  /** Scales trackpad delta so flicks feel calmer. */
+  sensitivity = 0.35,
+  /** Ignore further wheel advances after a step (ms). */
+  stepCooldownMs = 420,
 }: {
   enabled: boolean
   viewportRef: RefObject<HTMLElement | null>
@@ -113,6 +118,8 @@ export function useCarouselTrackpad({
   pause?: () => void
   resume?: () => void
   threshold?: number
+  sensitivity?: number
+  stepCooldownMs?: number
 }) {
   const onPrevRef = useRef(onPrev)
   const onNextRef = useRef(onNext)
@@ -129,6 +136,7 @@ export function useCarouselTrackpad({
 
     let acc = 0
     let resumeTimer = 0
+    let coolUntil = 0
 
     const onWheel = (event: WheelEvent) => {
       const absX = Math.abs(event.deltaX)
@@ -144,13 +152,21 @@ export function useCarouselTrackpad({
       window.clearTimeout(resumeTimer)
       resumeTimer = window.setTimeout(() => resumeRef.current?.(), 900)
 
-      acc += delta
+      const now = performance.now()
+      if (now < coolUntil) {
+        acc = 0
+        return
+      }
+
+      acc += delta * sensitivity
       if (acc >= threshold) {
         onNextRef.current()
         acc = 0
+        coolUntil = now + stepCooldownMs
       } else if (acc <= -threshold) {
         onPrevRef.current()
         acc = 0
+        coolUntil = now + stepCooldownMs
       }
     }
 
@@ -159,7 +175,7 @@ export function useCarouselTrackpad({
       el.removeEventListener('wheel', onWheel)
       window.clearTimeout(resumeTimer)
     }
-  }, [enabled, threshold, viewportRef])
+  }, [enabled, sensitivity, stepCooldownMs, threshold, viewportRef])
 }
 
 /**
@@ -171,7 +187,7 @@ export function useCarouselGrab({
   onNext,
   pause,
   resume,
-  threshold = 48,
+  threshold = 72,
 }: {
   enabled: boolean
   onPrev: () => void
