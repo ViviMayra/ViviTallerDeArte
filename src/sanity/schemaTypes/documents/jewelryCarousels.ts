@@ -1,5 +1,6 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
+import {translateButtonField} from '../objects/translateButton'
 
 const slideField = (name: string, title: string) =>
   defineField({
@@ -29,6 +30,7 @@ export const jewelryCarousels = defineType({
   title: 'Carruseles de joyería',
   type: 'document',
   fields: [
+    translateButtonField,
     slideField('womenSlides', 'Carrusel debajo de Mujer'),
     slideField('menSlides', 'Carrusel debajo de Hombre'),
     slideField('generalSlides', 'Carrusel debajo de General'),

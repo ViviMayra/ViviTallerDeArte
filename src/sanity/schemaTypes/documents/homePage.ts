@@ -1,11 +1,13 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
+import {translateButtonField} from '../objects/translateButton'
 
 export const homePage = defineType({
   name: 'homePage',
   title: 'Página de inicio',
   type: 'document',
   fields: [
+    translateButtonField,
     defineField({
       name: 'heroImage',
       title: 'Foto grande de portada',

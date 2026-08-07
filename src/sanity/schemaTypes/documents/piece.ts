@@ -3,12 +3,14 @@ import {AutoSlugInput, QuietSlugField} from '../../components/AutoSlugInput'
 import {DetailsInput} from '../../components/DetailsInput'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 import {PieceTypeInput} from '../../components/PieceTypeInput'
+import {translateButtonField} from '../objects/translateButton'
 
 export const piece = defineType({
   name: 'piece',
   title: 'Pieza',
   type: 'document',
   fields: [
+    translateButtonField,
     defineField({
       name: 'title',
       title: 'Nombre de la pieza',

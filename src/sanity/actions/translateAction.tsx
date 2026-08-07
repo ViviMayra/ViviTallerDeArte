@@ -22,8 +22,8 @@ export const translateAction: DocumentActionComponent = (props) => {
       'Completa todo en español, guarda, y haz clic aquí. El inglés se llena solo.',
     icon: TranslateIcon,
     tone: 'default',
-    // Visible action bar next to Publish — not the ••• menu
-    group: ['default'],
+    // Footer menu next to Publish + top-right ••• menu
+    group: ['default', 'paneActions'],
     disabled: loading || !hasSavedDoc,
     onHandle: async () => {
       setLoading(true)

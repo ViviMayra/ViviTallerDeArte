@@ -1,12 +1,14 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {AutoSlugInput, QuietSlugField} from '../../components/AutoSlugInput'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
+import {translateButtonField} from '../objects/translateButton'
 
 export const exhibition = defineType({
   name: 'exhibition',
   title: 'Exhibición',
   type: 'document',
   fields: [
+    translateButtonField,
     defineField({
       name: 'title',
       title: 'Nombre de la exhibición',

@@ -1,10 +1,12 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {translateButtonField} from '../objects/translateButton'
 
 export const aboutPage = defineType({
   name: 'aboutPage',
   title: 'About / Nosotros',
   type: 'document',
   fields: [
+    translateButtonField,
     defineField({
       name: 'title',
       title: 'Título de página',

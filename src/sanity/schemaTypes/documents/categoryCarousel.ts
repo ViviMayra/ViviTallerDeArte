@@ -1,5 +1,6 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
+import {translateButtonField} from '../objects/translateButton'
 
 /** Optional photo carousel under a category catalog (cerámica, ilustraciones, pintura). */
 export const categoryCarousel = defineType({
@@ -7,6 +8,7 @@ export const categoryCarousel = defineType({
   title: 'Carrusel del catálogo',
   type: 'document',
   fields: [
+    translateButtonField,
     defineField({
       name: 'slides',
       title: 'Fotos del carrusel',
