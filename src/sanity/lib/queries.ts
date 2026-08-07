@@ -56,7 +56,7 @@ export const aboutPageQuery = groq`*[_type == "aboutPage"][0]{
   seo
 }`
 
-export const piecesByCategoryQuery = groq`*[_type == "piece" && category == $category && status != "hidden"] | order(title.es asc){
+export const piecesByCategoryQuery = groq`*[_type == "piece" && category == $category && status != "hidden"] | order(orderRank asc, title.es asc){
   _id,
   title ${localizedString},
   "slug": slug.current,
@@ -69,7 +69,12 @@ export const piecesByCategoryQuery = groq`*[_type == "piece" && category == $cat
   gender,
   status,
   pieceType ${localizedString},
+  orderRank,
   seo
+}`
+
+export const categoryTypeOrderQuery = groq`*[_type == "categoryTypeOrder" && _id in [$id, $draftId]][0]{
+  types
 }`
 
 export const pieceBySlugQuery = groq`*[_type == "piece" && slug.current == $slug && status != "hidden"][0]{

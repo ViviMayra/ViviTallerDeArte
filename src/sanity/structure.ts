@@ -1,4 +1,5 @@
-import type {StructureBuilder, StructureResolver} from 'sanity/structure'
+import type {StructureResolver} from 'sanity/structure'
+import {orderableDocumentListDeskItem} from '@sanity/orderable-document-list'
 
 const CATEGORIES = [
   {id: 'joyeria', title: 'Joyería'},
@@ -8,7 +9,7 @@ const CATEGORIES = [
 ] as const
 
 function carouselItem(
-  S: StructureBuilder,
+  S: Parameters<StructureResolver>[0],
   category: 'ceramica' | 'ilustraciones' | 'pintura',
   title: string,
 ) {
@@ -22,11 +23,27 @@ function carouselItem(
     )
 }
 
+function typeOrderItem(
+  S: Parameters<StructureResolver>[0],
+  category: (typeof CATEGORIES)[number]['id'],
+  title: string,
+) {
+  return S.listItem()
+    .title('Orden de tipos')
+    .child(
+      S.document()
+        .schemaType('categoryTypeOrder')
+        .documentId(`type-order-${category}`)
+        .title(`Orden de tipos · ${title}`),
+    )
+}
+
 function categoryBranch(
-  S: StructureBuilder,
+  S: Parameters<StructureResolver>[0],
+  context: Parameters<StructureResolver>[1],
   title: string,
   category: (typeof CATEGORIES)[number]['id'],
-  extraItems: ReturnType<StructureBuilder['listItem']>[] = [],
+  extraItems: ReturnType<Parameters<StructureResolver>[0]['listItem']>[] = [],
 ) {
   return S.listItem()
     .title(title)
@@ -34,32 +51,36 @@ function categoryBranch(
       S.list()
         .title(title)
         .items([
-          S.listItem()
-            .title('Piezas')
-            .schemaType('piece')
-            .child(
-              // documentList (not documentTypeList) so Create uses only this
-              // category’s template — no “pick Cerámica / Joyería / …” picker
-              S.documentList()
-                .title(`Piezas · ${title}`)
-                .schemaType('piece')
-                .filter('_type == "piece" && category == $category')
-                .params({category})
-                .initialValueTemplates([
-                  S.initialValueTemplateItem(`piece-${category}`),
-                ])
-                .defaultOrdering([{field: 'title.es', direction: 'asc'}]),
-            ),
+          orderableDocumentListDeskItem({
+            type: 'piece',
+            title: 'Piezas',
+            id: `orderable-pieces-${category}`,
+            filter: `category == $category`,
+            params: {category},
+            createIntent: false,
+            menuItems: [
+              S.menuItem()
+                .title('Nueva pieza')
+                .intent({
+                  type: 'create',
+                  params: {type: 'piece', template: `piece-${category}`},
+                })
+                .serialize(),
+            ],
+            S,
+            context,
+          }),
+          typeOrderItem(S, category, title),
           ...extraItems,
         ]),
     )
 }
 
-export const structure: StructureResolver = (S) =>
+export const structure: StructureResolver = (S, context) =>
   S.list()
     .title('VIVI')
     .items([
-      categoryBranch(S, 'Joyería', 'joyeria', [
+      categoryBranch(S, context, 'Joyería', 'joyeria', [
         S.listItem()
           .title('Carruseles (opcional)')
           .child(
@@ -69,13 +90,13 @@ export const structure: StructureResolver = (S) =>
               .title('Carruseles de joyería'),
           ),
       ]),
-      categoryBranch(S, 'Cerámica', 'ceramica', [
+      categoryBranch(S, context, 'Cerámica', 'ceramica', [
         carouselItem(S, 'ceramica', 'Cerámica'),
       ]),
-      categoryBranch(S, 'Ilustraciones', 'ilustraciones', [
+      categoryBranch(S, context, 'Ilustraciones', 'ilustraciones', [
         carouselItem(S, 'ilustraciones', 'Ilustraciones'),
       ]),
-      categoryBranch(S, 'Pintura', 'pintura', [
+      categoryBranch(S, context, 'Pintura', 'pintura', [
         carouselItem(S, 'pintura', 'Pintura'),
       ]),
       S.divider(),

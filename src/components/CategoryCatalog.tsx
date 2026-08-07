@@ -9,16 +9,18 @@ import type {Category, Locale, Piece, SanityImage} from '@/lib/types'
 export async function CategoryCatalog({
   title,
   pieces,
+  typeOrder = [],
   carouselSlides = [],
 }: {
   title: string
   category: Category
   pieces: Piece[]
+  typeOrder?: string[]
   carouselSlides?: SanityImage[]
 }) {
   const locale = (await getLocale()) as Locale
   const common = await getTranslations('common')
-  const pieceTypes = collectPieceTypes(pieces, locale)
+  const pieceTypes = collectPieceTypes(pieces, locale, typeOrder)
 
   const jumpItems = pieceTypes.map((type) => ({
     id: type.slug,

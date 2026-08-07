@@ -10,7 +10,11 @@ import {
   Syne,
 } from 'next/font/google'
 import {CartProvider} from '@/lib/cart'
-import {getSettings, getPiecesByCategory} from '@/lib/content'
+import {
+  getSettings,
+  getPiecesByCategory,
+  getCategoryTypeOrder,
+} from '@/lib/content'
 import {
   collectJewelryTypesByGender,
   collectPieceTypes,
@@ -91,20 +95,45 @@ export default async function LocaleLayout({
   const messages = await getMessages()
   const settings = await getSettings()
   const localeKey = locale as Locale
-  const [joyeriaPieces, ceramicaPieces, ilustracionesPieces, pinturaPieces] =
-    await Promise.all([
-      getPiecesByCategory('joyeria'),
-      getPiecesByCategory('ceramica'),
-      getPiecesByCategory('ilustraciones'),
-      getPiecesByCategory('pintura'),
-    ])
+  const [
+    joyeriaPieces,
+    ceramicaPieces,
+    ilustracionesPieces,
+    pinturaPieces,
+    joyeriaTypeOrder,
+    ceramicaTypeOrder,
+    ilustracionesTypeOrder,
+    pinturaTypeOrder,
+  ] = await Promise.all([
+    getPiecesByCategory('joyeria'),
+    getPiecesByCategory('ceramica'),
+    getPiecesByCategory('ilustraciones'),
+    getPiecesByCategory('pintura'),
+    getCategoryTypeOrder('joyeria'),
+    getCategoryTypeOrder('ceramica'),
+    getCategoryTypeOrder('ilustraciones'),
+    getCategoryTypeOrder('pintura'),
+  ])
   const joyeriaTypesByGender = collectJewelryTypesByGender(
     joyeriaPieces,
     localeKey,
+    joyeriaTypeOrder,
   )
-  const ceramicaTypes = collectPieceTypes(ceramicaPieces, localeKey)
-  const ilustracionesTypes = collectPieceTypes(ilustracionesPieces, localeKey)
-  const pinturaTypes = collectPieceTypes(pinturaPieces, localeKey)
+  const ceramicaTypes = collectPieceTypes(
+    ceramicaPieces,
+    localeKey,
+    ceramicaTypeOrder,
+  )
+  const ilustracionesTypes = collectPieceTypes(
+    ilustracionesPieces,
+    localeKey,
+    ilustracionesTypeOrder,
+  )
+  const pinturaTypes = collectPieceTypes(
+    pinturaPieces,
+    localeKey,
+    pinturaTypeOrder,
+  )
 
   const localBusiness = {
     '@context': 'https://schema.org',

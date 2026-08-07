@@ -1,6 +1,10 @@
 import {getTranslations, setRequestLocale} from 'next-intl/server'
 import {CategoryCatalog} from '@/components/CategoryCatalog'
-import {getCategoryCarousel, getPiecesByCategory} from '@/lib/content'
+import {
+  getCategoryCarousel,
+  getCategoryTypeOrder,
+  getPiecesByCategory,
+} from '@/lib/content'
 
 export default async function IllustrationsPage({
   params,
@@ -10,8 +14,9 @@ export default async function IllustrationsPage({
   const {locale} = await params
   setRequestLocale(locale)
   const nav = await getTranslations('nav')
-  const [pieces, carouselSlides] = await Promise.all([
+  const [pieces, typeOrder, carouselSlides] = await Promise.all([
     getPiecesByCategory('ilustraciones'),
+    getCategoryTypeOrder('ilustraciones'),
     getCategoryCarousel('ilustraciones'),
   ])
 
@@ -20,6 +25,7 @@ export default async function IllustrationsPage({
       title={nav('ilustraciones')}
       category="ilustraciones"
       pieces={pieces}
+      typeOrder={typeOrder}
       carouselSlides={carouselSlides}
     />
   )

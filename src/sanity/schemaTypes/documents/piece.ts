@@ -1,4 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {AutoSlugInput, QuietSlugField} from '../../components/AutoSlugInput'
 import {DetailsInput} from '../../components/DetailsInput'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
@@ -9,7 +10,9 @@ export const piece = defineType({
   name: 'piece',
   title: 'Pieza',
   type: 'document',
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({type: 'piece'}),
     defineField({
       name: 'title',
       title: 'Nombre de la pieza',

@@ -20,6 +20,7 @@ import {sanityFetch} from '@/sanity/lib/client'
 import {
   aboutPageQuery,
   categoryCarouselQuery,
+  categoryTypeOrderQuery,
   exhibitionBySlugQuery,
   exhibitionsQuery,
   homePageQuery,
@@ -85,6 +86,18 @@ export async function getPiecesByCategory(category: Category): Promise<Piece[]> 
   }
   const data = await sanityFetch<Piece[]>(piecesByCategoryQuery, {category})
   return data?.length ? data : demoPieces.filter((p) => p.category === category)
+}
+
+export async function getCategoryTypeOrder(
+  category: Category,
+): Promise<string[]> {
+  if (!hasSanityConfig) return []
+  const id = `type-order-${category}`
+  const data = await sanityFetch<{types?: string[]}>(categoryTypeOrderQuery, {
+    id,
+    draftId: `drafts.${id}`,
+  })
+  return (data?.types || []).map((name) => name.trim()).filter(Boolean)
 }
 
 export async function getPieceBySlug(slug: string): Promise<Piece | null> {

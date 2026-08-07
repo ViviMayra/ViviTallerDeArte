@@ -1,6 +1,10 @@
 import {setRequestLocale} from 'next-intl/server'
 import {JewelryCatalog} from '@/components/JewelryCatalog'
-import {getJewelryCarousels, getPiecesByCategory} from '@/lib/content'
+import {
+  getCategoryTypeOrder,
+  getJewelryCarousels,
+  getPiecesByCategory,
+} from '@/lib/content'
 
 export default async function JoyeriaPage({
   params,
@@ -10,14 +14,16 @@ export default async function JoyeriaPage({
   const {locale} = await params
   setRequestLocale(locale)
 
-  const [pieces, carousels] = await Promise.all([
+  const [pieces, typeOrder, carousels] = await Promise.all([
     getPiecesByCategory('joyeria'),
+    getCategoryTypeOrder('joyeria'),
     getJewelryCarousels(),
   ])
 
   return (
     <JewelryCatalog
       pieces={pieces}
+      typeOrder={typeOrder}
       womenSlides={carousels.womenSlides || []}
       menSlides={carousels.menSlides || []}
       generalSlides={carousels.generalSlides || []}

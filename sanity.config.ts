@@ -53,7 +53,13 @@ export default defineConfig({
       if (creationContext.type === 'global') {
         return prev.filter((template) => {
           const id = String(template.templateId)
-          return id !== 'piece' && !id.startsWith('piece-')
+          return (
+            id !== 'piece' &&
+            !id.startsWith('piece-') &&
+            id !== 'categoryTypeOrder' &&
+            id !== 'categoryCarousel' &&
+            id !== 'jewelryCarousels'
+          )
         })
       }
       return prev

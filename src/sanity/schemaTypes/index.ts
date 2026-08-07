@@ -14,6 +14,7 @@ import {aboutPage} from './documents/aboutPage'
 import {settings} from './documents/settings'
 import {jewelryCarousels} from './documents/jewelryCarousels'
 import {categoryCarousel} from './documents/categoryCarousel'
+import {categoryTypeOrder} from './documents/categoryTypeOrder'
 
 export const schemaTypes = [
   localizedString,
@@ -30,4 +31,5 @@ export const schemaTypes = [
   settings,
   jewelryCarousels,
   categoryCarousel,
+  categoryTypeOrder,
 ]

@@ -19,11 +19,13 @@ type GenderId = 'mujer' | 'hombre' | 'general'
 
 export async function JewelryCatalog({
   pieces,
+  typeOrder = [],
   womenSlides,
   menSlides,
   generalSlides,
 }: {
   pieces: Piece[]
+  typeOrder?: string[]
   womenSlides: SanityImage[]
   menSlides: SanityImage[]
   generalSlides: SanityImage[]
@@ -56,7 +58,7 @@ export async function JewelryCatalog({
   ) {
     if (!genderPieces.length && !hasCarouselPhotos(slides)) return null
 
-    const pieceTypes = collectPieceTypes(genderPieces, locale)
+    const pieceTypes = collectPieceTypes(genderPieces, locale, typeOrder)
     const withTypes = pieceTypes
       .map((type) => ({
         type,
