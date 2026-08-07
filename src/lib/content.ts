@@ -56,6 +56,7 @@ export async function getHomePage(): Promise<HomePage> {
     ...data,
     heroImage: data.heroImage || demoHome.heroImage,
     heroEyebrow: data.heroEyebrow || demoHome.heroEyebrow,
+    // Optional — do not fall back to demo so an empty field stays empty
     heroSubline: data.heroSubline,
     featuredCarouselTitle:
       data.featuredCarouselTitle || demoHome.featuredCarouselTitle,

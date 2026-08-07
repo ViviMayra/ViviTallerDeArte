@@ -2,9 +2,11 @@ import type {Metadata} from 'next'
 import {getLocale, getTranslations, setRequestLocale} from 'next-intl/server'
 import {Link} from '@/i18n/navigation'
 import {FeaturedCarousel} from '@/components/FeaturedCarousel'
+import {HeroStyledText} from '@/components/HeroStyledText'
 import {getHomePage} from '@/lib/content'
 import {t} from '@/lib/locale'
 import {getImageAlt, getImageUrl} from '@/lib/images'
+import {getStyledBlocks} from '@/lib/styled-text'
 import type {Locale} from '@/lib/types'
 
 export async function generateMetadata({
@@ -62,14 +64,20 @@ export default async function HomePage({
           <p className="animate-fade-up font-[family-name:var(--font-display)] text-5xl tracking-[0.2em] md:text-7xl">
             {homeT('brand')}
           </p>
-          <p className="animate-fade-up-delay mt-3 text-sm uppercase tracking-[0.22em] text-foreground/90">
-            {t(home.heroEyebrow, locale, homeT('tagline'))}
-          </p>
-          {t(home.heroSubline, locale) ? (
-            <p className="animate-fade-up-delay mt-2 max-w-md font-[family-name:var(--font-body)] text-xs tracking-[0.04em] text-foreground/75 md:text-sm">
-              {t(home.heroSubline, locale)}
-            </p>
-          ) : null}
+          <HeroStyledText
+            className="animate-fade-up-delay mt-3"
+            variant="primary"
+            value={getStyledBlocks(
+              home.heroEyebrow,
+              locale,
+              homeT('tagline'),
+            )}
+          />
+          <HeroStyledText
+            className="animate-fade-up-delay mt-2 max-w-md"
+            variant="secondary"
+            value={getStyledBlocks(home.heroSubline, locale)}
+          />
         </div>
       </section>
 

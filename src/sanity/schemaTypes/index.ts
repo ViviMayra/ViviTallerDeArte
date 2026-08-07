@@ -2,8 +2,10 @@ import {seo} from './objects/seo'
 import {
   localizedBlockContent,
   localizedString,
+  localizedStyledText,
   localizedText,
   optionalLocalizedString,
+  optionalLocalizedStyledText,
 } from './objects/localizedString'
 import {piece} from './documents/piece'
 import {exhibition} from './documents/exhibition'
@@ -17,6 +19,8 @@ export const schemaTypes = [
   localizedString,
   optionalLocalizedString,
   localizedText,
+  localizedStyledText,
+  optionalLocalizedStyledText,
   localizedBlockContent,
   seo,
   piece,

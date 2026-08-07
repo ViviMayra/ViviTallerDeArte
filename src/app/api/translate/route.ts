@@ -71,11 +71,59 @@ function isLocalizedString(value: unknown): value is LocalizedString {
   return value.en === undefined || typeof value.en === 'string'
 }
 
-/** `{ es: PortableText[], en?: PortableText[] }` — localizedBlockContent */
+/** `{ es: PortableText[], en?: PortableText[] }` — localizedBlockContent / styled text */
 function isLocalizedBlocks(value: unknown): value is LocalizedBlocks {
   if (!isPlainObject(value) || !Array.isArray(value.es)) return false
   const keys = Object.keys(value)
   return keys.every((key) => key === 'es' || key === 'en')
+}
+
+function collectSpanTexts(blocks: unknown[]): string[] {
+  const texts: string[] = []
+  const walk = (node: unknown) => {
+    if (node == null) return
+    if (Array.isArray(node)) {
+      node.forEach(walk)
+      return
+    }
+    if (!isPlainObject(node)) return
+    if (
+      node._type === 'span' &&
+      typeof node.text === 'string' &&
+      node.text.trim()
+    ) {
+      texts.push(node.text)
+    }
+    for (const child of Object.values(node)) walk(child)
+  }
+  walk(blocks)
+  return texts
+}
+
+function applySpanTexts(blocks: unknown[], translations: string[]): unknown[] {
+  const cloned = JSON.parse(JSON.stringify(blocks)) as unknown[]
+  let index = 0
+  const walk = (node: unknown) => {
+    if (node == null) return
+    if (Array.isArray(node)) {
+      node.forEach(walk)
+      return
+    }
+    if (!isPlainObject(node)) return
+    if (
+      node._type === 'span' &&
+      typeof node.text === 'string' &&
+      node.text.trim()
+    ) {
+      if (index < translations.length) {
+        node.text = translations[index]
+        index += 1
+      }
+    }
+    for (const child of Object.values(node)) walk(child)
+  }
+  walk(cloned)
+  return cloned
 }
 
 function collectLocalized(
@@ -196,7 +244,7 @@ export async function POST(request: Request) {
       setPayload.detailsEn = await translateTexts(spanishDetails)
     }
 
-    // Block content: copy Spanish structure into English until rich translate exists
+    // Block content: translate span text, keep marks/structure
     for (const path of blockPaths) {
       const parts = path.split('.')
       let cursor: unknown = doc
@@ -207,9 +255,15 @@ export async function POST(request: Request) {
         }
         cursor = cursor[part]
       }
-      if (isLocalizedBlocks(cursor) && cursor.es) {
+      if (!isLocalizedBlocks(cursor) || !cursor.es) continue
+
+      const spanTexts = collectSpanTexts(cursor.es)
+      if (!spanTexts.length) {
         setPayload[`${path}.en`] = cursor.es
+        continue
       }
+      const translatedSpans = await translateTexts(spanTexts)
+      setPayload[`${path}.en`] = applySpanTexts(cursor.es, translatedSpans)
     }
 
     await patch.set(setPayload).commit()

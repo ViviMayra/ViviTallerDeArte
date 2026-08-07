@@ -1,6 +1,55 @@
-import {defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField, defineType} from 'sanity'
 import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 import {SpanishStringInput} from '../../components/SpanishStringInput'
+
+/** Short rich text for hero lines — bold, font, size. No headings/lists/images. */
+const styledTextBlock = defineArrayMember({
+  type: 'block',
+  styles: [{title: 'Normal', value: 'normal'}],
+  lists: [],
+  marks: {
+    decorators: [
+      {title: 'Negrita', value: 'strong'},
+      {title: 'Cursiva', value: 'em'},
+      {title: 'Subrayado', value: 'underline'},
+    ],
+    annotations: [
+      {
+        name: 'textStyle',
+        type: 'object',
+        title: 'Fuente y tamaño',
+        fields: [
+          defineField({
+            name: 'font',
+            title: 'Fuente',
+            type: 'string',
+            options: {
+              list: [
+                {title: 'Cuerpo', value: 'body'},
+                {title: 'Título (decorativa)', value: 'display'},
+              ],
+              layout: 'radio',
+            },
+          }),
+          defineField({
+            name: 'size',
+            title: 'Tamaño',
+            type: 'string',
+            options: {
+              list: [
+                {title: 'Pequeño', value: 'sm'},
+                {title: 'Normal', value: 'md'},
+                {title: 'Grande', value: 'lg'},
+                {title: 'Muy grande', value: 'xl'},
+              ],
+              layout: 'radio',
+            },
+          }),
+        ],
+      },
+    ],
+  },
+})
 
 /** Spanish is what Mayra edits. English is filled by “Traducir al inglés” and stays hidden. */
 export const localizedString = defineType({
@@ -64,6 +113,53 @@ export const optionalLocalizedString = defineType({
       title: 'English',
       type: 'string',
       hidden: true,
+    }),
+  ],
+})
+
+export const localizedStyledText = defineType({
+  name: 'localizedStyledText',
+  title: 'Texto con formato',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'es',
+      title: 'Texto',
+      description:
+        'Selecciona texto y usa la barra: Negrita, Cursiva, o “Fuente y tamaño”.',
+      type: 'array',
+      of: [styledTextBlock],
+      validation: (Rule) => Rule.required().min(1),
+    }),
+    defineField({
+      name: 'en',
+      title: 'English',
+      type: 'array',
+      hidden: true,
+      of: [styledTextBlock],
+    }),
+  ],
+})
+
+export const optionalLocalizedStyledText = defineType({
+  name: 'optionalLocalizedStyledText',
+  title: 'Texto con formato (opcional)',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'es',
+      title: 'Texto',
+      description:
+        'Opcional. Selecciona texto y usa la barra: Negrita, Cursiva, o “Fuente y tamaño”.',
+      type: 'array',
+      of: [styledTextBlock],
+    }),
+    defineField({
+      name: 'en',
+      title: 'English',
+      type: 'array',
+      hidden: true,
+      of: [styledTextBlock],
     }),
   ],
 })

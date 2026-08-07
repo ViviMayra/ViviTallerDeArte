@@ -23,11 +23,11 @@ export const demoHome: HomePage = {
   heroEyebrow: {
     es: 'Taller de Arte',
     en: 'Art Workshop',
-  },
+  } as HomePage['heroEyebrow'],
   heroSubline: {
     es: 'Piezas hechas a mano en Perú',
     en: 'Handmade pieces in Peru',
-  },
+  } as HomePage['heroSubline'],
   featuredCarouselTitle: {
     es: 'Destacados',
     en: 'Featured',

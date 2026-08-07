@@ -7,6 +7,12 @@ export type LocalizedString = {
 
 export type LocalizedText = LocalizedString
 
+/** Rich hero line — portable text arrays, or legacy plain strings. */
+export type LocalizedStyledText = {
+  es?: unknown[] | string
+  en?: unknown[] | string
+}
+
 export type SanityImage = {
   _type?: string
   asset?: {_ref?: string; _type?: string; url?: string}
@@ -100,8 +106,8 @@ export type FeaturedCarouselSlide =
 
 export type HomePage = {
   heroImage?: SanityImage
-  heroEyebrow?: LocalizedString
-  heroSubline?: LocalizedString
+  heroEyebrow?: LocalizedStyledText
+  heroSubline?: LocalizedStyledText
   featuredCarouselTitle?: LocalizedString
   featuredCarousel?: FeaturedCarouselSlide[]
   sections?: HomeSection[]

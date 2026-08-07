@@ -26,15 +26,15 @@ export const homePage = defineType({
       name: 'heroEyebrow',
       title: 'Texto debajo del logo (línea principal)',
       description:
-        'Ej. “Creado por Mayra”. Estilo: mayúsculas, espaciado amplio.',
-      type: 'localizedString',
+        'Ej. “Creado por Mayra”. Selecciona palabras → Negrita / Cursiva / icono de enlace “Fuente y tamaño”. Si el texto viejo no aparece, escríbelo de nuevo (ahora admite formato).',
+      type: 'localizedStyledText',
     }),
     defineField({
       name: 'heroSubline',
       title: 'Segunda línea debajo del logo (opcional)',
       description:
-        'Opcional. Aparece más pequeña y con otra tipografía, debajo de la línea principal.',
-      type: 'optionalLocalizedString',
+        'Opcional. Igual: selecciona texto → Negrita / Cursiva / “Fuente y tamaño”.',
+      type: 'optionalLocalizedStyledText',
     }),
     defineField({
       name: 'featuredCarouselTitle',
