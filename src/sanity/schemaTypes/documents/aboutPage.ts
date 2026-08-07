@@ -16,7 +16,7 @@ export const aboutPage = defineType({
       name: 'sections',
       title: 'Secciones',
       description:
-        'Cada sección es texto e imágenes. Puedes apilarlas o poner la foto al lado del texto.',
+        'Cada sección es texto e imágenes. En Posición puedes apilarlas o poner la foto al lado del texto.',
       type: 'array',
       of: [
         defineArrayMember({
@@ -25,61 +25,39 @@ export const aboutPage = defineType({
           title: 'Sección',
           fields: [
             defineField({
-              name: 'layout',
-              title: 'Diseño',
-              description:
-                'Apilado = uno debajo del otro. Al lado = foto y texto juntos en fila.',
-              type: 'string',
-              options: {
-                list: [
-                  {title: 'Apilado', value: 'stacked'},
-                  {title: 'Foto al lado del texto', value: 'sideBySide'},
-                ],
-                layout: 'radio',
-              },
-              initialValue: 'stacked',
-            }),
-            defineField({
               name: 'align',
               title: 'Posición',
               description:
-                'Coloca esta sección a la izquierda, al centro o a la derecha de la página.',
+                'Izquierda / Centro / Derecha = contenido apilado en ese lado. Las opciones con foto ponen la imagen al lado del texto.',
               type: 'string',
               options: {
                 list: [
                   {title: 'Izquierda', value: 'left'},
                   {title: 'Centro', value: 'center'},
                   {title: 'Derecha', value: 'right'},
+                  {
+                    title: 'Foto izquierda + texto',
+                    value: 'sideLeft',
+                  },
+                  {
+                    title: 'Foto derecha + texto',
+                    value: 'sideRight',
+                  },
                 ],
                 layout: 'radio',
               },
               initialValue: 'left',
-              hidden: ({parent}) => parent?.layout === 'sideBySide',
-            }),
-            defineField({
-              name: 'imageSide',
-              title: 'Lado de la foto',
-              description: '¿La foto va a la izquierda o a la derecha del texto?',
-              type: 'string',
-              options: {
-                list: [
-                  {title: 'Foto a la izquierda', value: 'left'},
-                  {title: 'Foto a la derecha', value: 'right'},
-                ],
-                layout: 'radio',
-              },
-              initialValue: 'left',
-              hidden: ({parent}) => parent?.layout !== 'sideBySide',
             }),
             defineField({
               name: 'image',
               title: 'Foto',
               description:
-                'Esta es la foto que va al lado del texto. Usa Continuar cuando termines.',
+                'Foto que va al lado del texto. Usa Continuar cuando termines.',
               type: 'image',
               options: {hotspot: true},
               components: {input: ImageInputWithContinue},
-              hidden: ({parent}) => parent?.layout !== 'sideBySide',
+              hidden: ({parent}) =>
+                parent?.align !== 'sideLeft' && parent?.align !== 'sideRight',
               fields: [
                 defineField({
                   name: 'widthPercent',
@@ -101,7 +79,7 @@ export const aboutPage = defineType({
               name: 'body',
               title: 'Contenido',
               description:
-                'Texto (e imágenes si usas Apilado). En “Foto al lado”, sube la foto arriba y escribe el texto aquí.',
+                'Texto e imágenes. Si elegiste una opción con foto al lado, sube la Foto arriba y escribe el texto aquí.',
               type: 'localizedBlockContent',
             }),
           ],
@@ -109,21 +87,15 @@ export const aboutPage = defineType({
             select: {
               blocks: 'body.es',
               align: 'align',
-              layout: 'layout',
-              imageSide: 'imageSide',
               media: 'image',
             },
             prepare({
               blocks,
               align,
-              layout,
-              imageSide,
               media,
             }: {
               blocks?: {_type?: string; children?: {text?: string}[]}[]
               align?: string
-              layout?: string
-              imageSide?: string
               media?: unknown
             }) {
               const firstText = (blocks || [])
@@ -131,21 +103,21 @@ export const aboutPage = defineType({
                 ?.children?.map((child) => child.text || '')
                 .join('')
                 .trim()
-              const layoutLabel =
-                layout === 'sideBySide'
-                  ? imageSide === 'right'
-                    ? 'Al lado · foto derecha'
-                    : 'Al lado · foto izquierda'
-                  : align === 'right'
-                    ? 'Apilado · Derecha'
-                    : align === 'center'
-                      ? 'Apilado · Centro'
-                      : 'Apilado · Izquierda'
+              const place =
+                align === 'sideRight'
+                  ? 'Foto derecha + texto'
+                  : align === 'sideLeft'
+                    ? 'Foto izquierda + texto'
+                    : align === 'right'
+                      ? 'Derecha'
+                      : align === 'center'
+                        ? 'Centro'
+                        : 'Izquierda'
               return {
                 title: firstText || 'Sección',
                 subtitle: firstText
-                  ? layoutLabel
-                  : `Vacía — agrega texto o fotos · ${layoutLabel}`,
+                  ? place
+                  : `Vacía — agrega texto o fotos · ${place}`,
                 media,
               }
             },

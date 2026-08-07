@@ -3,12 +3,26 @@ import {PortableBody} from '@/components/PortableBody'
 import {getAboutPage} from '@/lib/content'
 import {getImageAlt, getImageUrl} from '@/lib/images'
 import {t} from '@/lib/locale'
-import type {Locale, SanityImage} from '@/lib/types'
+import type {AboutSection, Locale, SanityImage} from '@/lib/types'
 
-function sectionAlignClass(align?: 'left' | 'center' | 'right') {
+function sectionAlignClass(align?: AboutSection['align']) {
   if (align === 'right') return 'flex justify-end'
   if (align === 'center') return 'flex justify-center'
   return undefined
+}
+
+function isSideBySide(section: AboutSection) {
+  return (
+    section.align === 'sideLeft' ||
+    section.align === 'sideRight' ||
+    section.layout === 'sideBySide'
+  )
+}
+
+function isPhotoRight(section: AboutSection) {
+  if (section.align === 'sideRight') return true
+  if (section.align === 'sideLeft') return false
+  return section.imageSide === 'right'
 }
 
 function imageWidthPercent(value: SanityImage): number {
@@ -60,12 +74,11 @@ export default async function AboutPage({
         {sections.map((section, index) => {
           const body = section.body?.[locale] || section.body?.es || []
           const key = section._key || `about-section-${index}`
-          const sideBySide =
-            section.layout === 'sideBySide' && Boolean(section.image)
+          const sideBySide = isSideBySide(section) && Boolean(section.image)
 
           if (sideBySide && section.image) {
             if (!body.length && !getImageUrl(section.image, 100)) return null
-            const photoRight = section.imageSide === 'right'
+            const photoRight = isPhotoRight(section)
             return (
               <div
                 key={key}

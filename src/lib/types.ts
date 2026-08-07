@@ -126,11 +126,15 @@ export type HomePage = {
 
 export type AboutSection = {
   _key?: string
-  /** stacked (default) or photo beside text */
+  /**
+   * Page placement / layout.
+   * left|center|right = stacked; sideLeft|sideRight = photo beside text.
+   * `layout` / `imageSide` are legacy fields still honored if present.
+   */
+  align?: 'left' | 'center' | 'right' | 'sideLeft' | 'sideRight'
+  /** @deprecated Use align sideLeft/sideRight */
   layout?: 'stacked' | 'sideBySide'
-  /** Horizontal placement when stacked. Defaults to left. */
-  align?: 'left' | 'center' | 'right'
-  /** Which side the photo sits on in sideBySide layout. */
+  /** @deprecated Use align sideLeft/sideRight */
   imageSide?: 'left' | 'right'
   image?: SanityImage
   body?: {
