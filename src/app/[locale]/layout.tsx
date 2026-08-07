@@ -20,10 +20,13 @@ import {Footer} from '@/components/Footer'
 import {CartDrawer} from '@/components/CartDrawer'
 import {JsonLd} from '@/components/JsonLd'
 import {getImageUrl} from '@/lib/images'
+import {getSiteUrl} from '@/lib/site-url'
 import {routing} from '@/i18n/routing'
 import type {Locale} from '@/lib/types'
 import {Analytics} from '@vercel/analytics/next'
 import '../globals.css'
+
+const siteUrl = getSiteUrl()
 
 const bodyFont = Figtree({
   subsets: ['latin'],
@@ -60,9 +63,7 @@ export const metadata: Metadata = {
   },
   description:
     'Joyería artesanal, cerámica, ilustración y pintura hechas en Perú. VIVI Taller de Arte.',
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-  ),
+  metadataBase: new URL(siteUrl),
   openGraph: {
     type: 'website',
     siteName: 'VIVI Taller de Arte',
@@ -111,14 +112,13 @@ export default async function LocaleLayout({
     name: settings.siteName || 'VIVI Taller de Arte',
     email: settings.email,
     telephone: settings.whatsapp ? `+${settings.whatsapp}` : undefined,
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    url: siteUrl,
     image:
       getImageUrl(settings.logo, 1600, {
         fit: 'max',
         quality: 100,
         autoFormat: false,
-      }) ||
-      `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`,
+      }) || `${siteUrl}/logo.png`,
     address: settings.address
       ? {
           '@type': 'PostalAddress',

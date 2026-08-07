@@ -1,5 +1,6 @@
 import type {MetadataRoute} from 'next'
 import {demoExhibitions, demoPieces} from '@/lib/demo-data'
+import {getSiteUrl} from '@/lib/site-url'
 import {hasSanityConfig} from '@/sanity/env'
 import {sanityFetch} from '@/sanity/lib/client'
 import {
@@ -7,7 +8,7 @@ import {
   allPieceSlugsQuery,
 } from '@/sanity/lib/queries'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+const siteUrl = getSiteUrl()
 
 const staticPaths = [
   '',
