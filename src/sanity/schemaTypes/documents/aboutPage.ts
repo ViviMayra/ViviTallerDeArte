@@ -24,6 +24,20 @@ export const aboutPage = defineType({
           title: 'Sección',
           fields: [
             defineField({
+              name: 'align',
+              title: 'Posición',
+              description: 'Coloca esta sección a la izquierda o a la derecha de la página.',
+              type: 'string',
+              options: {
+                list: [
+                  {title: 'Izquierda', value: 'left'},
+                  {title: 'Derecha', value: 'right'},
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'left',
+            }),
+            defineField({
               name: 'body',
               title: 'Contenido',
               description: 'Agrega texto e imágenes en el orden que quieras.',
@@ -33,16 +47,26 @@ export const aboutPage = defineType({
           preview: {
             select: {
               blocks: 'body.es',
+              align: 'align',
             },
-            prepare({blocks}: {blocks?: {_type?: string; children?: {text?: string}[]}[]}) {
+            prepare({
+              blocks,
+              align,
+            }: {
+              blocks?: {_type?: string; children?: {text?: string}[]}[]
+              align?: string
+            }) {
               const firstText = (blocks || [])
                 .find((block) => block?._type === 'block')
                 ?.children?.map((child) => child.text || '')
                 .join('')
                 .trim()
+              const side = align === 'right' ? 'Derecha' : 'Izquierda'
               return {
                 title: firstText || 'Sección',
-                subtitle: firstText ? 'Sección de About' : 'Vacía — agrega texto o fotos',
+                subtitle: firstText
+                  ? `Sección · ${side}`
+                  : `Vacía — agrega texto o fotos · ${side}`,
               }
             },
           },

@@ -25,11 +25,12 @@ export default async function AboutPage({
           const body = section.body?.[locale] || section.body?.es || []
           if (!body.length) return null
           return (
-            <PortableBody
+            <div
               key={section._key || `about-section-${index}`}
-              value={body as unknown[]}
-              locale={locale}
-            />
+              className={section.align === 'right' ? 'flex justify-end' : undefined}
+            >
+              <PortableBody value={body as unknown[]} locale={locale} />
+            </div>
           )
         })}
       </div>

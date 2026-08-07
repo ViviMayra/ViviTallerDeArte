@@ -124,6 +124,8 @@ export type HomePage = {
 
 export type AboutSection = {
   _key?: string
+  /** Horizontal placement of this section on the page. Defaults to left. */
+  align?: 'left' | 'right'
   body?: {
     es?: unknown[]
     en?: unknown[]

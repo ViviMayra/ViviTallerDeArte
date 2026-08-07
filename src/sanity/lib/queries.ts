@@ -52,6 +52,7 @@ export const aboutPageQuery = groq`*[_type == "aboutPage"][0]{
   title ${localizedString},
   sections[]{
     _key,
+    align,
     body
   },
   body,
