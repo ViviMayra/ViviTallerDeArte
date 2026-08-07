@@ -7,6 +7,9 @@ type Body = {
   texts?: {key: string; value: string}[]
 }
 
+type LocalizedString = {es?: string; en?: string}
+type LocalizedBlocks = {es?: unknown[]; en?: unknown[]}
+
 async function translateTexts(texts: string[]): Promise<string[]> {
   const apiKey = process.env.TRANSLATE_API_KEY
   if (!apiKey) {
@@ -56,13 +59,65 @@ async function translateTexts(texts: string[]): Promise<string[]> {
   return parsed
 }
 
-function queueLocalized(
-  queue: {key: string; value: string}[],
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+}
+
+/** `{ es: string, en?: string }` — localizedString / localizedText / optionalLocalizedString */
+function isLocalizedString(value: unknown): value is LocalizedString {
+  if (!isPlainObject(value) || typeof value.es !== 'string') return false
+  const keys = Object.keys(value)
+  if (!keys.every((key) => key === 'es' || key === 'en')) return false
+  return value.en === undefined || typeof value.en === 'string'
+}
+
+/** `{ es: PortableText[], en?: PortableText[] }` — localizedBlockContent */
+function isLocalizedBlocks(value: unknown): value is LocalizedBlocks {
+  if (!isPlainObject(value) || !Array.isArray(value.es)) return false
+  const keys = Object.keys(value)
+  return keys.every((key) => key === 'es' || key === 'en')
+}
+
+function collectLocalized(
+  value: unknown,
   path: string,
-  value: {es?: string; en?: string} | undefined,
+  stringQueue: {key: string; value: string}[],
+  blockPaths: string[],
 ) {
-  if (!value?.es) return
-  queue.push({key: `${path}.en`, value: value.es})
+  if (value == null) return
+
+  if (isLocalizedString(value)) {
+    if (value.es.trim()) {
+      stringQueue.push({key: `${path}.en`, value: value.es})
+    }
+    return
+  }
+
+  if (isLocalizedBlocks(value)) {
+    if (
+      value.es &&
+      value.es.length > 0 &&
+      (!value.en || value.en.length === 0)
+    ) {
+      blockPaths.push(path)
+    }
+    return
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => {
+      collectLocalized(item, `${path}[${index}]`, stringQueue, blockPaths)
+    })
+    return
+  }
+
+  if (!isPlainObject(value)) return
+
+  for (const [key, child] of Object.entries(value)) {
+    if (key.startsWith('_')) continue
+    const nextPath = path ? `${path}.${key}` : key
+    collectLocalized(child, nextPath, stringQueue, blockPaths)
+  }
 }
 
 export async function POST(request: Request) {
@@ -112,29 +167,9 @@ export async function POST(request: Request) {
       )
     }
 
-    const queue: {key: string; value: string}[] = []
-
-    queueLocalized(queue, 'title', doc.title)
-    queueLocalized(queue, 'description', doc.description)
-    queueLocalized(queue, 'place', doc.place)
-    queueLocalized(queue, 'summary', doc.summary)
-    queueLocalized(queue, 'heroEyebrow', doc.heroEyebrow)
-    queueLocalized(queue, 'pieceType', doc.pieceType)
-
-    if (Array.isArray(doc.sections)) {
-      doc.sections.forEach(
-        (
-          section: {
-            title?: {es?: string; en?: string}
-            text?: {es?: string; en?: string}
-          },
-          index: number,
-        ) => {
-          queueLocalized(queue, `sections[${index}].title`, section.title)
-          queueLocalized(queue, `sections[${index}].text`, section.text)
-        },
-      )
-    }
+    const stringQueue: {key: string; value: string}[] = []
+    const blockPaths: string[] = []
+    collectLocalized(doc, '', stringQueue, blockPaths)
 
     const spanishDetails = Array.isArray(doc.details)
       ? doc.details.filter(
@@ -143,11 +178,7 @@ export async function POST(request: Request) {
         )
       : []
 
-    const shouldCopyBody =
-      Boolean(doc.body?.es) &&
-      (!doc.body?.en || doc.body.en.length === 0)
-
-    if (!queue.length && !spanishDetails.length && !shouldCopyBody) {
+    if (!stringQueue.length && !spanishDetails.length && !blockPaths.length) {
       return NextResponse.json({
         ok: true,
         message: 'No había texto nuevo para traducir.',
@@ -157,9 +188,9 @@ export async function POST(request: Request) {
     const patch = writeClient.patch(body.documentId)
     const setPayload: Record<string, unknown> = {}
 
-    if (queue.length) {
-      const translated = await translateTexts(queue.map((q) => q.value))
-      queue.forEach((item, i) => {
+    if (stringQueue.length) {
+      const translated = await translateTexts(stringQueue.map((q) => q.value))
+      stringQueue.forEach((item, i) => {
         setPayload[item.key] = translated[i]
       })
     }
@@ -168,8 +199,20 @@ export async function POST(request: Request) {
       setPayload.detailsEn = await translateTexts(spanishDetails)
     }
 
-    if (shouldCopyBody) {
-      setPayload['body.en'] = doc.body.es
+    // Block content: copy Spanish structure into English until rich translate exists
+    for (const path of blockPaths) {
+      const parts = path.split('.')
+      let cursor: unknown = doc
+      for (const part of parts) {
+        if (!isPlainObject(cursor)) {
+          cursor = undefined
+          break
+        }
+        cursor = cursor[part]
+      }
+      if (isLocalizedBlocks(cursor) && cursor.es) {
+        setPayload[`${path}.en`] = cursor.es
+      }
     }
 
     await patch.set(setPayload).commit()

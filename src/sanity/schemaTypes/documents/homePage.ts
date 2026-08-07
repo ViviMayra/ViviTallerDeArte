@@ -9,6 +9,8 @@ export const homePage = defineType({
     defineField({
       name: 'heroImage',
       title: 'Foto grande de portada',
+      description:
+        'Recomendado: horizontal 2400×1350 px (16:9). Otras medidas también funcionan; usa el punto de enfoque si recorta.',
       type: 'image',
       options: {hotspot: true},
       fields: [
@@ -34,7 +36,7 @@ export const homePage = defineType({
       name: 'featuredCarousel',
       title: 'Carrusel destacado',
       description:
-        'Opcional. Mezcla fotos y/o piezas del catálogo. Si está vacío, el carrusel no aparece.',
+        'Opcional. Mezcla fotos y/o piezas del catálogo. Si está vacío, el carrusel no aparece. Fotos: recomendado 1920×1080 px (16:9); otras medidas también funcionan.',
       type: 'array',
       of: [
         defineArrayMember({
@@ -45,6 +47,8 @@ export const homePage = defineType({
             defineField({
               name: 'image',
               title: 'Foto',
+              description:
+                'Recomendado: 1920×1080 px (16:9). Si es otra medida, ajusta el punto de enfoque.',
               type: 'image',
               options: {hotspot: true},
               components: {input: ImageInputWithContinue},
@@ -117,6 +121,8 @@ export const homePage = defineType({
             defineField({
               name: 'image',
               title: 'Imagen',
+              description:
+                'Recomendado: vertical 1200×1500 px (4:5). Otras medidas también funcionan; usa el punto de enfoque si recorta.',
               type: 'image',
               options: {hotspot: true},
               fields: [

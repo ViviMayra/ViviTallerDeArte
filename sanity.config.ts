@@ -53,16 +53,25 @@ export default defineConfig({
       return prev
     },
     actions: (prev, context) => {
+      // Every document type that can hold Spanish → English copy
       const translateTypes = [
         'piece',
         'exhibition',
         'homePage',
         'aboutPage',
+        'categoryCarousel',
+        'jewelryCarousels',
       ]
+
+      // Keep Publish as the primary button; never let custom actions replace it
+      const publish = prev.find((action) => action.action === 'publish')
+      const rest = prev.filter((action) => action.action !== 'publish')
+      const ordered = publish ? [publish, ...rest] : rest
+
       if (translateTypes.includes(context.schemaType)) {
-        return [...prev, translateAction]
+        return [...ordered, translateAction]
       }
-      return prev
+      return ordered
     },
   },
 })

@@ -17,7 +17,8 @@ export const translateAction: DocumentActionComponent = (props) => {
     label: loading ? 'Traduciendo…' : 'Traducir al inglés',
     title:
       'Completa todo en español, guarda, y haz clic aquí. El inglés se llena solo.',
-    tone: 'positive',
+    // Keep this in the ••• menu so it never replaces the Publish button
+    group: ['paneActions'],
     disabled: loading,
     onHandle: async () => {
       setLoading(true)
