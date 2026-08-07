@@ -68,7 +68,7 @@ export const piece = defineType({
       name: 'photos',
       title: 'Fotos',
       description:
-        'La primera foto es la principal. Recomendado: cuadrada 1200×1200 px; otras medidas también funcionan (usa el punto de enfoque). Arrastra para reordenar. Al editar una foto, usa Continuar cuando termines.',
+        'La primera foto es la principal. Recomendado: cuadrada 1200×1200 px; otras medidas también funcionan (usa el punto de enfoque). Arrastra para reordenar. Al editar una foto, usa Continuar cuando termines. Si no carga, usa Quitar foto.',
       type: 'array',
       of: [
         defineArrayMember({

@@ -66,7 +66,19 @@ export async function getHomePage(): Promise<HomePage> {
 export async function getAboutPage(): Promise<AboutPage> {
   if (!hasSanityConfig) return demoAbout
   const data = await sanityFetch<AboutPage>(aboutPageQuery)
-  return data || demoAbout
+  if (!data) return demoAbout
+
+  const sections =
+    data.sections && data.sections.length > 0
+      ? data.sections
+      : data.body
+        ? [{body: data.body}]
+        : demoAbout.sections
+
+  return {
+    ...data,
+    sections,
+  }
 }
 
 export async function getPiecesByCategory(category: Category): Promise<Piece[]> {

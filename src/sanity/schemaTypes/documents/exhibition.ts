@@ -1,5 +1,6 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {AutoSlugInput, QuietSlugField} from '../../components/AutoSlugInput'
+import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 
 export const exhibition = defineType({
   name: 'exhibition',
@@ -28,16 +29,19 @@ export const exhibition = defineType({
     defineField({
       name: 'photos',
       title: 'Fotos (todas las que quieras)',
+      description:
+        'Al editar una foto, usa Continuar cuando termines. Si no carga, usa Quitar foto.',
       type: 'array',
       of: [
         defineArrayMember({
           type: 'image',
           options: {hotspot: true},
+          components: {input: ImageInputWithContinue},
           fields: [
             defineField({
               name: 'alt',
               title: 'Texto alternativo',
-              type: 'localizedString',
+              type: 'optionalLocalizedString',
             }),
           ],
         }),

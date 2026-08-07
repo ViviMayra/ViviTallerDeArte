@@ -252,32 +252,37 @@ export const demoExhibitions: Exhibition[] = [
 
 export const demoAbout: AboutPage = {
   title: {es: 'Sobre VIVI', en: 'About VIVI'},
-  body: {
-    es: [
-      {
-        _type: 'block',
-        style: 'normal',
-        children: [
+  sections: [
+    {
+      _key: 'about-1',
+      body: {
+        es: [
           {
-            _type: 'span',
-            text: 'VIVI Taller de Arte es un espacio de creación en Perú: joyería, cerámica, ilustración y pintura hechas a mano.',
+            _type: 'block',
+            style: 'normal',
+            children: [
+              {
+                _type: 'span',
+                text: 'VIVI Taller de Arte es un espacio de creación en Perú: joyería, cerámica, ilustración y pintura hechas a mano.',
+              },
+            ],
+          },
+        ],
+        en: [
+          {
+            _type: 'block',
+            style: 'normal',
+            children: [
+              {
+                _type: 'span',
+                text: 'VIVI Taller de Arte is a creative space in Peru: handmade jewelry, ceramics, illustration, and painting.',
+              },
+            ],
           },
         ],
       },
-    ],
-    en: [
-      {
-        _type: 'block',
-        style: 'normal',
-        children: [
-          {
-            _type: 'span',
-            text: 'VIVI Taller de Arte is a creative space in Peru: handmade jewelry, ceramics, illustration, and painting.',
-          },
-        ],
-      },
-    ],
-  },
+    },
+  ],
   seo: {
     title: 'About | VIVI Taller de Arte',
     description: 'Conoce el taller de arte VIVI en Perú.',

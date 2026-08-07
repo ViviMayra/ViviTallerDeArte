@@ -111,8 +111,18 @@ export type HomePage = {
   }
 }
 
+export type AboutSection = {
+  _key?: string
+  body?: {
+    es?: unknown[]
+    en?: unknown[]
+  }
+}
+
 export type AboutPage = {
   title?: LocalizedString
+  sections?: AboutSection[]
+  /** @deprecated Prefer `sections`. Kept so existing Sanity content still renders. */
   body?: {
     es?: unknown[]
     en?: unknown[]

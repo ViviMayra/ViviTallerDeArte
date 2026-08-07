@@ -1,20 +1,51 @@
 'use client'
 
-import {Button, Flex, Stack} from '@sanity/ui'
-import type {ObjectInputProps} from 'sanity'
+import {RemoveIcon} from '@sanity/icons/Remove'
+import {Button, Flex, Stack, Text} from '@sanity/ui'
+import {unset, type ObjectInputProps} from 'sanity'
 
-/** Adds a Continuar button under the photo editor so she can leave without using X. */
+type ImageValue = {
+  asset?: {_ref?: string; _type?: string}
+  _upload?: {progress?: number; file?: {name?: string}}
+}
+
+/** Continuar + Quitar foto under the photo editor (leave without X; clear stuck uploads). */
 export function ImageInputWithContinue(props: ObjectInputProps) {
+  const value = props.value as ImageValue | undefined
+  const isUploading = Boolean(value?._upload)
+  const hasPhoto = Boolean(value?.asset) || isUploading
+  const progress = value?._upload?.progress
+
+  const clearPhoto = () => {
+    props.onChange(unset())
+    props.onPathFocus([])
+  }
+
   return (
-    <Stack space={4}>
+    <Stack space={3}>
       {props.renderDefault(props)}
-      <Flex justify="flex-end">
+      {isUploading ? (
+        <Text size={1} muted>
+          Subiendo
+          {typeof progress === 'number' ? ` (${Math.round(progress)}%)` : ''}…
+          Si se queda trabada, usa Quitar foto e intenta de nuevo.
+        </Text>
+      ) : null}
+      <Flex justify="flex-end" gap={2} wrap="wrap">
+        {hasPhoto ? (
+          <Button
+            text="Quitar foto"
+            icon={RemoveIcon}
+            tone="critical"
+            mode="ghost"
+            onClick={clearPhoto}
+          />
+        ) : null}
         <Button
           text="Continuar"
           tone="primary"
           mode="default"
           onClick={() => {
-            // Collapse nested editor / return to the piece form
             props.onPathFocus([])
           }}
         />

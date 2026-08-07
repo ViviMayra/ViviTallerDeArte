@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 import {SpanishStringInput} from '../../components/SpanishStringInput'
 
 /** Spanish is what Mayra edits. English is filled by “Traducir al inglés” and stays hidden. */
@@ -81,6 +82,7 @@ export const localizedBlockContent = defineType({
         {
           type: 'image',
           options: {hotspot: true},
+          components: {input: ImageInputWithContinue},
           fields: [
             defineField({
               name: 'alt',
@@ -101,6 +103,7 @@ export const localizedBlockContent = defineType({
         {
           type: 'image',
           options: {hotspot: true},
+          components: {input: ImageInputWithContinue},
           fields: [
             defineField({
               name: 'alt',

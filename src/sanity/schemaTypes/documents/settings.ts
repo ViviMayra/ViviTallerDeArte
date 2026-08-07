@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {ImageInputWithContinue} from '../../components/ImageInputWithContinue'
 
 export const settings = defineType({
   name: 'settings',
@@ -15,9 +16,10 @@ export const settings = defineType({
       name: 'logo',
       title: 'Logo',
       description:
-        'Recomendado: PNG transparente ~800–1200 px de ancho. Después de cambiarlo, Publish y refresca la web.',
+        'Recomendado: PNG transparente ~800–1200 px de ancho. Después de cambiarlo, Publish y refresca la web. Usa Continuar cuando termines; Quitar foto si no carga.',
       type: 'image',
       options: {hotspot: true},
+      components: {input: ImageInputWithContinue},
     }),
     defineField({
       name: 'whatsapp',

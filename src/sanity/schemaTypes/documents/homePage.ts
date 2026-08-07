@@ -10,14 +10,15 @@ export const homePage = defineType({
       name: 'heroImage',
       title: 'Foto grande de portada',
       description:
-        'Recomendado: horizontal 2400×1350 px (16:9). Otras medidas también funcionan; usa el punto de enfoque si recorta.',
+        'Recomendado: horizontal 2400×1350 px (16:9). Otras medidas también funcionan; usa el punto de enfoque si recorta. Al editar la foto, usa Continuar cuando termines. Si no carga, usa Quitar foto.',
       type: 'image',
       options: {hotspot: true},
+      components: {input: ImageInputWithContinue},
       fields: [
         defineField({
           name: 'alt',
           title: 'Descripción corta de la foto',
-          type: 'localizedString',
+          type: 'optionalLocalizedString',
         }),
       ],
     }),
@@ -48,7 +49,7 @@ export const homePage = defineType({
               name: 'image',
               title: 'Foto',
               description:
-                'Recomendado: 1920×1080 px (16:9). Si es otra medida, ajusta el punto de enfoque.',
+                'Recomendado: 1920×1080 px (16:9). Si es otra medida, ajusta el punto de enfoque. Usa Continuar cuando termines; Quitar foto si no carga.',
               type: 'image',
               options: {hotspot: true},
               components: {input: ImageInputWithContinue},
@@ -122,14 +123,15 @@ export const homePage = defineType({
               name: 'image',
               title: 'Imagen',
               description:
-                'Recomendado: vertical 1200×1500 px (4:5). Otras medidas también funcionan; usa el punto de enfoque si recorta.',
+                'Recomendado: vertical 1200×1500 px (4:5). Otras medidas también funcionan; usa el punto de enfoque si recorta. Al editar la foto, usa Continuar cuando termines. Si no carga, usa Quitar foto.',
               type: 'image',
               options: {hotspot: true},
+              components: {input: ImageInputWithContinue},
               fields: [
                 defineField({
                   name: 'alt',
                   title: 'Texto alternativo',
-                  type: 'localizedString',
+                  type: 'optionalLocalizedString',
                 }),
               ],
             }),

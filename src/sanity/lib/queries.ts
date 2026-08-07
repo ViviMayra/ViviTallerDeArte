@@ -47,6 +47,10 @@ export const homePageQuery = groq`*[_type == "homePage"][0]{
 
 export const aboutPageQuery = groq`*[_type == "aboutPage"][0]{
   title ${localizedString},
+  sections[]{
+    _key,
+    body
+  },
   body,
   seo
 }`
