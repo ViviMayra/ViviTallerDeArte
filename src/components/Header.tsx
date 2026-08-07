@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import {useTranslations, useLocale} from 'next-intl'
 import {useState} from 'react'
 import {Link, usePathname} from '@/i18n/navigation'
@@ -15,6 +14,7 @@ type NavChild = {
 }
 
 type Props = {
+  logoSrc?: string
   joyeriaTypesByGender?: {
     mujer: PieceTypeLabel[]
     hombre: PieceTypeLabel[]
@@ -25,6 +25,7 @@ type Props = {
 }
 
 export function Header({
+  logoSrc = '/logo.png',
   joyeriaTypesByGender = {mujer: [], hombre: []},
   ceramicaTypes = [],
   ilustracionesTypes = [],
@@ -101,14 +102,11 @@ export function Header({
     <header className="absolute inset-x-0 top-0 z-40">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-5 md:px-10 md:py-7">
         <Link href="/" className="flex shrink-0 items-center">
-          <Image
-            src="/logo.png"
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={logoSrc}
             alt="VIVI Taller de Arte"
-            width={424}
-            height={304}
             className="h-20 w-auto md:h-28"
-            style={{width: 'auto'}}
-            priority
           />
         </Link>
 

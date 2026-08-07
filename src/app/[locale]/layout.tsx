@@ -13,6 +13,7 @@ import {Header} from '@/components/Header'
 import {Footer} from '@/components/Footer'
 import {CartDrawer} from '@/components/CartDrawer'
 import {JsonLd} from '@/components/JsonLd'
+import {getImageUrl} from '@/lib/images'
 import {routing} from '@/i18n/routing'
 import type {Locale} from '@/lib/types'
 import '../globals.css'
@@ -79,7 +80,9 @@ export default async function LocaleLayout({
     email: settings.email,
     telephone: settings.whatsapp ? `+${settings.whatsapp}` : undefined,
     url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-    image: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`,
+    image:
+      getImageUrl(settings.logo, 1200, {fit: 'max'}) ||
+      `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`,
     address: settings.address
       ? {
           '@type': 'PostalAddress',
@@ -100,6 +103,9 @@ export default async function LocaleLayout({
     ].filter(Boolean),
   }
 
+  const logoSrc =
+    getImageUrl(settings.logo, 600, {fit: 'max'}) || '/logo.png'
+
   return (
     <html
       lang={locale}
@@ -110,6 +116,7 @@ export default async function LocaleLayout({
           <CartProvider>
             <JsonLd data={localBusiness} />
             <Header
+              logoSrc={logoSrc}
               joyeriaTypesByGender={joyeriaTypesByGender}
               ceramicaTypes={ceramicaTypes}
               ilustracionesTypes={ilustracionesTypes}

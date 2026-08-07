@@ -14,7 +14,10 @@ export const settings = defineType({
     defineField({
       name: 'logo',
       title: 'Logo',
+      description:
+        'Recomendado: PNG transparente ~800–1200 px de ancho. Después de cambiarlo, Publish y refresca la web.',
       type: 'image',
+      options: {hotspot: true},
     }),
     defineField({
       name: 'whatsapp',
