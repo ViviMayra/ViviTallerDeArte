@@ -39,25 +39,32 @@ export function PieceTypeInput(props: ObjectInputProps) {
     }
   }, [client, category])
 
-  const currentEs = value.es?.trim() || ''
+  const currentEs = value.es || ''
+  const currentEsTrimmed = currentEs.trim()
   const known = useMemo(() => {
-    if (currentEs && !existing.includes(currentEs)) {
-      return [...existing, currentEs].sort((a, b) => a.localeCompare(b, 'es'))
+    if (currentEsTrimmed && !existing.includes(currentEsTrimmed)) {
+      return [...existing, currentEsTrimmed].sort((a, b) =>
+        a.localeCompare(b, 'es'),
+      )
     }
     return existing
-  }, [existing, currentEs])
+  }, [existing, currentEsTrimmed])
 
   const selectValue =
-    mode === 'new' ? NEW : currentEs && known.includes(currentEs) ? currentEs : NONE
+    mode === 'new'
+      ? NEW
+      : currentEsTrimmed && known.includes(currentEsTrimmed)
+        ? currentEsTrimmed
+        : NONE
 
   const writeEs = (es: string) => {
-    const next = es.trim()
-    if (!next) {
+    // Keep characters as typed (no length cap). Only clear the field when empty.
+    if (es === '') {
       props.onChange(unset())
       return
     }
     // Clear English so “Traducir al inglés” can refill after a rename
-    props.onChange(set({es: next, en: undefined}))
+    props.onChange(set({es, en: undefined}))
   }
 
   return (
@@ -89,10 +96,15 @@ export function PieceTypeInput(props: ObjectInputProps) {
 
       {mode === 'new' && (
         <TextInput
-          {...props.elementProps}
+          id={props.id}
           value={currentEs}
           placeholder="Ej: Collares, Aretes, Anillos…"
           onChange={(event) => writeEs(event.currentTarget.value)}
+          onBlur={() => {
+            const trimmed = currentEs.trim()
+            if (!trimmed) props.onChange(unset())
+            else if (trimmed !== currentEs) writeEs(trimmed)
+          }}
         />
       )}
     </Stack>
