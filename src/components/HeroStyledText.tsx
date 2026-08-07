@@ -41,19 +41,19 @@ function resolveSize(size: TextStyleValue['size']): {
 }
 
 function components(variant: Variant): PortableTextComponents {
-  // Defaults match the previous look until she overrides with Fuente y tamaño
+  // Same left edge + tracking as VIVI; only size/color differ by line
   const baseSize = variant === 'primary' ? 'text-sm' : 'text-xs md:text-sm'
   const baseFont =
-    variant === 'primary'
-      ? 'font-[family-name:var(--font-body)] uppercase tracking-[0.2em]'
-      : 'font-[family-name:var(--font-body)] tracking-[0.04em]'
+    'font-[family-name:var(--font-body)] uppercase tracking-[0.2em]'
   const baseColor =
     variant === 'primary' ? 'text-foreground/90' : 'text-foreground/75'
 
   return {
     block: {
       normal: ({children}) => (
-        <p className={`m-0 text-left ${baseSize} ${baseFont} ${baseColor}`}>
+        <p
+          className={`m-0 w-full text-left ${baseSize} ${baseFont} ${baseColor}`}
+        >
           {children}
         </p>
       ),
@@ -120,7 +120,7 @@ export function HeroStyledText({
 }) {
   if (!value?.length) return null
   return (
-    <div className={`space-y-1 text-left ${className}`.trim()}>
+    <div className={`w-full space-y-1 text-left ${className}`.trim()}>
       <PortableText value={value} components={components(variant)} />
     </div>
   )

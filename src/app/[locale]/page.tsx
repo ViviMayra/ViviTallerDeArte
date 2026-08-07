@@ -61,12 +61,12 @@ export default async function HomePage({
         <div className="absolute inset-0 bg-gradient-to-b from-background/35 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
         <div className="relative mx-auto flex min-h-[78vh] max-w-7xl flex-col justify-end px-4 pb-16 md:px-8">
-          <div className="text-left">
-            <p className="animate-fade-up font-[family-name:var(--font-display)] text-5xl tracking-[0.2em] md:text-7xl">
+          <div className="hero-titles flex w-full max-w-xl flex-col items-start text-left">
+            <p className="animate-fade-up w-full self-start font-[family-name:var(--font-display)] text-5xl tracking-[0.2em] md:text-7xl">
               {homeT('brand')}
             </p>
             <HeroStyledText
-              className="animate-fade-up-delay mt-3"
+              className="animate-fade-up-delay mt-3 w-full self-start"
               variant="primary"
               value={getStyledBlocks(
                 home.heroEyebrow,
@@ -75,7 +75,7 @@ export default async function HomePage({
               )}
             />
             <HeroStyledText
-              className="animate-fade-up-delay mt-2 max-w-md"
+              className="animate-fade-up-delay mt-2 w-full self-start"
               variant="secondary"
               value={getStyledBlocks(home.heroSubline, locale)}
             />

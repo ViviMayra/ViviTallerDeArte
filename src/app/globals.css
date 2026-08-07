@@ -34,6 +34,15 @@ body {
   font-family: var(--font-body), system-ui, sans-serif;
 }
 
+/* Hero brand + two lines: one shared left edge */
+.hero-titles,
+.hero-titles p {
+  text-align: left;
+  margin-left: 0;
+  padding-left: 0;
+  text-indent: 0;
+}
+
 ::selection {
   background: color-mix(in oklab, var(--ochre) 35%, white);
 }
