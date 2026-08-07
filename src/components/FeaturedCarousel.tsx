@@ -8,6 +8,7 @@ import {formatPrice, t} from '@/lib/locale'
 import {getImageAlt, getImageUrl} from '@/lib/images'
 import {
   useCarouselVisibleCount,
+  useCarouselSwipe,
   useInfiniteCarousel,
 } from '@/lib/use-infinite-carousel'
 import type {FeaturedCarouselSlide, Locale} from '@/lib/types'
@@ -50,8 +51,18 @@ export function FeaturedCarousel({slides, title, locale}: Props) {
     goNext,
     goTo,
     onTransitionEnd,
+    pause,
+    resume,
     cloneCount,
   } = useInfiniteCarousel(validSlides.length, visibleCount, 5000)
+
+  const {dragX, dragging, swipeHandlers} = useCarouselSwipe({
+    enabled: canNavigate,
+    onPrev: goPrev,
+    onNext: goNext,
+    pause,
+    resume,
+  })
 
   const trackSlides = useMemo(() => {
     if (!cloneCount) return validSlides
@@ -88,16 +99,25 @@ export function FeaturedCarousel({slides, title, locale}: Props) {
 
       <div className="relative">
         <div className="relative bg-gradient-to-b from-[#f3efe6]/80 to-transparent px-8 py-6 sm:px-10 sm:py-8 md:px-14 md:py-12">
-          <div ref={viewportRef} className="overflow-hidden">
+          <div
+            ref={viewportRef}
+            className={`overflow-hidden touch-pan-y ${
+              canNavigate ? 'cursor-grab active:cursor-grabbing' : ''
+            }`}
+            {...swipeHandlers}
+          >
             <div
               className="flex ease-out"
               style={{
                 gap: GAP_PX,
                 transform:
-                  cardWidth > 0 ? `translateX(-${offset}px)` : undefined,
-                transition: transitionOn
-                  ? 'transform 500ms ease-out'
-                  : 'none',
+                  cardWidth > 0
+                    ? `translateX(${-offset + dragX}px)`
+                    : undefined,
+                transition:
+                  dragging || !transitionOn
+                    ? 'none'
+                    : 'transform 500ms ease-out',
               }}
               onTransitionEnd={onTransitionEnd}
             >
@@ -180,6 +200,7 @@ function SlideCard({
           <img
             src={getImageUrl(slide.image, 900) || ''}
             alt={getImageAlt(slide.image, locale)}
+            draggable={false}
             className="h-full w-full object-cover"
           />
         </div>
@@ -207,6 +228,7 @@ function SlideCard({
               locale,
               t(piece.title, locale),
             )}
+            draggable={false}
             className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${
               sold ? 'group-hover:grayscale-[30%] group-hover:brightness-95' : ''
             }`}

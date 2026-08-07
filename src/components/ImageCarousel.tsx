@@ -5,6 +5,7 @@ import type {Locale, SanityImage} from '@/lib/types'
 import {getImageAlt, getImageUrl} from '@/lib/images'
 import {
   useCarouselVisibleCount,
+  useCarouselSwipe,
   useInfiniteCarousel,
 } from '@/lib/use-infinite-carousel'
 
@@ -35,8 +36,18 @@ export function ImageCarousel({
     goNext,
     goTo,
     onTransitionEnd,
+    pause,
+    resume,
     cloneCount,
   } = useInfiniteCarousel(validSlides.length, visibleCount, 4500)
+
+  const {dragX, dragging, swipeHandlers} = useCarouselSwipe({
+    enabled: canNavigate,
+    onPrev: goPrev,
+    onNext: goNext,
+    pause,
+    resume,
+  })
 
   const trackSlides = useMemo(() => {
     if (!cloneCount) return validSlides
@@ -66,13 +77,21 @@ export function ImageCarousel({
   return (
     <div className="relative mt-10">
       <div className="relative bg-gradient-to-b from-[#f3efe6]/80 to-transparent px-8 py-5 sm:px-10 sm:py-6 md:px-14 md:py-8">
-        <div ref={viewportRef} className="overflow-hidden">
+        <div
+          ref={viewportRef}
+          className={`overflow-hidden touch-pan-y ${
+            canNavigate ? 'cursor-grab active:cursor-grabbing' : ''
+          }`}
+          {...swipeHandlers}
+        >
           <div
             className="flex ease-out"
             style={{
               gap: GAP_PX,
-              transform: cardWidth > 0 ? `translateX(-${offset}px)` : undefined,
-              transition: transitionOn ? 'transform 500ms ease-out' : 'none',
+              transform:
+                cardWidth > 0 ? `translateX(${-offset + dragX}px)` : undefined,
+              transition:
+                dragging || !transitionOn ? 'none' : 'transform 500ms ease-out',
             }}
             onTransitionEnd={onTransitionEnd}
           >
@@ -91,6 +110,7 @@ export function ImageCarousel({
                   <img
                     src={getImageUrl(slide, 900) || ''}
                     alt={getImageAlt(slide, locale)}
+                    draggable={false}
                     className="h-full w-full object-cover"
                   />
                 </div>
