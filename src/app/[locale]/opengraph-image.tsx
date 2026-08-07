@@ -1,11 +1,12 @@
 import {readFile} from 'node:fs/promises'
 import {join} from 'node:path'
+import {ImageResponse} from 'next/og'
 import sharp from 'sharp'
 import {getHomePage, getSettings} from '@/lib/content'
 import {getImageUrl} from '@/lib/images'
 import {urlFor} from '@/sanity/lib/image'
 import {blocksToPlainText, getStyledBlocks} from '@/lib/styled-text'
-import type {Locale} from '@/lib/types'
+import type {Locale, SanityImage} from '@/lib/types'
 
 export const alt = 'VIVI Taller de Arte'
 export const size = {
@@ -24,27 +25,10 @@ async function fetchBuffer(url: string): Promise<Buffer | null> {
   }
 }
 
-function escapeXml(value: string) {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&apos;')
-}
-
 /** Prefer Sanity CDN crop (respects hotspot) at exact OG dimensions. */
-function heroOgUrl(image: Parameters<typeof urlFor>[0] | undefined | null) {
+function heroOgUrl(image?: SanityImage | null) {
   if (!image) return undefined
-  // Local/demo images expose a direct url — skip the CDN builder.
-  if (
-    typeof image === 'object' &&
-    image !== null &&
-    'url' in image &&
-    typeof (image as {url?: unknown}).url === 'string'
-  ) {
-    return (image as {url: string}).url
-  }
+  if (image.url) return image.url
   try {
     return (
       urlFor(image)
@@ -67,7 +51,12 @@ export default async function Image({
   const {locale: localeParam} = await params
   const locale: Locale = localeParam === 'en' ? 'en' : 'es'
 
-  const [home, settings] = await Promise.all([getHomePage(), getSettings()])
+  const [home, settings, syneFont, figtreeFont] = await Promise.all([
+    getHomePage(),
+    getSettings(),
+    readFile(join(process.cwd(), 'public/fonts/Syne-Regular.ttf')),
+    readFile(join(process.cwd(), 'public/fonts/Figtree-Regular.ttf')),
+  ])
 
   const heroUrl =
     heroOgUrl(home.heroImage) ||
@@ -103,7 +92,6 @@ export default async function Image({
   )
   const subline = blocksToPlainText(getStyledBlocks(home.heroSubline, locale))
 
-  // Normalize every layer to PNG first — more reliable under Next's bundler.
   const basePng = heroBuf
     ? await sharp(heroBuf)
         .resize(size.width, size.height, {fit: 'cover', position: 'centre'})
@@ -125,10 +113,10 @@ export default async function Image({
       <svg width="${size.width}" height="${size.height}" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="white" stop-opacity="0.42"/>
-            <stop offset="38%" stop-color="white" stop-opacity="0"/>
-            <stop offset="68%" stop-color="white" stop-opacity="0.22"/>
-            <stop offset="100%" stop-color="white" stop-opacity="0.8"/>
+            <stop offset="0%" stop-color="rgb(247,244,239)" stop-opacity="0.42"/>
+            <stop offset="38%" stop-color="rgb(247,244,239)" stop-opacity="0"/>
+            <stop offset="68%" stop-color="rgb(247,244,239)" stop-opacity="0.22"/>
+            <stop offset="100%" stop-color="rgb(247,244,239)" stop-opacity="0.8"/>
           </linearGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#g)"/>
@@ -144,34 +132,87 @@ export default async function Image({
 
   if (logoBuf) {
     const logoPng = await sharp(logoBuf)
-      .resize(320, 216, {fit: 'inside', withoutEnlargement: true})
+      .resize(340, 120, {fit: 'inside', withoutEnlargement: true})
       .png()
       .toBuffer()
-    composites.push({input: logoPng, top: 36, left: 44})
+    composites.push({input: logoPng, top: 32, left: 40})
   }
 
-  // Match the site hero: brand + uppercase eyebrow/subline, no nav.
-  const titleLines = [
-    `<text x="48" y="470" font-family="Helvetica, Arial, sans-serif" font-size="72" letter-spacing="12" fill="#111111">VIVI</text>`,
-    eyebrow
-      ? `<text x="48" y="520" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="5" fill="#1a1a1a">${escapeXml(eyebrow.toUpperCase())}</text>`
-      : '',
-    subline
-      ? `<text x="48" y="558" font-family="Helvetica, Arial, sans-serif" font-size="18" letter-spacing="3" fill="#2a2a2a">${escapeXml(subline.toUpperCase())}</text>`
-      : '',
-  ]
-    .filter(Boolean)
-    .join('\n')
-
-  const titlesPng = await sharp(
-    Buffer.from(`
-      <svg width="${size.width}" height="${size.height}" xmlns="http://www.w3.org/2000/svg">
-        ${titleLines}
-      </svg>
-    `),
+  // Render titles with next/og fonts (system SVG fonts failed on Vercel → □□□□).
+  const titlesResponse = new ImageResponse(
+    (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          backgroundColor: 'transparent',
+          position: 'relative',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            left: 48,
+            bottom: 52,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          }}
+        >
+          <div
+            style={{
+              fontFamily: 'Syne',
+              fontSize: 72,
+              letterSpacing: 12,
+              color: '#111111',
+              lineHeight: 1,
+            }}
+          >
+            VIVI
+          </div>
+          {eyebrow ? (
+            <div
+              style={{
+                marginTop: 16,
+                fontFamily: 'Figtree',
+                fontSize: 24,
+                letterSpacing: 4,
+                color: '#1a1a1a',
+                lineHeight: 1.15,
+                textTransform: 'uppercase',
+              }}
+            >
+              {eyebrow}
+            </div>
+          ) : null}
+          {subline ? (
+            <div
+              style={{
+                marginTop: 10,
+                fontFamily: 'Figtree',
+                fontSize: 17,
+                letterSpacing: 3,
+                color: '#2a2a2a',
+                lineHeight: 1.15,
+                textTransform: 'uppercase',
+              }}
+            >
+              {subline}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    ),
+    {
+      ...size,
+      fonts: [
+        {name: 'Syne', data: syneFont, style: 'normal', weight: 400},
+        {name: 'Figtree', data: figtreeFont, style: 'normal', weight: 400},
+      ],
+    },
   )
-    .png()
-    .toBuffer()
+  const titlesPng = Buffer.from(await titlesResponse.arrayBuffer())
   composites.push({input: titlesPng, top: 0, left: 0})
 
   const png = await sharp(basePng).composite(composites).png().toBuffer()
