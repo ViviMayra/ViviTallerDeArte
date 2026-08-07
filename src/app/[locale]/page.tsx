@@ -53,48 +53,47 @@ export default async function HomePage({
   return (
     <div>
       {/*
-        Mobile/tablet: show the full cover photo (no CSS crop) so both eyes
-        stay visible; titles sit under the photo.
-        Large desktop: unchanged full-bleed overlay hero.
+        Same composition as desktop: photo edge-to-edge, gradients, titles on
+        the image. Below lg the frame matches the photo’s ~2:1 ratio so both
+        eyes stay in view (a tall cover crop would cut them off).
       */}
       <section className="relative -mt-32 w-full overflow-hidden md:-mt-40 lg:min-h-[78vh]">
-        <div className="h-32 shrink-0 md:h-40 lg:hidden" aria-hidden="true" />
-
-        <div className="relative w-full bg-background lg:absolute lg:inset-0 lg:h-full lg:min-h-[78vh]">
+        <div className="relative aspect-[2/1] w-full lg:absolute lg:inset-0 lg:aspect-auto lg:h-full lg:min-h-[78vh]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={heroSrc}
             alt={getImageAlt(home.heroImage, locale, 'VIVI')}
-            className="block h-auto w-full object-contain lg:absolute lg:inset-0 lg:h-full lg:object-cover"
+            className="absolute inset-0 h-full w-full object-cover object-center"
             style={
               heroObjectPosition
                 ? {objectPosition: heroObjectPosition}
                 : undefined
             }
           />
-          <div className="pointer-events-none absolute inset-0 hidden bg-gradient-to-b from-background/35 via-transparent to-transparent lg:block" />
-          <div className="pointer-events-none absolute inset-0 hidden bg-gradient-to-t from-background/80 via-background/20 to-transparent lg:block" />
-        </div>
-
-        <div className="relative mx-auto flex w-full max-w-7xl flex-col justify-end px-4 pb-10 pt-6 lg:absolute lg:inset-0 lg:min-h-[78vh] lg:px-8 lg:pb-16 lg:pt-0">
-          <div className="hero-titles flex w-full max-w-xl flex-col items-start text-left">
-            <p className="animate-fade-up w-full self-start -ml-1 font-[family-name:var(--font-display)] text-5xl tracking-[0.2em] md:-ml-1.5 md:text-7xl">
-              {homeT('brand')}
-            </p>
-            <HeroStyledText
-              className="animate-fade-up-delay mt-3 w-full self-start"
-              variant="primary"
-              value={getStyledBlocks(
-                home.heroEyebrow,
-                locale,
-                homeT('tagline'),
-              )}
-            />
-            <HeroStyledText
-              className="animate-fade-up-delay mt-2 w-full self-start"
-              variant="secondary"
-              value={getStyledBlocks(home.heroSubline, locale)}
-            />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/35 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
+          <div className="absolute inset-0 flex flex-col justify-end">
+            <div className="mx-auto w-full max-w-7xl px-4 pb-3 sm:pb-6 md:px-8 md:pb-16">
+              <div className="hero-titles flex w-full max-w-xl origin-bottom-left scale-[0.72] flex-col items-start text-left sm:scale-100">
+                <p className="animate-fade-up w-full self-start -ml-1 font-[family-name:var(--font-display)] text-5xl tracking-[0.2em] md:-ml-1.5 md:text-7xl">
+                  {homeT('brand')}
+                </p>
+                <HeroStyledText
+                  className="animate-fade-up-delay mt-3 w-full self-start"
+                  variant="primary"
+                  value={getStyledBlocks(
+                    home.heroEyebrow,
+                    locale,
+                    homeT('tagline'),
+                  )}
+                />
+                <HeroStyledText
+                  className="animate-fade-up-delay mt-2 w-full self-start"
+                  variant="secondary"
+                  value={getStyledBlocks(home.heroSubline, locale)}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
