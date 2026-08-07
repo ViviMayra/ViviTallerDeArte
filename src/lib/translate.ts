@@ -12,7 +12,7 @@ const DEFAULT_GATEWAY_MODELS = [
 
 export type TranslateResult = {
   translations: string[]
-  mode: 'ai' | 'copy'
+  mode: 'ai' | 'machine' | 'copy'
   model?: string
   /** Present when we had to fall back — safe to show in Studio toasts. */
   fallbackReason?: string
@@ -165,6 +165,47 @@ async function translateViaOpenAICompatible(
   throw lastError || new Error('All translate models failed')
 }
 
+async function translateViaMyMemory(texts: string[]): Promise<TranslateResult> {
+  const translations: string[] = []
+
+  for (const text of texts) {
+    // Keep requests short — MyMemory URL length limits
+    const chunk = text.length > 450 ? text.slice(0, 450) : text
+    const url = new URL('https://api.mymemory.translated.net/get')
+    url.searchParams.set('q', chunk)
+    url.searchParams.set('langpair', 'es|en')
+
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`MyMemory failed: ${response.status}`)
+    }
+
+    const json = (await response.json()) as {
+      responseStatus?: number | string
+      responseData?: {translatedText?: string}
+      quotaFinished?: boolean
+    }
+
+    if (json.quotaFinished) {
+      throw new Error('MyMemory quota finished')
+    }
+
+    const status = Number(json.responseStatus)
+    const translated = json.responseData?.translatedText
+    if (status !== 200 || typeof translated !== 'string' || !translated.trim()) {
+      throw new Error('MyMemory returned empty translation')
+    }
+
+    translations.push(translated)
+  }
+
+  return {
+    translations,
+    mode: 'machine',
+    model: 'mymemory',
+  }
+}
+
 /**
  * Translate Spanish strings → English with model failover.
  * Never throws for empty input. On total AI failure, returns a copy fallback
@@ -195,7 +236,14 @@ export async function translateTexts(texts: string[]): Promise<TranslateResult> 
     errors.push('No AI_GATEWAY_API_KEY / TRANSLATE_API_KEY in env')
   }
 
-  // 3) Last resort — copy Spanish so the button never hard-fails for Mayra
+  // 3) Free machine translation so Studio still gets real English without AI keys
+  try {
+    return await translateViaMyMemory(texts)
+  } catch (error) {
+    errors.push(errorMessage(error))
+  }
+
+  // 4) Last resort — copy Spanish so the button never hard-fails for Mayra
   const fallbackReason = errors.filter(Boolean).join(' | ')
   console.warn('[translate] Falling back to Spanish copy:', fallbackReason)
   return {

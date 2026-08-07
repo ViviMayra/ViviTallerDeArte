@@ -118,11 +118,12 @@ function collectLocalized(
   }
 }
 
-function successMessage(mode: 'ai' | 'copy', model?: string) {
+function successMessage(mode: 'ai' | 'machine' | 'copy', model?: string) {
   if (mode === 'ai') {
-    return model
-      ? `Inglés generado (${model}).`
-      : 'Inglés generado.'
+    return model ? `Inglés generado (${model}).` : 'Inglés generado.'
+  }
+  if (mode === 'machine') {
+    return 'Inglés traducido (respaldo automático).'
   }
   return 'Inglés copiado del español (la IA no respondió; se usó el texto español como respaldo).'
 }
@@ -198,15 +199,21 @@ export async function POST(request: Request) {
 
     const patch = writeClient.patch(body.documentId)
     const setPayload: Record<string, unknown> = {}
-    let mode: 'ai' | 'copy' = 'ai'
+    let mode: 'ai' | 'machine' | 'copy' = 'ai'
     let model: string | undefined
     let fallbackReason: string | undefined
 
+    const noteResult = (result: Awaited<ReturnType<typeof translateTexts>>) => {
+      // Prefer reporting the weakest mode used across batches
+      if (result.mode === 'copy') mode = 'copy'
+      else if (result.mode === 'machine' && mode === 'ai') mode = 'machine'
+      model = model || result.model
+      if (result.fallbackReason) fallbackReason = result.fallbackReason
+    }
+
     if (stringQueue.length) {
       const result = await translateTexts(stringQueue.map((q) => q.value))
-      mode = result.mode
-      model = result.model
-      fallbackReason = result.fallbackReason
+      noteResult(result)
       stringQueue.forEach((item, i) => {
         setPayload[item.key] = result.translations[i]
       })
@@ -214,11 +221,7 @@ export async function POST(request: Request) {
 
     if (spanishDetails.length) {
       const result = await translateTexts(spanishDetails)
-      if (result.mode === 'copy') {
-        mode = 'copy'
-        fallbackReason = result.fallbackReason || fallbackReason
-      }
-      model = model || result.model
+      noteResult(result)
       setPayload.detailsEn = result.translations
     }
 
@@ -241,11 +244,7 @@ export async function POST(request: Request) {
         continue
       }
       const result = await translateTexts(spanTexts)
-      if (result.mode === 'copy') {
-        mode = 'copy'
-        fallbackReason = result.fallbackReason || fallbackReason
-      }
-      model = model || result.model
+      noteResult(result)
       setPayload[`${path}.en`] = applySpanTexts(cursor.es, result.translations)
     }
 

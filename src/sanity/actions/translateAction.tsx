@@ -50,7 +50,12 @@ export const translateAction: DocumentActionComponent = (props) => {
 
         toast.push({
           status: data.mode === 'copy' ? 'warning' : 'success',
-          title: data.mode === 'copy' ? 'Inglés copiado' : 'Listo',
+          title:
+            data.mode === 'copy'
+              ? 'Inglés copiado'
+              : data.mode === 'machine'
+                ? 'Inglés traducido'
+                : 'Listo',
           description:
             data.message ||
             'Inglés actualizado. Recargando para que puedas publicar…',
