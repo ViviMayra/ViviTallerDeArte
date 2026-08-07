@@ -201,11 +201,6 @@ export const localizedBlockContent = defineType({
           components: {input: ImageInputWithContinue},
           fields: [
             defineField({
-              name: 'alt',
-              type: 'string',
-              title: 'Texto alternativo',
-            }),
-            defineField({
               name: 'widthPercent',
               title: 'Ancho (%)',
               description:
@@ -213,6 +208,11 @@ export const localizedBlockContent = defineType({
               type: 'number',
               initialValue: 100,
               validation: (Rule) => Rule.min(10).max(100).integer(),
+            }),
+            defineField({
+              name: 'alt',
+              type: 'string',
+              title: 'Texto alternativo',
             }),
           ],
         },
@@ -231,11 +231,6 @@ export const localizedBlockContent = defineType({
           components: {input: ImageInputWithContinue},
           fields: [
             defineField({
-              name: 'alt',
-              type: 'string',
-              title: 'Alt text',
-            }),
-            defineField({
               name: 'widthPercent',
               title: 'Width (%)',
               description:
@@ -243,6 +238,11 @@ export const localizedBlockContent = defineType({
               type: 'number',
               initialValue: 100,
               validation: (Rule) => Rule.min(10).max(100).integer(),
+            }),
+            defineField({
+              name: 'alt',
+              type: 'string',
+              title: 'Alt text',
             }),
           ],
         },

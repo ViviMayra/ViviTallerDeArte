@@ -8,6 +8,7 @@ import {dismissStudioFocus} from './dismissStudioFocus'
 type ImageValue = {
   asset?: {_ref?: string; _type?: string}
   _upload?: {progress?: number; file?: {name?: string}}
+  widthPercent?: number
 }
 
 /** Continuar + Quitar foto under the photo editor (leave without X; clear stuck uploads). */
@@ -16,6 +17,9 @@ export function ImageInputWithContinue(props: ObjectInputProps) {
   const isUploading = Boolean(value?._upload)
   const hasPhoto = Boolean(value?.asset) || isUploading
   const progress = value?._upload?.progress
+  const showsWidth =
+    Array.isArray(props.schemaType?.fields) &&
+    props.schemaType.fields.some((field) => field.name === 'widthPercent')
 
   const leaveEditor = () => dismissStudioFocus(props.onPathFocus)
 
@@ -26,7 +30,13 @@ export function ImageInputWithContinue(props: ObjectInputProps) {
 
   return (
     <Stack space={3}>
-      {props.renderDefault(props)}
+      {showsWidth ? (
+        <Text size={1} muted>
+          Ancho (%) está debajo de la foto — baja un poco si no lo ves. Ej: 50 =
+          la mitad del ancho.
+        </Text>
+      ) : null}
+      <div style={{paddingBottom: hasPhoto ? 88 : 0}}>{props.renderDefault(props)}</div>
       {isUploading ? (
         <Text size={1} muted>
           Subiendo
