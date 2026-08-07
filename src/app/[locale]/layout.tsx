@@ -22,6 +22,7 @@ import {
 import {Header} from '@/components/Header'
 import {Footer} from '@/components/Footer'
 import {CartDrawer} from '@/components/CartDrawer'
+import {WhatsAppSun} from '@/components/WhatsAppSun'
 import {JsonLd} from '@/components/JsonLd'
 import {getImageUrl} from '@/lib/images'
 import {getSiteUrl} from '@/lib/site-url'
@@ -195,6 +196,7 @@ export default async function LocaleLayout({
             <main className="flex-1 pt-32 md:pt-40">{children}</main>
             <Footer settings={settings} />
             <CartDrawer whatsapp={settings.whatsapp || '51954734273'} />
+            <WhatsAppSun whatsapp={settings.whatsapp || '51954734273'} />
           </CartProvider>
         </NextIntlClientProvider>
         <Analytics />

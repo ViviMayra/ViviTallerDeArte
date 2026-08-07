@@ -50,5 +50,15 @@
     "whatsapp": "WhatsApp",
     "email": "Email",
     "maps": "Google Maps"
+  },
+  "whatsappSun": {
+    "open": "Message on WhatsApp",
+    "close": "Close",
+    "title": "Write to me",
+    "subtitle": "Tell me what you’re looking for, what you loved, or any question you have. I’ll open WhatsApp with your note ready.",
+    "placeholder": "Ask a question, or write whatever you’d like to share…",
+    "send": "Open in WhatsApp",
+    "teaserLabel": "VIVI",
+    "teaser": "Have a question? Write to me"
   }
 }

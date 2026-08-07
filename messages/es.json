@@ -50,5 +50,15 @@
     "whatsapp": "WhatsApp",
     "email": "Email",
     "maps": "Google Maps"
+  },
+  "whatsappSun": {
+    "open": "Escribir por WhatsApp",
+    "close": "Cerrar",
+    "title": "Escríbeme",
+    "subtitle": "Cuéntame qué buscas, qué te gustó o cualquier pregunta. Te abro WhatsApp con tu mensaje listo.",
+    "placeholder": "Escribe tu pregunta o lo que quieras contarme…",
+    "send": "Abrir en WhatsApp",
+    "teaserLabel": "VIVI",
+    "teaser": "¿Tienes una pregunta? Escríbeme"
   }
 }

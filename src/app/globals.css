@@ -104,3 +104,79 @@ body {
 .animate-fade-up-delay {
   animation: fade-up 0.8s ease 0.12s both;
 }
+
+/* Floating WhatsApp sun — soft idle shine, brand palette only */
+.whatsapp-sun-button {
+  transition: transform 0.25s ease;
+}
+
+.whatsapp-sun-button:hover {
+  transform: scale(1.05);
+}
+
+.whatsapp-sun-button:active {
+  transform: scale(0.97);
+}
+
+.whatsapp-sun-glow {
+  position: absolute;
+  inset: -10%;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--ochre) 55%, white) 0%,
+    color-mix(in oklab, var(--ochre) 18%, transparent) 55%,
+    transparent 72%
+  );
+  opacity: 0.55;
+  animation: sun-shine 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.whatsapp-sun-face {
+  animation: sun-breathe 2.8s ease-in-out infinite;
+}
+
+.whatsapp-sun-button--open .whatsapp-sun-glow,
+.whatsapp-sun-button--open .whatsapp-sun-face {
+  animation: none;
+}
+
+.whatsapp-sun-button--open .whatsapp-sun-glow {
+  opacity: 0.28;
+}
+
+@keyframes sun-shine {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.12);
+  }
+}
+
+@keyframes sun-breathe {
+  0%,
+  100% {
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
+  50% {
+    filter: brightness(1.12) saturate(1.08);
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whatsapp-sun-glow,
+  .whatsapp-sun-face {
+    animation: none;
+  }
+
+  .whatsapp-sun-glow {
+    opacity: 0.45;
+  }
+}
