@@ -1,6 +1,13 @@
 'use client'
 
-import {useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent} from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type RefObject,
+} from 'react'
 
 /** Multi-card carousel that loops forward seamlessly via cloned slides. */
 export function useInfiniteCarousel(
@@ -87,10 +94,78 @@ export function useInfiniteCarousel(
 }
 
 /**
- * Mouse / touch swipe for carousels. Tracks horizontally once intent is clear,
- * leaves vertical scrolling alone, and reports drag offset for live follow.
+ * Trackpad two-finger swipe (horizontal wheel) — the Mac gesture.
+ * Leaves mostly-vertical page scrolling alone.
  */
-export function useCarouselSwipe({
+export function useCarouselTrackpad({
+  enabled,
+  viewportRef,
+  onPrev,
+  onNext,
+  pause,
+  resume,
+  threshold = 40,
+}: {
+  enabled: boolean
+  viewportRef: RefObject<HTMLElement | null>
+  onPrev: () => void
+  onNext: () => void
+  pause?: () => void
+  resume?: () => void
+  threshold?: number
+}) {
+  const onPrevRef = useRef(onPrev)
+  const onNextRef = useRef(onNext)
+  const pauseRef = useRef(pause)
+  const resumeRef = useRef(resume)
+  onPrevRef.current = onPrev
+  onNextRef.current = onNext
+  pauseRef.current = pause
+  resumeRef.current = resume
+
+  useEffect(() => {
+    const el = viewportRef.current
+    if (!el || !enabled) return
+
+    let acc = 0
+    let resumeTimer = 0
+
+    const onWheel = (event: WheelEvent) => {
+      const absX = Math.abs(event.deltaX)
+      const absY = Math.abs(event.deltaY)
+      const horizontal = absX > absY || (event.shiftKey && absY > 0)
+      if (!horizontal) return
+
+      const delta = absX > absY ? event.deltaX : event.deltaY
+      if (Math.abs(delta) < 0.5) return
+
+      event.preventDefault()
+      pauseRef.current?.()
+      window.clearTimeout(resumeTimer)
+      resumeTimer = window.setTimeout(() => resumeRef.current?.(), 900)
+
+      acc += delta
+      if (acc >= threshold) {
+        onNextRef.current()
+        acc = 0
+      } else if (acc <= -threshold) {
+        onPrevRef.current()
+        acc = 0
+      }
+    }
+
+    el.addEventListener('wheel', onWheel, {passive: false})
+    return () => {
+      el.removeEventListener('wheel', onWheel)
+      window.clearTimeout(resumeTimer)
+    }
+  }, [enabled, threshold, viewportRef])
+}
+
+/**
+ * Grab-hand mouse drag: open hand on hover, grabbing hand while dragging.
+ */
+export function useCarouselGrab({
   enabled,
   onPrev,
   onNext,
@@ -106,7 +181,7 @@ export function useCarouselSwipe({
   threshold?: number
 }) {
   const [dragX, setDragX] = useState(0)
-  const [dragging, setDragging] = useState(false)
+  const [grabbing, setGrabbing] = useState(false)
   const pointerIdRef = useRef<number | null>(null)
   const startXRef = useRef(0)
   const startYRef = useRef(0)
@@ -129,7 +204,7 @@ export function useCarouselSwipe({
       movedRef.current = false
       dragXRef.current = 0
       setDragX(0)
-      setDragging(false)
+      setGrabbing(false)
       resume?.()
     },
     [onNext, onPrev, resume, threshold],
@@ -138,6 +213,7 @@ export function useCarouselSwipe({
   const onPointerDown = useCallback(
     (event: ReactPointerEvent<HTMLElement>) => {
       if (!enabled || event.button !== 0) return
+      // Don't steal clicks from arrows / dots outside the track
       pointerIdRef.current = event.pointerId
       startXRef.current = event.clientX
       startYRef.current = event.clientY
@@ -145,7 +221,7 @@ export function useCarouselSwipe({
       axisRef.current = null
       movedRef.current = false
       suppressClickRef.current = false
-      setDragging(true)
+      setGrabbing(true)
       setDragX(0)
       pause?.()
       event.currentTarget.setPointerCapture(event.pointerId)
@@ -163,7 +239,6 @@ export function useCarouselSwipe({
         if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
         axisRef.current = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
         if (axisRef.current === 'y') {
-          // Let the page scroll; abandon carousel drag.
           try {
             event.currentTarget.releasePointerCapture(event.pointerId)
           } catch {
@@ -204,17 +279,20 @@ export function useCarouselSwipe({
     [endDrag],
   )
 
-  const onClickCapture = useCallback((event: {preventDefault: () => void; stopPropagation: () => void}) => {
-    if (!suppressClickRef.current) return
-    event.preventDefault()
-    event.stopPropagation()
-    suppressClickRef.current = false
-  }, [])
+  const onClickCapture = useCallback(
+    (event: {preventDefault: () => void; stopPropagation: () => void}) => {
+      if (!suppressClickRef.current) return
+      event.preventDefault()
+      event.stopPropagation()
+      suppressClickRef.current = false
+    },
+    [],
+  )
 
   return {
     dragX,
-    dragging,
-    swipeHandlers: {
+    grabbing,
+    grabHandlers: {
       onPointerDown,
       onPointerMove,
       onPointerUp,

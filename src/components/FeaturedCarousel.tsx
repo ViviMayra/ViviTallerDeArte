@@ -7,8 +7,9 @@ import {SoldBadge} from '@/components/SoldBadge'
 import {formatPrice, t} from '@/lib/locale'
 import {getImageAlt, getImageUrl} from '@/lib/images'
 import {
+  useCarouselGrab,
   useCarouselVisibleCount,
-  useCarouselSwipe,
+  useCarouselTrackpad,
   useInfiniteCarousel,
 } from '@/lib/use-infinite-carousel'
 import type {FeaturedCarouselSlide, Locale} from '@/lib/types'
@@ -56,7 +57,16 @@ export function FeaturedCarousel({slides, title, locale}: Props) {
     cloneCount,
   } = useInfiniteCarousel(validSlides.length, visibleCount, 5000)
 
-  const {dragX, dragging, swipeHandlers} = useCarouselSwipe({
+  useCarouselTrackpad({
+    enabled: canNavigate,
+    viewportRef,
+    onPrev: goPrev,
+    onNext: goNext,
+    pause,
+    resume,
+  })
+
+  const {dragX, grabbing, grabHandlers} = useCarouselGrab({
     enabled: canNavigate,
     onPrev: goPrev,
     onNext: goNext,
@@ -101,10 +111,14 @@ export function FeaturedCarousel({slides, title, locale}: Props) {
         <div className="relative bg-gradient-to-b from-[#f3efe6]/80 to-transparent px-8 py-6 sm:px-10 sm:py-8 md:px-14 md:py-12">
           <div
             ref={viewportRef}
-            className={`overflow-hidden touch-pan-y ${
-              canNavigate ? 'cursor-grab active:cursor-grabbing' : ''
+            className={`overflow-hidden ${
+              canNavigate
+                ? grabbing
+                  ? 'cursor-grabbing'
+                  : 'cursor-grab'
+                : ''
             }`}
-            {...swipeHandlers}
+            {...grabHandlers}
           >
             <div
               className="flex ease-out"
@@ -115,7 +129,7 @@ export function FeaturedCarousel({slides, title, locale}: Props) {
                     ? `translateX(${-offset + dragX}px)`
                     : undefined,
                 transition:
-                  dragging || !transitionOn
+                  grabbing || !transitionOn
                     ? 'none'
                     : 'transform 500ms ease-out',
               }}
@@ -201,7 +215,7 @@ function SlideCard({
             src={getImageUrl(slide.image, 900) || ''}
             alt={getImageAlt(slide.image, locale)}
             draggable={false}
-            className="h-full w-full object-cover"
+            className="pointer-events-none h-full w-full object-cover"
           />
         </div>
       </div>
@@ -229,7 +243,7 @@ function SlideCard({
               t(piece.title, locale),
             )}
             draggable={false}
-            className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${
+            className={`pointer-events-none h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${
               sold ? 'group-hover:grayscale-[30%] group-hover:brightness-95' : ''
             }`}
           />

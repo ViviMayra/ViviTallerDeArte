@@ -4,8 +4,9 @@ import {useEffect, useMemo, useRef, useState} from 'react'
 import type {Locale, SanityImage} from '@/lib/types'
 import {getImageAlt, getImageUrl} from '@/lib/images'
 import {
+  useCarouselGrab,
   useCarouselVisibleCount,
-  useCarouselSwipe,
+  useCarouselTrackpad,
   useInfiniteCarousel,
 } from '@/lib/use-infinite-carousel'
 
@@ -41,7 +42,16 @@ export function ImageCarousel({
     cloneCount,
   } = useInfiniteCarousel(validSlides.length, visibleCount, 4500)
 
-  const {dragX, dragging, swipeHandlers} = useCarouselSwipe({
+  useCarouselTrackpad({
+    enabled: canNavigate,
+    viewportRef,
+    onPrev: goPrev,
+    onNext: goNext,
+    pause,
+    resume,
+  })
+
+  const {dragX, grabbing, grabHandlers} = useCarouselGrab({
     enabled: canNavigate,
     onPrev: goPrev,
     onNext: goNext,
@@ -79,10 +89,10 @@ export function ImageCarousel({
       <div className="relative bg-gradient-to-b from-[#f3efe6]/80 to-transparent px-8 py-5 sm:px-10 sm:py-6 md:px-14 md:py-8">
         <div
           ref={viewportRef}
-          className={`overflow-hidden touch-pan-y ${
-            canNavigate ? 'cursor-grab active:cursor-grabbing' : ''
+          className={`overflow-hidden ${
+            canNavigate ? (grabbing ? 'cursor-grabbing' : 'cursor-grab') : ''
           }`}
-          {...swipeHandlers}
+          {...grabHandlers}
         >
           <div
             className="flex ease-out"
@@ -91,7 +101,7 @@ export function ImageCarousel({
               transform:
                 cardWidth > 0 ? `translateX(${-offset + dragX}px)` : undefined,
               transition:
-                dragging || !transitionOn ? 'none' : 'transform 500ms ease-out',
+                grabbing || !transitionOn ? 'none' : 'transform 500ms ease-out',
             }}
             onTransitionEnd={onTransitionEnd}
           >
@@ -111,7 +121,7 @@ export function ImageCarousel({
                     src={getImageUrl(slide, 900) || ''}
                     alt={getImageAlt(slide, locale)}
                     draggable={false}
-                    className="h-full w-full object-cover"
+                    className="pointer-events-none h-full w-full object-cover"
                   />
                 </div>
               </div>
