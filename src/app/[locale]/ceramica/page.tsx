@@ -1,3 +1,4 @@
+import type {Metadata} from 'next'
 import {getTranslations, setRequestLocale} from 'next-intl/server'
 import {CategoryCatalog} from '@/components/CategoryCatalog'
 import {
@@ -5,6 +6,23 @@ import {
   getCategoryTypeOrder,
   getPiecesByCategory,
 } from '@/lib/content'
+import {buildPageMetadata, categorySeoCopy} from '@/lib/seo'
+import type {Locale} from '@/lib/types'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{locale: string}>
+}): Promise<Metadata> {
+  const {locale} = await params
+  const copy = categorySeoCopy('ceramica', locale as Locale)
+  return buildPageMetadata({
+    locale,
+    path: '/ceramica',
+    title: copy.title,
+    description: copy.description,
+  })
+}
 
 export default async function CeramicsPage({
   params,

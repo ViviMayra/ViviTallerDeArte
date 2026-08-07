@@ -1,16 +1,39 @@
 import {notFound} from 'next/navigation'
 import {getLocale, getTranslations, setRequestLocale} from 'next-intl/server'
+import type {Metadata} from 'next'
 import {Link} from '@/i18n/navigation'
+import {JsonLd} from '@/components/JsonLd'
 import {ProductGallery} from '@/components/ProductGallery'
 import {getExhibitionBySlug} from '@/lib/content'
 import {t} from '@/lib/locale'
+import {getImageUrl} from '@/lib/images'
+import {buildPageMetadata} from '@/lib/seo'
+import {getSiteUrl} from '@/lib/site-url'
 import type {Locale} from '@/lib/types'
 
-export default async function ExhibitionDetailPage({
-  params,
-}: {
-  params: Promise<{locale: string; slug: string}>
-}) {
+type Props = {params: Promise<{locale: string; slug: string}>}
+
+export async function generateMetadata({params}: Props): Promise<Metadata> {
+  const {locale: localeParam, slug} = await params
+  const exhibition = await getExhibitionBySlug(slug)
+  if (!exhibition) return {}
+  const locale = localeParam as Locale
+  const image =
+    getImageUrl(exhibition.seo?.image || exhibition.photos?.[0], 1200) ||
+    undefined
+  return buildPageMetadata({
+    locale,
+    path: `/exhibiciones/${slug}`,
+    title: exhibition.seo?.title || t(exhibition.title, locale),
+    description:
+      exhibition.seo?.description ||
+      t(exhibition.summary, locale) ||
+      undefined,
+    image,
+  })
+}
+
+export default async function ExhibitionDetailPage({params}: Props) {
   const {locale: localeParam, slug} = await params
   setRequestLocale(localeParam)
   const locale = (await getLocale()) as Locale
@@ -18,9 +41,32 @@ export default async function ExhibitionDetailPage({
   if (!exhibition) notFound()
   const common = await getTranslations('common')
   const title = t(exhibition.title, locale)
+  const siteUrl = getSiteUrl()
+  const imageUrl = getImageUrl(exhibition.photos?.[0], 1200)
+
+  const exhibitionLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ExhibitionEvent',
+    name: title,
+    description: t(exhibition.summary, locale),
+    image: imageUrl,
+    url: `${siteUrl}/${locale}/exhibiciones/${slug}`,
+    startDate: exhibition.year || undefined,
+    location: t(exhibition.place, locale)
+      ? {
+          '@type': 'Place',
+          name: t(exhibition.place, locale),
+          address: {
+            '@type': 'PostalAddress',
+            addressCountry: 'PE',
+          },
+        }
+      : undefined,
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-14">
+      <JsonLd data={exhibitionLd} />
       <Link href="/exhibiciones" className="text-xs text-muted hover:text-foreground">
         ← {common('back')}
       </Link>

@@ -1,9 +1,31 @@
+import type {Metadata} from 'next'
 import {getLocale, setRequestLocale} from 'next-intl/server'
 import {PortableBody} from '@/components/PortableBody'
 import {getAboutPage} from '@/lib/content'
 import {getImageAlt, getImageUrl} from '@/lib/images'
 import {t} from '@/lib/locale'
+import {buildPageMetadata, categorySeoCopy} from '@/lib/seo'
 import type {AboutSection, Locale, SanityImage} from '@/lib/types'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{locale: string}>
+}): Promise<Metadata> {
+  const {locale} = await params
+  const about = await getAboutPage()
+  const copy = categorySeoCopy('about', locale as Locale)
+  const image =
+    getImageUrl(about.seo?.image || about.sections?.[0]?.image, 1200) ||
+    undefined
+  return buildPageMetadata({
+    locale,
+    path: '/about',
+    title: about.seo?.title || t(about.title, locale as Locale, copy.title),
+    description: about.seo?.description || copy.description,
+    image,
+  })
+}
 
 function sectionAlignClass(align?: AboutSection['align']) {
   if (align === 'right') return 'flex justify-end'

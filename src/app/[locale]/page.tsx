@@ -6,6 +6,7 @@ import {HeroStyledText} from '@/components/HeroStyledText'
 import {getHomePage} from '@/lib/content'
 import {t} from '@/lib/locale'
 import {getImageAlt, getImageObjectPosition, getImageUrl} from '@/lib/images'
+import {buildPageMetadata, SITE_NAME} from '@/lib/seo'
 import {getStyledBlocks} from '@/lib/styled-text'
 import type {Locale} from '@/lib/types'
 
@@ -16,24 +17,23 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale} = await params
   const home = await getHomePage()
-  return {
+  const ogImage =
+    getImageUrl(home.seo?.image || home.heroImage, 1200) || '/logo.png'
+  return buildPageMetadata({
+    locale,
+    path: '',
     title:
       home.seo?.title ||
       (locale === 'es'
-        ? 'VIVI Taller de Arte | Joyería y arte en Perú'
-        : 'VIVI Taller de Arte | Jewelry & art in Peru'),
+        ? `${SITE_NAME} | Joyería y arte en Perú`
+        : `${SITE_NAME} | Jewelry & art in Peru`),
     description:
       home.seo?.description ||
       (locale === 'es'
         ? 'Joyería artesanal, cerámica, ilustración y pintura. Piezas únicas hechas en Perú.'
         : 'Handmade jewelry, ceramics, illustration, and painting. Unique pieces made in Peru.'),
-    alternates: {
-      languages: {
-        es: '/es',
-        en: '/en',
-      },
-    },
-  }
+    image: ogImage,
+  })
 }
 
 export default async function HomePage({

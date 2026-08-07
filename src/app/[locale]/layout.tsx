@@ -25,6 +25,10 @@ import {CartDrawer} from '@/components/CartDrawer'
 import {WhatsAppSun} from '@/components/WhatsAppSun'
 import {JsonLd} from '@/components/JsonLd'
 import {getImageUrl} from '@/lib/images'
+import {
+  SITE_NAME,
+  defaultSiteDescription,
+} from '@/lib/seo'
 import {getSiteUrl} from '@/lib/site-url'
 import {facebookUrl, instagramUrl, tiktokUrl} from '@/lib/social'
 import {routing} from '@/i18n/routing'
@@ -34,6 +38,7 @@ import {SpeedInsights} from '@vercel/speed-insights/next'
 import '../globals.css'
 
 const siteUrl = getSiteUrl()
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim()
 
 const bodyFont = Figtree({
   subsets: ['latin'],
@@ -65,19 +70,55 @@ const scriptFont = Great_Vibes({
 
 export const metadata: Metadata = {
   title: {
-    default: 'VIVI Taller de Arte',
-    template: '%s | VIVI Taller de Arte',
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    'Joyería artesanal, cerámica, ilustración y pintura hechas en Perú. VIVI Taller de Arte.',
+  description: defaultSiteDescription('es'),
   metadataBase: new URL(siteUrl),
+  applicationName: SITE_NAME,
+  authors: [{name: SITE_NAME, url: siteUrl}],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  keywords: [
+    'VIVI',
+    'Taller de Arte',
+    'joyería artesanal',
+    'cerámica',
+    'ilustraciones',
+    'pintura',
+    'Perú',
+    'handmade jewelry',
+    'Peru art',
+  ],
   openGraph: {
     type: 'website',
-    siteName: 'VIVI Taller de Arte',
+    siteName: SITE_NAME,
+    locale: 'es_PE',
+    alternateLocale: ['en_US'],
+    url: siteUrl,
+    images: [{url: '/logo.png', alt: SITE_NAME}],
   },
   twitter: {
     card: 'summary_large_image',
+    title: SITE_NAME,
+    description: defaultSiteDescription('es'),
+    images: ['/logo.png'],
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
+  verification: googleVerification
+    ? {google: googleVerification}
+    : undefined,
+  category: 'arts',
 }
 
 export function generateStaticParams() {
@@ -138,19 +179,30 @@ export default async function LocaleLayout({
     pinturaTypeOrder,
   )
 
+  const businessName = settings.siteName || SITE_NAME
+  const logoUrl =
+    getImageUrl(settings.logo, 1600, {
+      fit: 'max',
+      quality: 100,
+      autoFormat: false,
+    }) || `${siteUrl}/logo.png`
+  const sameAs = [
+    instagramUrl(settings.instagram),
+    facebookUrl(settings.facebook),
+    tiktokUrl(settings.tiktok),
+    settings.googleMapsUrl,
+  ].filter(Boolean)
+
   const localBusiness = {
     '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: settings.siteName || 'VIVI Taller de Arte',
+    '@type': ['LocalBusiness', 'ArtGallery'],
+    '@id': `${siteUrl}/#business`,
+    name: businessName,
     email: settings.email,
     telephone: settings.whatsapp ? `+${settings.whatsapp}` : undefined,
     url: siteUrl,
-    image:
-      getImageUrl(settings.logo, 1600, {
-        fit: 'max',
-        quality: 100,
-        autoFormat: false,
-      }) || `${siteUrl}/logo.png`,
+    image: logoUrl,
+    logo: logoUrl,
     address: settings.address
       ? {
           '@type': 'PostalAddress',
@@ -163,12 +215,17 @@ export default async function LocaleLayout({
           addressCountry: 'PE',
           addressLocality: settings.city || 'Perú',
         },
-    sameAs: [
-      instagramUrl(settings.instagram),
-      facebookUrl(settings.facebook),
-      tiktokUrl(settings.tiktok),
-      settings.googleMapsUrl,
-    ].filter(Boolean),
+    sameAs,
+  }
+
+  const websiteLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${siteUrl}/#website`,
+    name: businessName,
+    url: siteUrl,
+    inLanguage: ['es', 'en'],
+    publisher: {'@id': `${siteUrl}/#business`},
   }
 
   // High-res PNG for crisp logo on retina; skip auto-format so it stays sharp.
@@ -194,6 +251,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <CartProvider>
             <JsonLd data={localBusiness} />
+            <JsonLd data={websiteLd} />
             <Header
               logoSrc={logoSrc}
               social={social}

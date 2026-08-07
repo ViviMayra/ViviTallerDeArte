@@ -10,31 +10,27 @@ import {ShareButton} from '@/components/ShareButton'
 import {getPieceBySlug, getRelatedPieces} from '@/lib/content'
 import {formatPrice, t} from '@/lib/locale'
 import {getImageUrl} from '@/lib/images'
+import {buildPageMetadata} from '@/lib/seo'
+import {getSiteUrl} from '@/lib/site-url'
 import type {Category, Locale} from '@/lib/types'
 
 type Props = {params: Promise<{locale: string; slug: string}>}
 
 export async function generateMetadata({params}: Props): Promise<Metadata> {
-  const {slug} = await params
+  const {locale: localeParam, slug} = await params
   const piece = await getPieceBySlug(slug)
   if (!piece) return {}
-  const locale = (await getLocale()) as Locale
-  return {
+  const locale = localeParam as Locale
+  const image =
+    getImageUrl(piece.seo?.image || piece.photos?.[0], 1200) || undefined
+  return buildPageMetadata({
+    locale,
+    path: `/pieza/${slug}`,
     title: piece.seo?.title || t(piece.title, locale),
     description:
       piece.seo?.description || t(piece.description, locale) || undefined,
-    openGraph: {
-      images: getImageUrl(piece.photos?.[0])
-        ? [getImageUrl(piece.photos?.[0])!]
-        : undefined,
-    },
-    alternates: {
-      languages: {
-        es: `/es/pieza/${slug}`,
-        en: `/en/pieza/${slug}`,
-      },
-    },
-  }
+    image,
+  })
 }
 
 export default async function PiecePage({params}: Props) {
@@ -50,16 +46,19 @@ export default async function PiecePage({params}: Props) {
   const title = t(piece.title, locale)
   const imageUrl = getImageUrl(piece.photos?.[0], 800)
 
+  const siteUrl = getSiteUrl()
   const productLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: title,
     description: t(piece.description, locale),
     image: imageUrl,
+    url: `${siteUrl}/${locale}/pieza/${slug}`,
     offers: {
       '@type': 'Offer',
       priceCurrency: 'PEN',
       price: piece.price,
+      url: `${siteUrl}/${locale}/pieza/${slug}`,
       availability:
         piece.status === 'available'
           ? 'https://schema.org/InStock'

@@ -10,15 +10,23 @@ import {
 
 const siteUrl = getSiteUrl()
 
-const staticPaths = [
-  '',
-  '/joyeria',
-  '/ceramica',
-  '/ilustraciones',
-  '/pintura',
-  '/exhibiciones',
-  '/about',
+const staticPaths: {path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']}[] = [
+  {path: '', priority: 1, changeFrequency: 'weekly'},
+  {path: '/joyeria', priority: 0.9, changeFrequency: 'weekly'},
+  {path: '/ceramica', priority: 0.8, changeFrequency: 'weekly'},
+  {path: '/ilustraciones', priority: 0.8, changeFrequency: 'weekly'},
+  {path: '/pintura', priority: 0.8, changeFrequency: 'weekly'},
+  {path: '/exhibiciones', priority: 0.7, changeFrequency: 'monthly'},
+  {path: '/about', priority: 0.6, changeFrequency: 'monthly'},
 ]
+
+function languageAlternates(path: string) {
+  return {
+    es: `${siteUrl}/es${path}`,
+    en: `${siteUrl}/en${path}`,
+    'x-default': `${siteUrl}/es${path}`,
+  }
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let pieces = demoPieces.map((p) => ({slug: p.slug}))
@@ -33,17 +41,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (exhibitionData?.length) exhibitions = exhibitionData
   }
 
+  const now = new Date()
   const entries: MetadataRoute.Sitemap = []
 
   for (const locale of ['es', 'en']) {
-    for (const path of staticPaths) {
+    for (const item of staticPaths) {
       entries.push({
-        url: `${siteUrl}/${locale}${path}`,
+        url: `${siteUrl}/${locale}${item.path}`,
+        lastModified: now,
+        changeFrequency: item.changeFrequency,
+        priority: item.priority,
         alternates: {
-          languages: {
-            es: `${siteUrl}/es${path}`,
-            en: `${siteUrl}/en${path}`,
-          },
+          languages: languageAlternates(item.path),
         },
       })
     }
@@ -51,11 +60,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const path = `/pieza/${piece.slug}`
       entries.push({
         url: `${siteUrl}/${locale}${path}`,
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.7,
         alternates: {
-          languages: {
-            es: `${siteUrl}/es${path}`,
-            en: `${siteUrl}/en${path}`,
-          },
+          languages: languageAlternates(path),
         },
       })
     }
@@ -63,11 +72,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const path = `/exhibiciones/${exhibition.slug}`
       entries.push({
         url: `${siteUrl}/${locale}${path}`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.5,
         alternates: {
-          languages: {
-            es: `${siteUrl}/es${path}`,
-            en: `${siteUrl}/en${path}`,
-          },
+          languages: languageAlternates(path),
         },
       })
     }

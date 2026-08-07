@@ -1,9 +1,26 @@
+import type {Metadata} from 'next'
 import {getLocale, getTranslations, setRequestLocale} from 'next-intl/server'
 import {Link} from '@/i18n/navigation'
 import {getExhibitions} from '@/lib/content'
 import {t} from '@/lib/locale'
 import {getImageAlt, getImageUrl} from '@/lib/images'
+import {buildPageMetadata, categorySeoCopy} from '@/lib/seo'
 import type {Locale} from '@/lib/types'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{locale: string}>
+}): Promise<Metadata> {
+  const {locale} = await params
+  const copy = categorySeoCopy('exhibiciones', locale as Locale)
+  return buildPageMetadata({
+    locale,
+    path: '/exhibiciones',
+    title: copy.title,
+    description: copy.description,
+  })
+}
 
 export default async function ExhibitionsPage({
   params,
