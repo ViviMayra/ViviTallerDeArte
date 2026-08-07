@@ -40,7 +40,7 @@ export const homePage = defineType({
       name: 'featuredCarouselTitle',
       title: 'Título del carrusel destacado (opcional)',
       description: 'Aparece encima del carrusel en la página de inicio.',
-      type: 'localizedString',
+      type: 'optionalLocalizedString',
     }),
     defineField({
       name: 'featuredCarousel',
@@ -121,7 +121,12 @@ export const homePage = defineType({
               name: 'title',
               title: 'Título',
               type: 'localizedString',
-              validation: (Rule) => Rule.required(),
+              validation: (Rule) =>
+                Rule.custom((value) => {
+                  const es = (value as {es?: string} | undefined)?.es
+                  if (typeof es === 'string' && es.trim()) return true
+                  return 'Escribe el título'
+                }),
             }),
             defineField({
               name: 'text',

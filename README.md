@@ -32,12 +32,12 @@ NEXT_PUBLIC_SANITY_PROJECT_ID=xxxxxxxx
 NEXT_PUBLIC_SANITY_DATASET=production
 NEXT_PUBLIC_SANITY_API_VERSION=2025-01-01
 SANITY_API_WRITE_TOKEN=...          # for “Traducir al inglés”
-TRANSLATE_API_KEY=...               # optional OpenAI-compatible key
+AI_GATEWAY_API_KEY=...              # Vercel AI Gateway (local); on Vercel OIDC is enough
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ```
 
 3. Open `/studio`, fill **Ajustes**, **Inicio**, pieces, etc.
-4. On a piece document, use the document action **Traducir al inglés** after saving Spanish fields.
+4. On any editable page (pieza, exhibición, Inicio, About, carruseles), click **Traducir al inglés** next to Publish after saving Spanish. It tries several AI models, then copies Spanish if all fail.
 
 ### Studio sidebar (simple for Mayra)
 

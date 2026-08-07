@@ -13,7 +13,12 @@ export const piece = defineType({
       name: 'title',
       title: 'Nombre de la pieza',
       type: 'localizedString',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.custom((value) => {
+          const es = (value as {es?: string} | undefined)?.es
+          if (typeof es === 'string' && es.trim()) return true
+          return 'Escribe el nombre de la pieza'
+        }),
     }),
     defineField({
       name: 'slug',

@@ -4,6 +4,7 @@ import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './src/sanity/schemaTypes'
 import {structure} from './src/sanity/structure'
 import {projectId, dataset} from './src/sanity/env'
+import {wrapPublishAction} from './src/sanity/actions/publishReadyAction'
 import {translateAction} from './src/sanity/actions/translateAction'
 
 export default defineConfig({
@@ -63,15 +64,19 @@ export default defineConfig({
         'jewelryCarousels',
       ]
 
-      // Keep Publish as the primary button; never let custom actions replace it
+      // Publish always first + focus-safe; Traducir next so Mayra sees it
       const publish = prev.find((action) => action.action === 'publish')
       const rest = prev.filter((action) => action.action !== 'publish')
-      const ordered = publish ? [publish, ...rest] : rest
+      const readyPublish = publish ? wrapPublishAction(publish) : null
 
-      if (translateTypes.includes(context.schemaType)) {
-        return [...ordered, translateAction]
+      if (!translateTypes.includes(context.schemaType)) {
+        return readyPublish ? [readyPublish, ...rest] : rest
       }
-      return ordered
+
+      if (readyPublish) {
+        return [readyPublish, translateAction, ...rest]
+      }
+      return [translateAction, ...rest]
     },
   },
 })

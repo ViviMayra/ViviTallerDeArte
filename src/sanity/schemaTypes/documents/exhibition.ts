@@ -11,7 +11,12 @@ export const exhibition = defineType({
       name: 'title',
       title: 'Nombre de la exhibición',
       type: 'localizedString',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.custom((value) => {
+          const es = (value as {es?: string} | undefined)?.es
+          if (typeof es === 'string' && es.trim()) return true
+          return 'Escribe el nombre de la exhibición'
+        }),
     }),
     defineField({
       name: 'slug',

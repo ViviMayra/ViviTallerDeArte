@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server'
 import {createClient} from 'next-sanity'
 import {apiVersion, dataset, projectId, hasSanityConfig} from '@/sanity/env'
+import {translateTexts} from '@/lib/translate'
 
 type Body = {
   documentId?: string
@@ -9,55 +10,6 @@ type Body = {
 
 type LocalizedString = {es: string; en?: string}
 type LocalizedBlocks = {es: unknown[]; en?: unknown[]}
-
-async function translateTexts(texts: string[]): Promise<string[]> {
-  const apiKey = process.env.TRANSLATE_API_KEY
-  if (!apiKey) {
-    return texts.map((text) => text)
-  }
-
-  const url =
-    process.env.TRANSLATE_API_URL ||
-    'https://api.openai.com/v1/chat/completions'
-  const model = process.env.TRANSLATE_MODEL || 'gpt-4o-mini'
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      temperature: 0.2,
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You translate Spanish product copy for an art/jewelry atelier into natural English. Return ONLY a JSON array of strings in the same order. Keep proper nouns. Preserve line breaks exactly when present.',
-        },
-        {
-          role: 'user',
-          content: JSON.stringify(texts),
-        },
-      ],
-    }),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Translate API failed: ${response.status}`)
-  }
-
-  const json = (await response.json()) as {
-    choices?: {message?: {content?: string}}[]
-  }
-  const content = json.choices?.[0]?.message?.content || '[]'
-  const parsed = JSON.parse(content) as string[]
-  if (!Array.isArray(parsed) || parsed.length !== texts.length) {
-    throw new Error('Unexpected translate response shape')
-  }
-  return parsed
-}
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
@@ -143,7 +95,8 @@ function collectLocalized(
   }
 
   if (isLocalizedBlocks(value)) {
-    if (value.es.length > 0 && (!value.en || value.en.length === 0)) {
+    // Always re-translate when the action is clicked (overwrite prior EN)
+    if (value.es.length > 0) {
       blockPaths.push(path)
     }
     return
@@ -165,16 +118,27 @@ function collectLocalized(
   }
 }
 
+function successMessage(mode: 'ai' | 'copy', model?: string) {
+  if (mode === 'ai') {
+    return model
+      ? `Inglés generado (${model}).`
+      : 'Inglés generado.'
+  }
+  return 'Inglés copiado del español (la IA no respondió; se usó el texto español como respaldo).'
+}
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Body
 
     if (body.texts?.length) {
-      const translated = await translateTexts(body.texts.map((t) => t.value))
+      const result = await translateTexts(body.texts.map((t) => t.value))
       return NextResponse.json({
+        mode: result.mode,
+        model: result.model,
         translations: body.texts.map((item, i) => ({
           key: item.key,
-          value: translated[i],
+          value: result.translations[i],
         })),
       })
     }
@@ -226,22 +190,30 @@ export async function POST(request: Request) {
     if (!stringQueue.length && !spanishDetails.length && !blockPaths.length) {
       return NextResponse.json({
         ok: true,
+        mode: 'ai',
         message: 'No había texto nuevo para traducir.',
       })
     }
 
     const patch = writeClient.patch(body.documentId)
     const setPayload: Record<string, unknown> = {}
+    let mode: 'ai' | 'copy' = 'ai'
+    let model: string | undefined
 
     if (stringQueue.length) {
-      const translated = await translateTexts(stringQueue.map((q) => q.value))
+      const result = await translateTexts(stringQueue.map((q) => q.value))
+      mode = result.mode
+      model = result.model
       stringQueue.forEach((item, i) => {
-        setPayload[item.key] = translated[i]
+        setPayload[item.key] = result.translations[i]
       })
     }
 
     if (spanishDetails.length) {
-      setPayload.detailsEn = await translateTexts(spanishDetails)
+      const result = await translateTexts(spanishDetails)
+      if (result.mode === 'copy') mode = 'copy'
+      model = model || result.model
+      setPayload.detailsEn = result.translations
     }
 
     // Block content: translate span text, keep marks/structure
@@ -262,18 +234,20 @@ export async function POST(request: Request) {
         setPayload[`${path}.en`] = cursor.es
         continue
       }
-      const translatedSpans = await translateTexts(spanTexts)
-      setPayload[`${path}.en`] = applySpanTexts(cursor.es, translatedSpans)
+      const result = await translateTexts(spanTexts)
+      if (result.mode === 'copy') mode = 'copy'
+      model = model || result.model
+      setPayload[`${path}.en`] = applySpanTexts(cursor.es, result.translations)
     }
 
     await patch.set(setPayload).commit()
 
     return NextResponse.json({
       ok: true,
+      mode,
+      model,
       patched: Object.keys(setPayload),
-      message: process.env.TRANSLATE_API_KEY
-        ? 'Inglés generado.'
-        : 'Inglés copiado del español (agrega TRANSLATE_API_KEY para traducción automática real).',
+      message: successMessage(mode, model),
     })
   } catch (error) {
     return NextResponse.json(

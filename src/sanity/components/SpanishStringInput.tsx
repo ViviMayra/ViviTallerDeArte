@@ -11,17 +11,23 @@ export function SpanishStringInput(props: ObjectInputProps) {
   const {elementProps, onChange, schemaType} = props
   const isText = schemaType.name === 'localizedText'
 
+  const handleChange = (next: string) => {
+    // Clearing Spanish removes the whole value (including hidden EN).
+    // Leaving `{ es: '', en: '...' }` after translate blocks Publish.
+    if (!next.trim()) {
+      onChange(unset())
+      return
+    }
+    onChange(set({es: next, ...(value.en ? {en: value.en} : {})}))
+  }
+
   if (isText) {
     return (
       <TextArea
         {...elementProps}
         rows={3}
         value={value.es || ''}
-        onChange={(event) => {
-          const next = event.currentTarget.value
-          if (!next && !value.en) onChange(unset())
-          else onChange(set({...value, es: next}))
-        }}
+        onChange={(event) => handleChange(event.currentTarget.value)}
       />
     )
   }
@@ -30,11 +36,7 @@ export function SpanishStringInput(props: ObjectInputProps) {
     <TextInput
       {...elementProps}
       value={value.es || ''}
-      onChange={(event) => {
-        const next = event.currentTarget.value
-        if (!next && !value.en) onChange(unset())
-        else onChange(set({...value, es: next}))
-      }}
+      onChange={(event) => handleChange(event.currentTarget.value)}
     />
   )
 }

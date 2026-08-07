@@ -65,7 +65,16 @@ export const localizedString = defineType({
       name: 'es',
       title: 'Texto',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      // Don't hard-require here — empty leftover objects used to block Publish.
+      // Document fields that need Spanish use their own Rule.required()/custom.
+      validation: (Rule) =>
+        Rule.custom((value) => {
+          if (value == null || value === '') return true
+          if (typeof value === 'string' && !value.trim()) {
+            return 'Escribe el texto o bórralo del todo'
+          }
+          return true
+        }),
     }),
     defineField({
       name: 'en',
@@ -87,7 +96,14 @@ export const localizedText = defineType({
       title: 'Texto',
       type: 'text',
       rows: 4,
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.custom((value) => {
+          if (value == null || value === '') return true
+          if (typeof value === 'string' && !value.trim()) {
+            return 'Escribe el texto o bórralo del todo'
+          }
+          return true
+        }),
     }),
     defineField({
       name: 'en',
@@ -133,7 +149,6 @@ export const localizedStyledText = defineType({
         'Selecciona texto → botón “Fuente y tamaño”: elige fuente y un número (12, 14, 16…). También Negrita / Cursiva.',
       type: 'array',
       of: [styledTextBlock],
-      validation: (Rule) => Rule.required().min(1),
     }),
     defineField({
       name: 'en',

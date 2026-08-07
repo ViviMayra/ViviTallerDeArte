@@ -1,10 +1,12 @@
 import {useState} from 'react'
 import type {DocumentActionComponent} from 'sanity'
 import {useToast} from '@sanity/ui'
+import {TranslateIcon} from '@sanity/icons/Translate'
 
 /**
  * Fills hidden English fields from Spanish.
  * Mayra only edits Spanish; visitors still get ES/EN on the site.
+ * Shown next to Publish (not buried in •••).
  */
 export const translateAction: DocumentActionComponent = (props) => {
   const {id, onComplete, draft, published} = props
@@ -12,14 +14,17 @@ export const translateAction: DocumentActionComponent = (props) => {
   const [loading, setLoading] = useState(false)
 
   const docId = draft?._id || published?._id || id
+  const hasSavedDoc = Boolean(draft || published)
 
   return {
     label: loading ? 'Traduciendo…' : 'Traducir al inglés',
     title:
       'Completa todo en español, guarda, y haz clic aquí. El inglés se llena solo.',
-    // Keep this in the ••• menu so it never replaces the Publish button
-    group: ['paneActions'],
-    disabled: loading,
+    icon: TranslateIcon,
+    tone: 'default',
+    // Visible action bar next to Publish — not the ••• menu
+    group: ['default'],
+    disabled: loading || !hasSavedDoc,
     onHandle: async () => {
       setLoading(true)
       try {
@@ -44,12 +49,17 @@ export const translateAction: DocumentActionComponent = (props) => {
         if (!response.ok) throw new Error(data.error || 'Error al traducir')
 
         toast.push({
-          status: 'success',
-          title: 'Listo',
+          status: data.mode === 'copy' ? 'warning' : 'success',
+          title: data.mode === 'copy' ? 'Inglés copiado' : 'Listo',
           description:
             data.message ||
-            'Inglés actualizado. Puedes seguir editando en español cuando quieras.',
+            'Inglés actualizado. Recargando para que puedas publicar…',
         })
+
+        // Reload so Studio picks up patched EN fields and Publish stays in sync
+        window.setTimeout(() => {
+          window.location.reload()
+        }, 600)
       } catch (error) {
         toast.push({
           status: 'error',
@@ -59,7 +69,6 @@ export const translateAction: DocumentActionComponent = (props) => {
               ? error.message
               : 'Pide ayuda para configurar el token de traducción.',
         })
-      } finally {
         setLoading(false)
         onComplete()
       }
