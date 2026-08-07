@@ -3,10 +3,8 @@
 import {useEffect, useRef} from 'react'
 import {Stack, Text} from '@sanity/ui'
 import {
-  PatchEvent,
   set,
   unset,
-  useFormCallbacks,
   useFormValue,
   type FieldProps,
   type ObjectInputProps,
@@ -18,9 +16,9 @@ import {slugify} from '../lib/slugify'
 export function AutoSlugInput(props: ObjectInputProps) {
   const titleEs = useFormValue(['title', 'es']) as string | undefined
   const current = (props.value as SlugValue | undefined)?.current
-  const {onChange} = useFormCallbacks()
+  const {onChange, readOnly: readOnlyProp} = props
   const lastWritten = useRef<string | undefined>(current)
-  const readOnly = Boolean(props.readOnly)
+  const readOnly = Boolean(readOnlyProp)
 
   useEffect(() => {
     // Published / locked docs throw if we patch — skip until there's a draft
@@ -28,10 +26,10 @@ export function AutoSlugInput(props: ObjectInputProps) {
 
     const next = slugify(titleEs || '')
     if (!next) {
-      if (lastWritten.current) {
+      if (current || lastWritten.current) {
         lastWritten.current = undefined
         try {
-          onChange(PatchEvent.from(unset(['slug'])))
+          onChange(unset())
         } catch {
           // Document became read-only mid-render
         }
@@ -41,7 +39,8 @@ export function AutoSlugInput(props: ObjectInputProps) {
     if (next === current || next === lastWritten.current) return
     lastWritten.current = next
     try {
-      onChange(PatchEvent.from(set({_type: 'slug', current: next}, ['slug'])))
+      // Field-scoped patch is more reliable than document-level PatchEvent
+      onChange(set({_type: 'slug', current: next}))
     } catch {
       // Ignore read-only patch attempts (e.g. viewing published version)
     }

@@ -187,7 +187,7 @@ function SlideCard({
     )
   }
 
-  if (!slide.piece) return null
+  if (!slide.piece?.slug) return null
 
   const piece = slide.piece
   const sold = piece.status === 'sold'
