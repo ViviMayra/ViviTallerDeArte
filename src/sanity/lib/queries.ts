@@ -12,6 +12,8 @@ export const settingsQuery = groq`*[_type == "settings"][0]{
   logo ${imageFields},
   whatsapp,
   instagram,
+  facebook,
+  tiktok,
   email,
   googleMapsUrl,
   address,

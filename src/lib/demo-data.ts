@@ -10,6 +10,8 @@ export const demoSettings: Settings = {
   siteName: 'VIVI Taller de Arte',
   whatsapp: '51954734273',
   instagram: 'vivitallerdearte',
+  facebook: 'https://www.facebook.com/share/1DBKaYYyse/',
+  tiktok: 'viviartistryimagination',
   email: 'viviartistryimagination@gmail.com',
   googleMapsUrl: 'https://maps.app.goo.gl/v8RWC44eAsGuxLNq9',
   city: 'Perú',

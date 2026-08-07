@@ -76,6 +76,8 @@ export type Settings = {
   logo?: SanityImage
   whatsapp?: string
   instagram?: string
+  facebook?: string
+  tiktok?: string
   email?: string
   googleMapsUrl?: string
   address?: string

@@ -15,6 +15,11 @@ type NavChild = {
 
 type Props = {
   logoSrc?: string
+  social?: {
+    instagram: string
+    facebook: string
+    tiktok: string
+  }
   joyeriaTypesByGender?: {
     mujer: PieceTypeLabel[]
     hombre: PieceTypeLabel[]
@@ -26,6 +31,11 @@ type Props = {
 
 export function Header({
   logoSrc = '/logo.png',
+  social = {
+    instagram: 'https://www.instagram.com/vivitallerdearte/',
+    facebook: 'https://www.facebook.com/share/1DBKaYYyse/',
+    tiktok: 'https://www.tiktok.com/@viviartistryimagination',
+  },
   joyeriaTypesByGender = {mujer: [], hombre: []},
   ceramicaTypes = [],
   ilustracionesTypes = [],
@@ -190,7 +200,12 @@ export function Header({
             count={count}
             onClick={toggleCart}
           />
-          <LanguageSwitch locale={locale} pathname={pathname || '/'} />
+          <div className="relative shrink-0">
+            <LanguageSwitch locale={locale} pathname={pathname || '/'} />
+            <div className="absolute left-full top-1/2 ml-3 flex -translate-y-1/2 items-center">
+              <SocialIcons links={social} />
+            </div>
+          </div>
         </nav>
 
         <div className="flex items-center gap-4 lg:hidden">
@@ -276,11 +291,16 @@ export function Header({
             <Link href="/about" className="nav-link" onClick={() => setMobileOpen(false)}>
               {tr('about')}
             </Link>
-            <LanguageSwitch
-              locale={locale}
-              pathname={pathname || '/'}
-              onNavigate={() => setMobileOpen(false)}
-            />
+            <div className="relative w-fit">
+              <LanguageSwitch
+                locale={locale}
+                pathname={pathname || '/'}
+                onNavigate={() => setMobileOpen(false)}
+              />
+              <div className="absolute left-full top-1/2 ml-3 flex -translate-y-1/2 items-center">
+                <SocialIcons links={social} />
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -368,5 +388,92 @@ function LanguageSwitch({
       </svg>
       <span>{common('language')}</span>
     </Link>
+  )
+}
+
+function SocialIcons({
+  links,
+}: {
+  links: {instagram: string; facebook: string; tiktok: string}
+}) {
+  const items = [
+    {
+      href: links.instagram,
+      label: 'Instagram',
+      icon: (
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <rect x="3" y="3" width="18" height="18" rx="5" />
+          <circle cx="12" cy="12" r="4" />
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+        </svg>
+      ),
+    },
+    {
+      href: links.facebook,
+      label: 'Facebook',
+      icon: (
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M14 8h2V5h-2c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h2.2l.8-3H13V9c0-.6.4-1 1-1z" />
+        </svg>
+      ),
+    },
+    {
+      href: links.tiktok,
+      label: 'TikTok',
+      icon: (
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M14 4v9.2a3.8 3.8 0 1 1-2.6-3.6" />
+          <path d="M14 7.5c1.2 1.4 2.8 2.3 4.5 2.5" />
+        </svg>
+      ),
+    },
+  ] as const
+
+  return (
+    <div className="flex items-center gap-2.5">
+      {items.map((item) => (
+        <a
+          key={item.label}
+          href={item.href}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={item.label}
+          title={item.label}
+          className="inline-flex items-center justify-center text-foreground transition-colors hover:text-ochre-deep"
+        >
+          {item.icon}
+        </a>
+      ))}
+    </div>
   )
 }

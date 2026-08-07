@@ -35,6 +35,18 @@ export const settings = defineType({
       initialValue: 'vivitallerdearte',
     }),
     defineField({
+      name: 'facebook',
+      title: 'Facebook (URL o página)',
+      type: 'string',
+      initialValue: 'https://www.facebook.com/share/1DBKaYYyse/',
+    }),
+    defineField({
+      name: 'tiktok',
+      title: 'TikTok (usuario o URL)',
+      type: 'string',
+      initialValue: 'viviartistryimagination',
+    }),
+    defineField({
       name: 'email',
       title: 'Email',
       type: 'string',

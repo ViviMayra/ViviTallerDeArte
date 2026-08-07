@@ -1,11 +1,6 @@
 import {getTranslations} from 'next-intl/server'
 import type {Settings} from '@/lib/types'
-
-function instagramUrl(value?: string) {
-  if (!value) return 'https://www.instagram.com/vivitallerdearte/'
-  if (value.startsWith('http')) return value
-  return `https://www.instagram.com/${value.replace(/^@/, '')}/`
-}
+import {facebookUrl, instagramUrl, tiktokUrl} from '@/lib/social'
 
 export async function Footer({settings}: {settings: Settings}) {
   const t = await getTranslations('footer')
@@ -26,6 +21,22 @@ export async function Footer({settings}: {settings: Settings}) {
             className="hover:text-ochre-deep"
           >
             {t('instagram')}
+          </a>
+          <a
+            href={facebookUrl(settings.facebook)}
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-ochre-deep"
+          >
+            {t('facebook')}
+          </a>
+          <a
+            href={tiktokUrl(settings.tiktok)}
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-ochre-deep"
+          >
+            {t('tiktok')}
           </a>
           <a
             href={`https://wa.me/${whatsapp}`}

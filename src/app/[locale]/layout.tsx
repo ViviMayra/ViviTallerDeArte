@@ -26,6 +26,7 @@ import {WhatsAppSun} from '@/components/WhatsAppSun'
 import {JsonLd} from '@/components/JsonLd'
 import {getImageUrl} from '@/lib/images'
 import {getSiteUrl} from '@/lib/site-url'
+import {facebookUrl, instagramUrl, tiktokUrl} from '@/lib/social'
 import {routing} from '@/i18n/routing'
 import type {Locale} from '@/lib/types'
 import {Analytics} from '@vercel/analytics/next'
@@ -162,9 +163,9 @@ export default async function LocaleLayout({
           addressLocality: settings.city || 'Perú',
         },
     sameAs: [
-      settings.instagram?.startsWith('http')
-        ? settings.instagram
-        : `https://www.instagram.com/${(settings.instagram || 'vivitallerdearte').replace(/^@/, '')}/`,
+      instagramUrl(settings.instagram),
+      facebookUrl(settings.facebook),
+      tiktokUrl(settings.tiktok),
       settings.googleMapsUrl,
     ].filter(Boolean),
   }
@@ -177,6 +178,12 @@ export default async function LocaleLayout({
       autoFormat: false,
     }) || '/logo.png'
 
+  const social = {
+    instagram: instagramUrl(settings.instagram),
+    facebook: facebookUrl(settings.facebook),
+    tiktok: tiktokUrl(settings.tiktok),
+  }
+
   return (
     <html
       lang={locale}
@@ -188,6 +195,7 @@ export default async function LocaleLayout({
             <JsonLd data={localBusiness} />
             <Header
               logoSrc={logoSrc}
+              social={social}
               joyeriaTypesByGender={joyeriaTypesByGender}
               ceramicaTypes={ceramicaTypes}
               ilustracionesTypes={ilustracionesTypes}
