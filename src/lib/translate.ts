@@ -1,7 +1,7 @@
-import {generateText} from 'ai'
+import {generateText, gateway} from 'ai'
 
 const SYSTEM_PROMPT =
-  'You translate Spanish product copy for an art/jewelry atelier into natural English. Return ONLY a JSON array of strings in the same order. Keep proper nouns. Preserve line breaks exactly when present.'
+  'You translate Spanish product copy for an art/jewelry atelier into natural English. Return ONLY a JSON array of strings in the same order. Keep proper nouns. Preserve line breaks exactly when present. Do not wrap the array in markdown.'
 
 /** Primary + backups via Vercel AI Gateway (provider/model slugs). */
 const DEFAULT_GATEWAY_MODELS = [
@@ -14,6 +14,8 @@ export type TranslateResult = {
   translations: string[]
   mode: 'ai' | 'copy'
   model?: string
+  /** Present when we had to fall back — safe to show in Studio toasts. */
+  fallbackReason?: string
 }
 
 function parseModelsEnv(value: string | undefined, fallback: string[]): string[] {
@@ -27,7 +29,15 @@ function parseModelsEnv(value: string | undefined, fallback: string[]): string[]
 function parseJsonArray(content: string, expectedLength: number): string[] {
   const trimmed = content.trim()
   const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)```$/i)
-  const raw = fenced ? fenced[1].trim() : trimmed
+  let raw = fenced ? fenced[1].trim() : trimmed
+
+  // Models sometimes add prose around the array — pull the first JSON array
+  if (!raw.startsWith('[')) {
+    const start = raw.indexOf('[')
+    const end = raw.lastIndexOf(']')
+    if (start >= 0 && end > start) raw = raw.slice(start, end + 1)
+  }
+
   const parsed = JSON.parse(raw) as unknown
   if (!Array.isArray(parsed) || parsed.length !== expectedLength) {
     throw new Error('Unexpected translate response shape')
@@ -43,6 +53,11 @@ function stripProvider(model: string): string {
   return slash >= 0 ? model.slice(slash + 1) : model
 }
 
+function errorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message
+  return String(error)
+}
+
 async function translateViaGateway(texts: string[]): Promise<TranslateResult> {
   const models = parseModelsEnv(
     process.env.TRANSLATE_MODELS,
@@ -51,8 +66,9 @@ async function translateViaGateway(texts: string[]): Promise<TranslateResult> {
   const [primary, ...fallbacks] = models
   if (!primary) throw new Error('No translate models configured')
 
+  // gateway() wrapper is required for providerOptions.gateway model failover
   const {text, finalStep} = await generateText({
-    model: primary,
+    model: gateway(primary),
     temperature: 0.2,
     providerOptions: {
       gateway: {
@@ -110,7 +126,6 @@ async function translateViaOpenAICompatible(
             {role: 'system', content: SYSTEM_PROMPT},
             {role: 'user', content: JSON.stringify(texts)},
           ],
-          // Gateway-native backup models (ignored by plain OpenAI)
           ...(usesGateway
             ? {
                 providerOptions: {
@@ -124,7 +139,10 @@ async function translateViaOpenAICompatible(
       })
 
       if (!response.ok) {
-        lastError = new Error(`Translate API failed: ${response.status}`)
+        const body = await response.text().catch(() => '')
+        lastError = new Error(
+          `Translate API ${response.status}${body ? `: ${body.slice(0, 180)}` : ''}`,
+        )
         continue
       }
 
@@ -163,9 +181,7 @@ export async function translateTexts(texts: string[]): Promise<TranslateResult> 
   try {
     return await translateViaGateway(texts)
   } catch (error) {
-    errors.push(
-      error instanceof Error ? error.message : 'AI Gateway translate failed',
-    )
+    errors.push(errorMessage(error))
   }
 
   // 2) Direct OpenAI-compatible chat completions (TRANSLATE_API_KEY / gateway key)
@@ -173,15 +189,18 @@ export async function translateTexts(texts: string[]): Promise<TranslateResult> 
     try {
       return await translateViaOpenAICompatible(texts)
     } catch (error) {
-      errors.push(
-        error instanceof Error
-          ? error.message
-          : 'OpenAI-compatible translate failed',
-      )
+      errors.push(errorMessage(error))
     }
+  } else {
+    errors.push('No AI_GATEWAY_API_KEY / TRANSLATE_API_KEY in env')
   }
 
   // 3) Last resort — copy Spanish so the button never hard-fails for Mayra
-  console.warn('[translate] Falling back to Spanish copy:', errors.join(' | '))
-  return {translations: texts.map((text) => text), mode: 'copy'}
+  const fallbackReason = errors.filter(Boolean).join(' | ')
+  console.warn('[translate] Falling back to Spanish copy:', fallbackReason)
+  return {
+    translations: texts.map((text) => text),
+    mode: 'copy',
+    fallbackReason,
+  }
 }

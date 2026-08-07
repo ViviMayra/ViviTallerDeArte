@@ -136,6 +136,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         mode: result.mode,
         model: result.model,
+        fallbackReason: result.fallbackReason,
         translations: body.texts.map((item, i) => ({
           key: item.key,
           value: result.translations[i],
@@ -199,11 +200,13 @@ export async function POST(request: Request) {
     const setPayload: Record<string, unknown> = {}
     let mode: 'ai' | 'copy' = 'ai'
     let model: string | undefined
+    let fallbackReason: string | undefined
 
     if (stringQueue.length) {
       const result = await translateTexts(stringQueue.map((q) => q.value))
       mode = result.mode
       model = result.model
+      fallbackReason = result.fallbackReason
       stringQueue.forEach((item, i) => {
         setPayload[item.key] = result.translations[i]
       })
@@ -211,7 +214,10 @@ export async function POST(request: Request) {
 
     if (spanishDetails.length) {
       const result = await translateTexts(spanishDetails)
-      if (result.mode === 'copy') mode = 'copy'
+      if (result.mode === 'copy') {
+        mode = 'copy'
+        fallbackReason = result.fallbackReason || fallbackReason
+      }
       model = model || result.model
       setPayload.detailsEn = result.translations
     }
@@ -235,7 +241,10 @@ export async function POST(request: Request) {
         continue
       }
       const result = await translateTexts(spanTexts)
-      if (result.mode === 'copy') mode = 'copy'
+      if (result.mode === 'copy') {
+        mode = 'copy'
+        fallbackReason = result.fallbackReason || fallbackReason
+      }
       model = model || result.model
       setPayload[`${path}.en`] = applySpanTexts(cursor.es, result.translations)
     }
@@ -246,6 +255,7 @@ export async function POST(request: Request) {
       ok: true,
       mode,
       model,
+      fallbackReason,
       patched: Object.keys(setPayload),
       message: successMessage(mode, model),
     })

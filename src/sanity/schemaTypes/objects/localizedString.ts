@@ -74,7 +74,7 @@ export const localizedString = defineType({
             return 'Escribe el texto o bórralo del todo'
           }
           return true
-        }),
+        }).warning(),
     }),
     defineField({
       name: 'en',
@@ -103,7 +103,7 @@ export const localizedText = defineType({
             return 'Escribe el texto o bórralo del todo'
           }
           return true
-        }),
+        }).warning(),
     }),
     defineField({
       name: 'en',

@@ -13,12 +13,13 @@ export const piece = defineType({
       name: 'title',
       title: 'Nombre de la pieza',
       type: 'localizedString',
+      // Warnings only — never block Publish for Mayra
       validation: (Rule) =>
         Rule.custom((value) => {
           const es = (value as {es?: string} | undefined)?.es
           if (typeof es === 'string' && es.trim()) return true
           return 'Escribe el nombre de la pieza'
-        }),
+        }).warning(),
     }),
     defineField({
       name: 'slug',
@@ -31,7 +32,7 @@ export const piece = defineType({
           const current = (value as {current?: string} | undefined)?.current
           if (current?.trim()) return true
           return 'Escribe el nombre arriba — la URL se crea sola'
-        }),
+        }).warning(),
     }),
     defineField({
       name: 'description',
@@ -59,7 +60,7 @@ export const piece = defineType({
             return 'Elige Mujer, Hombre o General'
           }
           return true
-        }),
+        }).warning(),
     }),
     defineField({
       name: 'pieceType',
@@ -89,7 +90,7 @@ export const piece = defineType({
           ],
         }),
       ],
-      validation: (Rule) => Rule.min(1).error('Agrega al menos una foto'),
+      validation: (Rule) => Rule.min(1).warning('Agrega al menos una foto'),
     }),
     defineField({
       name: 'details',
@@ -110,7 +111,7 @@ export const piece = defineType({
       name: 'price',
       title: 'Precio (S/)',
       type: 'number',
-      validation: (Rule) => Rule.required().min(0),
+      validation: (Rule) => Rule.min(0).warning(),
     }),
     defineField({
       name: 'status',
@@ -125,13 +126,12 @@ export const piece = defineType({
         layout: 'radio',
       },
       initialValue: 'available',
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'category',
       title: 'Categoría',
       type: 'string',
-      // Only show if missing — otherwise Publish is blocked with no visible field
+      // Only show if missing — template usually sets it from the list she opened
       hidden: ({value}) => Boolean(value),
       options: {
         list: [
@@ -141,7 +141,7 @@ export const piece = defineType({
           {title: 'Pintura', value: 'pintura'},
         ],
       },
-      validation: (Rule) => Rule.required().error('Elige la categoría'),
+      validation: (Rule) => Rule.required().warning('Elige la categoría'),
     }),
     defineField({
       name: 'seo',

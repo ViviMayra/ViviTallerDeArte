@@ -1,4 +1,4 @@
-import type {DocumentActionComponent, DocumentActionDescription} from 'sanity'
+import {useDocumentOperation, type DocumentActionComponent} from 'sanity'
 
 /** Close photo/text popovers so Publish is always clickable. */
 function dismissBlockingFocus() {
@@ -24,27 +24,34 @@ function dismissBlockingFocus() {
 }
 
 /**
- * Wraps Sanity's Publish action: clears nested editor focus first, then publishes.
- * Keeps Publish as the primary button Mayra can always reach.
+ * Wraps Sanity's Publish action so it stays enabled whenever there is a draft.
+ * Bypasses Studio validation gating (missing photo/price/etc.) — Mayra can always publish.
  */
 export function wrapPublishAction(
   PublishAction: DocumentActionComponent,
 ): DocumentActionComponent {
   const PublishReady: DocumentActionComponent = (props) => {
     const original = PublishAction(props)
+    const {publish} = useDocumentOperation(props.id, props.type)
+    const hasDraft = Boolean(props.draft)
+
     if (!original) return original
 
-    const description: DocumentActionDescription = {
+    // No draft / no permission / already published — keep Sanity's disabled state
+    if (!hasDraft || !original.onHandle) return original
+
+    return {
       ...original,
+      disabled: false,
+      title: 'Publicar en la web',
       onHandle: () => {
         dismissBlockingFocus()
-        // Let Escape/blur settle before Sanity runs publish
         window.setTimeout(() => {
-          original.onHandle?.()
+          publish.execute()
+          props.onComplete()
         }, 50)
       },
     }
-    return description
   }
 
   PublishReady.action = 'publish'
