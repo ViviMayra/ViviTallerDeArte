@@ -7,6 +7,13 @@ import {projectId, dataset} from './src/sanity/env'
 import {wrapPublishAction} from './src/sanity/actions/publishReadyAction'
 import {translateAction} from './src/sanity/actions/translateAction'
 
+const PIECE_CATEGORIES = [
+  {id: 'joyeria', title: 'Joyería'},
+  {id: 'ceramica', title: 'Cerámica'},
+  {id: 'ilustraciones', title: 'Ilustraciones'},
+  {id: 'pintura', title: 'Pintura'},
+] as const
+
 export default defineConfig({
   name: 'vivi',
   title: 'VIVI Taller de Arte',
@@ -17,39 +24,35 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
     templates: (prev) => [
+      // Drop auto piece templates — we add one clear “Nueva pieza” per category
       ...prev.filter((template) => {
         const id = String(template.id)
         return (
           id !== 'piece' &&
-          id !== 'piece-by-category' &&
           !id.startsWith('piece-') &&
           id !== 'section' &&
           !id.startsWith('section-')
         )
       }),
-      // One template — category comes from the list you clicked + in
-      {
-        id: 'piece-by-category',
-        title: 'Nueva pieza',
+      ...PIECE_CATEGORIES.map((category) => ({
+        id: `piece-${category.id}`,
+        title: `Nueva pieza · ${category.title}`,
         schemaType: 'piece' as const,
-        parameters: [{name: 'category', type: 'string' as const}],
-        value: (params: {category?: string}) => ({
-          category: params.category,
+        value: {
+          category: category.id,
           status: 'available' as const,
-        }),
-      },
+        },
+      })),
     ],
   },
   document: {
     newDocumentOptions: (prev, {creationContext}) => {
-      // Never offer “pick a category” from the top-right global + menu
+      // Global + menu: exhibitions yes; pieces only from each category list
       if (creationContext.type === 'global') {
-        return prev.filter(
-          (template) =>
-            template.templateId !== 'piece' &&
-            template.templateId !== 'piece-by-category' &&
-            !String(template.templateId).startsWith('piece-'),
-        )
+        return prev.filter((template) => {
+          const id = String(template.templateId)
+          return id !== 'piece' && !id.startsWith('piece-')
+        })
       }
       return prev
     },

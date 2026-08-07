@@ -1,5 +1,12 @@
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 
+const CATEGORIES = [
+  {id: 'joyeria', title: 'Joyería'},
+  {id: 'ceramica', title: 'Cerámica'},
+  {id: 'ilustraciones', title: 'Ilustraciones'},
+  {id: 'pintura', title: 'Pintura'},
+] as const
+
 function carouselItem(
   S: StructureBuilder,
   category: 'ceramica' | 'ilustraciones' | 'pintura',
@@ -18,7 +25,7 @@ function carouselItem(
 function categoryBranch(
   S: StructureBuilder,
   title: string,
-  category: 'joyeria' | 'ceramica' | 'ilustraciones' | 'pintura',
+  category: (typeof CATEGORIES)[number]['id'],
   extraItems: ReturnType<StructureBuilder['listItem']>[] = [],
 ) {
   return S.listItem()
@@ -31,14 +38,13 @@ function categoryBranch(
             .title('Piezas')
             .schemaType('piece')
             .child(
-              S.documentList()
+              S.documentTypeList('piece')
                 .title(`Piezas · ${title}`)
-                .schemaType('piece')
                 .filter('_type == "piece" && category == $category')
                 .params({category})
-                // Single create option for this category — no 4-card picker
+                // Non-parameterized template — keeps the + / Nueva pieza button visible
                 .initialValueTemplates([
-                  S.initialValueTemplateItem('piece-by-category', {category}),
+                  S.initialValueTemplateItem(`piece-${category}`),
                 ])
                 .defaultOrdering([{field: 'title.es', direction: 'asc'}]),
             ),
@@ -74,7 +80,13 @@ export const structure: StructureResolver = (S) =>
       S.listItem()
         .title('Exhibiciones')
         .schemaType('exhibition')
-        .child(S.documentTypeList('exhibition').title('Exhibiciones')),
+        .child(
+          S.documentTypeList('exhibition')
+            .title('Exhibiciones')
+            .initialValueTemplates([
+              S.initialValueTemplateItem('exhibition'),
+            ]),
+        ),
       S.divider(),
       S.listItem()
         .title('Inicio')
