@@ -26,11 +26,13 @@ export const aboutPage = defineType({
             defineField({
               name: 'align',
               title: 'Posición',
-              description: 'Coloca esta sección a la izquierda o a la derecha de la página.',
+              description:
+                'Coloca esta sección a la izquierda, al centro o a la derecha de la página.',
               type: 'string',
               options: {
                 list: [
                   {title: 'Izquierda', value: 'left'},
+                  {title: 'Centro', value: 'center'},
                   {title: 'Derecha', value: 'right'},
                 ],
                 layout: 'radio',
@@ -61,7 +63,12 @@ export const aboutPage = defineType({
                 ?.children?.map((child) => child.text || '')
                 .join('')
                 .trim()
-              const side = align === 'right' ? 'Derecha' : 'Izquierda'
+              const side =
+                align === 'right'
+                  ? 'Derecha'
+                  : align === 'center'
+                    ? 'Centro'
+                    : 'Izquierda'
               return {
                 title: firstText || 'Sección',
                 subtitle: firstText

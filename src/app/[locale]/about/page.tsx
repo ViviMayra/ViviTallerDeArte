@@ -4,6 +4,12 @@ import {getAboutPage} from '@/lib/content'
 import {t} from '@/lib/locale'
 import type {Locale} from '@/lib/types'
 
+function sectionAlignClass(align?: 'left' | 'center' | 'right') {
+  if (align === 'right') return 'flex justify-end'
+  if (align === 'center') return 'flex justify-center'
+  return undefined
+}
+
 export default async function AboutPage({
   params,
 }: {
@@ -27,7 +33,7 @@ export default async function AboutPage({
           return (
             <div
               key={section._key || `about-section-${index}`}
-              className={section.align === 'right' ? 'flex justify-end' : undefined}
+              className={sectionAlignClass(section.align)}
             >
               <PortableBody value={body as unknown[]} locale={locale} />
             </div>
