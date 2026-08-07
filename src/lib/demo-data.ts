@@ -261,6 +261,7 @@ export const demoAbout: AboutPage = {
   sections: [
     {
       _key: 'about-1',
+      layout: 'stacked',
       align: 'left',
       body: {
         es: [

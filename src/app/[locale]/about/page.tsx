@@ -1,13 +1,43 @@
 import {getLocale, setRequestLocale} from 'next-intl/server'
 import {PortableBody} from '@/components/PortableBody'
 import {getAboutPage} from '@/lib/content'
+import {getImageAlt, getImageUrl} from '@/lib/images'
 import {t} from '@/lib/locale'
-import type {Locale} from '@/lib/types'
+import type {Locale, SanityImage} from '@/lib/types'
 
 function sectionAlignClass(align?: 'left' | 'center' | 'right') {
   if (align === 'right') return 'flex justify-end'
   if (align === 'center') return 'flex justify-center'
   return undefined
+}
+
+function imageWidthPercent(value: SanityImage): number {
+  const raw = value.widthPercent
+  if (typeof raw !== 'number' || Number.isNaN(raw)) return 100
+  return Math.min(100, Math.max(10, Math.round(raw)))
+}
+
+function AboutSideImage({
+  image,
+  locale,
+}: {
+  image: SanityImage
+  locale: Locale
+}) {
+  const src = getImageUrl(image, 1400)
+  if (!src) return null
+  const widthPercent = imageWidthPercent(image)
+  return (
+    <div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={getImageAlt(image, locale)}
+        className="max-w-full object-cover"
+        style={{width: `${widthPercent}%`}}
+      />
+    </div>
+  )
 }
 
 export default async function AboutPage({
@@ -29,12 +59,35 @@ export default async function AboutPage({
       <div className="mt-10 space-y-16 md:space-y-20">
         {sections.map((section, index) => {
           const body = section.body?.[locale] || section.body?.es || []
+          const key = section._key || `about-section-${index}`
+          const sideBySide =
+            section.layout === 'sideBySide' && Boolean(section.image)
+
+          if (sideBySide && section.image) {
+            if (!body.length && !getImageUrl(section.image, 100)) return null
+            const photoRight = section.imageSide === 'right'
+            return (
+              <div
+                key={key}
+                className="grid items-center gap-8 md:grid-cols-2 md:gap-12"
+              >
+                <div className={photoRight ? 'md:order-2' : undefined}>
+                  <AboutSideImage image={section.image} locale={locale} />
+                </div>
+                <div className={photoRight ? 'md:order-1' : undefined}>
+                  <PortableBody
+                    value={body as unknown[]}
+                    locale={locale}
+                    className="w-full max-w-none"
+                  />
+                </div>
+              </div>
+            )
+          }
+
           if (!body.length) return null
           return (
-            <div
-              key={section._key || `about-section-${index}`}
-              className={sectionAlignClass(section.align)}
-            >
+            <div key={key} className={sectionAlignClass(section.align)}>
               <PortableBody value={body as unknown[]} locale={locale} />
             </div>
           )

@@ -126,8 +126,13 @@ export type HomePage = {
 
 export type AboutSection = {
   _key?: string
-  /** Horizontal placement of this section on the page. Defaults to left. */
+  /** stacked (default) or photo beside text */
+  layout?: 'stacked' | 'sideBySide'
+  /** Horizontal placement when stacked. Defaults to left. */
   align?: 'left' | 'center' | 'right'
+  /** Which side the photo sits on in sideBySide layout. */
+  imageSide?: 'left' | 'right'
+  image?: SanityImage
   body?: {
     es?: unknown[]
     en?: unknown[]

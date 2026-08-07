@@ -46,13 +46,15 @@ const components = (locale: Locale): PortableTextComponents => ({
 export function PortableBody({
   value,
   locale,
+  className = 'max-w-2xl',
 }: {
   value?: unknown[]
   locale: Locale
+  className?: string
 }) {
   if (!value?.length) return null
   return (
-    <div className="max-w-2xl">
+    <div className={className}>
       <PortableText value={value} components={components(locale)} />
     </div>
   )
